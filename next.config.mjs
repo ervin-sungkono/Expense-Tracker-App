@@ -17,7 +17,7 @@ const nextConfig = withPWA({
     workboxOptions: {
       disableDevLogs: true,
     },
-    // ... other options you like
+    disable: process.env.NODE_ENV === 'development' ? true : false
 });
 
 export default nextConfig;
