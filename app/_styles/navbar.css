@@ -1,0 +1,39 @@
+.navbar {
+    @apply w-full px-6 fixed bottom-6 left-1/2 -translate-x-1/2 z-fixed;
+}
+
+.navbar-content {
+    @apply max-w-2xl mx-auto px-8 py-5 rounded-2xl bg-white grid grid-cols-5;
+}
+
+.nav-link {
+    @apply flex justify-center;
+}
+
+.nav-link > a {
+    @apply relative text-dark;
+}
+
+.nav-link > .nav-active {
+    @apply text-ocean-blue;
+}
+
+.nav-indicator {
+    @apply hidden absolute -bottom-2 left-1/2 -translate-1/2 w-1 h-1 rounded-full bg-basic-gradient;
+}
+
+.nav-active > .nav-indicator {
+    @apply block;
+}
+
+.nav-fab {
+    @apply relative flex justify-center;
+}
+
+.nav-fab > button {
+    @apply cursor-pointer absolute top-0 -translate-y-9/10 p-3.5 rounded-full bg-basic-gradient text-white z-10;
+}
+
+.nav-fab > button > .glow-effect {
+    @apply absolute w-4/5 h-4/5 -bottom-1.5 left-1/2 -translate-x-1/2 bg-basic-gradient rounded-full blur-xl;
+}
