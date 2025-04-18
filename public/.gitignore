@@ -1,0 +1,6 @@
+precache.*.*.js
+sw.js
+workbox-*.js
+worker-*.js
+swe-worker-*.js
+fallback-*.js
