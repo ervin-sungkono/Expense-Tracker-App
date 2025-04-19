@@ -2,8 +2,8 @@ import withPWA from "@ducanh2912/next-pwa";
 
 /** @type {import('next').NextConfig} */
 const nextConfig = withPWA({
-    cacheOnFrontEndNav: true,
-    aggressiveFrontEndNavCaching: true,
+    cacheOnFrontEndNav: process.env.NODE_ENV !== 'development',
+    aggressiveFrontEndNavCaching: process.env.NODE_ENV !== 'development',
     reloadOnOnline: true,
     swcMinify: true,
     dest: "public",
@@ -17,7 +17,7 @@ const nextConfig = withPWA({
     workboxOptions: {
       disableDevLogs: true,
     },
-    disable: process.env.NODE_ENV === 'development' ? true : false
+    disable: process.env.NODE_ENV === 'development'
 });
 
 export default nextConfig;
