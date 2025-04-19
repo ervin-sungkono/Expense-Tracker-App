@@ -11,18 +11,18 @@
 }
 
 .nav-link > a {
-    @apply relative text-dark;
+    @apply relative text-dark/60 hover:text-ocean-blue transition-opacity duration-300 ease-in-out after:absolute;
 }
 
 .nav-link > .nav-active {
     @apply text-ocean-blue;
 }
 
-.nav-indicator {
-    @apply hidden absolute -bottom-2 left-1/2 -translate-1/2 w-1 h-1 rounded-full bg-basic-gradient;
+.nav-link > a::after {
+    @apply hidden -bottom-2 left-1/2 -translate-1/2 w-1 h-1 rounded-full bg-basic-gradient;
 }
 
-.nav-active > .nav-indicator {
+.nav-link > .nav-active > a::after {
     @apply block;
 }
 
@@ -30,10 +30,14 @@
     @apply relative flex justify-center;
 }
 
-.nav-fab > button {
-    @apply cursor-pointer absolute top-0 -translate-y-9/10 p-3.5 rounded-full bg-basic-gradient text-white z-10;
+.nav-fab button {
+    @apply relative cursor-pointer p-3.5 rounded-full bg-basic-gradient text-white z-fixed transition-transform duration-300 ease-in-out;
 }
 
-.nav-fab > button > .glow-effect {
-    @apply absolute w-4/5 h-4/5 -bottom-1.5 left-1/2 -translate-x-1/2 bg-basic-gradient rounded-full blur-xl;
+.nav-fab > .fab-wrapper {
+    @apply absolute top-0 -translate-y-9/10 before:absolute;
+}
+
+.nav-fab > .fab-wrapper::before {
+    @apply w-4/5 h-4/5 -bottom-1.5 left-1/2 -translate-x-1/2 bg-basic-gradient rounded-full blur-xl;
 }
