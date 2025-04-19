@@ -5,3 +5,7 @@
 @utility bg-basic-gradient {
     @apply bg-linear-to-r from-deep-blue to-ocean-blue;
 }
+
+@utility bg-basic-gradient--hover {
+    @apply bg-linear-to-r from-ocean-blue to-ocean-blue/80;
+}
