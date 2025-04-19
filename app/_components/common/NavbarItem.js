@@ -1,15 +1,14 @@
 import Link from "next/link";
 
-export default function NavbarItem({ item, active }) {
+export default function NavbarItem({ item, active = false }) {
     if (!item) return
     return(
-        <div 
-            key={item.label}  
+        <div  
             className={`nav-link`}
+            aria-label={item.label}
         >
             <Link href={item.url} className={`text-dark${active ? ' nav-active' : ''}`}>
                 {item.icon}
-                <span className="nav-indicator"></span>
             </Link>
         </div>
     )

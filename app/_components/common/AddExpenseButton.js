@@ -1,16 +1,17 @@
-"use client"
+'use client'
 
 export default function AddExpenseButton({ item }) {
     if (!item) return
     return (
         <div 
-            key={item.label}  
             className={`nav-fab`}
+            aria-label={item.label}
         >
-            <button onClick={() => console.log("test")}>
-                {item.icon}
-                <span className="glow-effect"></span>
-            </button>
+            <div className="fab-wrapper">
+                <button onClick={() => console.log("test")}>
+                    {item.icon}
+                </button>
+            </div>
         </div>
     )
 }
