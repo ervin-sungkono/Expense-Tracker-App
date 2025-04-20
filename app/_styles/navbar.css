@@ -35,7 +35,7 @@
 }
 
 .nav-fab > .fab-wrapper {
-    @apply absolute top-0 -translate-y-9/10 before:absolute;
+    @apply absolute top-0 -translate-y-3/4 before:absolute;
 }
 
 .nav-fab > .fab-wrapper::before {
