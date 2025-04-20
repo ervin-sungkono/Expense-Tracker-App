@@ -6,13 +6,7 @@ export async function POST(req) {
 
     let resultToken = null;
     try{
-        const payload = {
-            ...data,
-            iat: Math.floor(Date.now() / 1000),
-            exp: Math.floor(Date.now() / 1000) + (60 * 60) // 1 hour
-        }
-
-        resultToken = sign(JSON.stringify(payload), process.env.JWT_SECRET);
+        resultToken = sign(JSON.stringify(data), process.env.JWT_SECRET);
     } catch(e) {
         console.log(e);
         return NextResponse.json({ data: 'Something went wrong' }, { status: 500 });
