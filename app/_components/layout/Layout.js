@@ -1,4 +1,4 @@
-import Navbar from "../common/Navbar";
+import Navbar from "../common/navbar/Navbar";
 import { NAV_ITEMS } from "@/app/_lib/const";
 
 export default function Layout({ children, hideNavbar = false, pathname }) {
