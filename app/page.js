@@ -1,11 +1,21 @@
+'use client'
 import Layout from "./_components/layout/Layout";
 import AppLogo from "./_components/common/AppLogo";
 import SplashImage from "./_components/onboarding/SplashImage";
 import TextContent from "./_components/common/TextContent";
-import Button from "./_components/common/Button";
 import LinkButton from "./_components/common/LinkButton";
+import { useEffect } from "react";
+import { useLocalStorage } from "./_lib/hooks";
+import { useRouter } from "next/navigation";
 
 export default function Onboarding() {
+    const [username, _] = useLocalStorage('username');
+    const router = useRouter();
+
+    useEffect(() => {
+      if (username) router.replace('/home');
+    }, [username]);
+
     return (
         <Layout pathname="/" hideNavbar>
             <AppLogo position="center" className="mb-12"/>
