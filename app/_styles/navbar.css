@@ -31,7 +31,7 @@
 }
 
 .nav-fab button {
-    @apply relative cursor-pointer p-3.5 rounded-full bg-basic-gradient text-white z-fixed transition-transform duration-300 ease-in-out;
+    @apply relative cursor-pointer p-3.5 rounded-full bg-basic-gradient text-white z-fixed transition-transform duration-150 ease-in-out hover:scale-105 active:scale-95;
 }
 
 .nav-fab > .fab-wrapper {
@@ -39,5 +39,5 @@
 }
 
 .nav-fab > .fab-wrapper::before {
-    @apply w-4/5 h-4/5 -bottom-1.5 left-1/2 -translate-x-1/2 bg-basic-gradient rounded-full blur-xl;
+    @apply w-4/5 h-4/5 -bottom-1.5 left-1/2 -translate-x-1/2 bg-basic-gradient rounded-full blur-xl opacity-80;
 }
