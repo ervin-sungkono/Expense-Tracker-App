@@ -12,6 +12,38 @@ class ExpenseDB extends Dexie {
             categories: '++id, name',
             shops: '++id, name, image, min_price, max_price, location'
         });
+
+        this.on('storagemutated', (e) => {
+            console.log('mutated', e);
+        })
+    }
+
+    addExpense({date, amount, categoryId, shopId}) {
+        return this.expenses.add({ date, amount, categoryId, shopId });
+    }
+
+    addCategory({name}) {
+        return this.categories.add({ name });
+    }
+
+    addShop({name, image, min_price, max_price, location}) {
+        return this.shops.add({ name, image, min_price, max_price, location });
+    }
+
+    updateExpense(expenseId, {date, amount, categoryId, shopId}) {
+        return this.expenses.update(expenseId, {date, amount, categoryId, shopId});
+    }
+
+    updateCategory(categoryId, { name }) {
+        return this.categories.update(categoryId, {name});
+    }
+
+    updateShop(shopId, {name, image, min_price, max_price, location}) {
+        return this.shops.update(shopId, {name, image, min_price, max_price, location});
+    }
+
+    deleteExpense(expenseId) {
+        this.categories.delete(expenseId);
     }
 
     deleteCategory(categoryId) {
