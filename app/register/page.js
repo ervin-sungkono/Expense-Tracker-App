@@ -4,12 +4,29 @@ import TextContent from "../_components/common/TextContent";
 import Button from "../_components/common/Button";
 import InputField from "../_components/common/InputField";
 import { createRef, useEffect } from "react";
+import { useLocalStorage } from "../_lib/hooks";
+import { useRouter } from "next/navigation";
 
 export default function Register() {
+    const [username, setUsername] = useLocalStorage('username');
     const inputRef = createRef();
+    const router = useRouter
+
     useEffect(() => {
-        console.log(inputRef.current);
-    }, [inputRef])
+        if (username) router.replace('/home');
+    }, [username]);
+
+    const registerUser = () => {
+        const input = inputRef.current
+        if(!input) return;
+
+        if (input.value.length === 0) {
+            return alert('Name cannot be empty');
+        }
+
+        alert('Registration success');
+        setUsername(input.value);
+    }
 
     return(
         <Layout pathname={'/register'} hideNavbar>
@@ -29,6 +46,7 @@ export default function Register() {
             <Button 
                 label="Let's Go" 
                 className="absolute bottom-8 left-0 px-14"
+                onClick={registerUser}
             />
         </Layout>
     )
