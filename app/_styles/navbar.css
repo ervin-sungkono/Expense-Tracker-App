@@ -1,5 +1,5 @@
 .navbar {
-    @apply w-full px-6 fixed bottom-6 left-1/2 -translate-x-1/2 z-fixed;
+    @apply w-full px-6 fixed bottom-6 left-0 z-fixed;
 }
 
 .navbar-content {
@@ -30,7 +30,7 @@
     @apply relative flex justify-center;
 }
 
-.nav-fab button {
+.nav-fab .fab-button {
     @apply relative cursor-pointer p-3.5 rounded-full bg-basic-gradient text-white z-fixed transition-transform duration-150 ease-in-out hover:scale-105 active:scale-95;
 }
 
