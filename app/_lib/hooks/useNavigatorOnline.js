@@ -5,7 +5,7 @@ const getOnLineStatus = () =>
       ? navigator.onLine
       : true;
   
-export const useNavigatorOnLine = () => {
+const useNavigatorOnLine = () => {
     const [status, setStatus] = useState(getOnLineStatus());
   
     const setOnline = () => setStatus(true);
@@ -23,3 +23,5 @@ export const useNavigatorOnLine = () => {
   
     return { isOnline: status };
 };
+
+export default useNavigatorOnLine;
