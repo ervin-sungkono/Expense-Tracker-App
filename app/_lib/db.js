@@ -12,10 +12,18 @@ class ExpenseDB extends Dexie {
             categories: '++id, name',
             shops: '++id, name, image, min_price, max_price, location'
         });
+    }
 
-        this.on('storagemutated', (e) => {
-            console.log('mutated', e);
-        })
+    getAllExpenses() {
+        return this.expenses.toArray();
+    }
+
+    getAllCategories() {
+        return this.categories.toArray();
+    }
+
+    getAllShops() {
+        return this.shops.toArray();
     }
 
     addExpense({date, amount, categoryId, shopId}) {
@@ -66,6 +74,23 @@ async function populate() {
         { name: "Food" },
         { name: "Transportation" },
         { name: "Entertainment" }
+    ]);
+
+    await db.shops.bulkAdd([
+        {
+            name: 'Warung Bu Mila',
+            image: 'https://picsum.photos/seed/picsum/200/300',
+            min_price: 20000,
+            max_price: 25000,
+            location: 'Senayan'
+        },
+        {
+            name: 'Nasi Goreng',
+            image: 'https://picsum.photos/seed/picsum/200/300',
+            min_price: 20000,
+            max_price: 25000,
+            location: 'Senayan'
+        }
     ])
 }
 
