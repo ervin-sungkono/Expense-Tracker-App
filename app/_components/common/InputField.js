@@ -3,7 +3,7 @@
 import { useState } from "react"
 
 export default function InputField({ name, required = false, label, type, placeholder, defaultValue, errorMessage = '', ref = null }) {
-    const [value, setValue] = useState("")
+    const [value, setValue] = useState(defaultValue)
     
     return(
         <div className="flex flex-col gap-2">
@@ -16,7 +16,6 @@ export default function InputField({ name, required = false, label, type, placeh
                     ref={ref}
                     id={name}
                     type={type}
-                    defaultValue={defaultValue}
                     value={value}
                     onInput={(e) => setValue(e.target.value)}
                     placeholder={placeholder}
