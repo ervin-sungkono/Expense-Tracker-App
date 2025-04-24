@@ -7,14 +7,15 @@ export default function InputField({ name, required = false, label, type, placeh
     
     return(
         <div className="flex flex-col gap-2">
-            <label htmlFor={name} className="block font-semibold text-xs md:text-sm text-dark-blue">
+            <label htmlFor={`id-${name}`} className="block font-semibold text-xs md:text-sm text-dark-blue">
                 {label}
                 {required && <span className="text-red-600">*</span>}
             </label>
             <div className="flex flex-col gap-1">
                 <input 
                     ref={ref}
-                    id={name}
+                    id={`id-${name}`}
+                    name={name}
                     type={type}
                     value={value}
                     onInput={(e) => setValue(e.target.value)}
