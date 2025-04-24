@@ -45,7 +45,7 @@ export default function SelectField({ label, name, required = false, _selected, 
                     </div>
                 </>}
             </div>
-            {errorMessage && <p className="text-xs md:text-sm text-red-600 dark:text-red-400">{errorMessage}</p>}
+            {errorMessage && <p className="text-[10.8px] md:text-xs text-red-600 dark:text-red-400">{errorMessage}</p>}
         </div>
     )
 }
