@@ -8,7 +8,7 @@ class ExpenseDB extends Dexie {
         super(DB_NAME);
 
         this.version(DB_VERSION).stores({
-            expenses: '++id, date, amount, categoryId, shopId',
+            expenses: '++id, date, amount, categoryId, shopId, remarks',
             categories: '++id, name',
             shops: '++id, name, image, min_price, max_price, location'
         });
@@ -26,8 +26,8 @@ class ExpenseDB extends Dexie {
         return this.shops.toArray();
     }
 
-    addExpense({date, amount, categoryId, shopId}) {
-        return this.expenses.add({ date, amount, categoryId, shopId });
+    addExpense({date, amount, categoryId, shopId, remarks}) {
+        return this.expenses.add({ date, amount, categoryId, shopId, remarks });
     }
 
     addCategory({name}) {
