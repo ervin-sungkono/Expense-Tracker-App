@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 
-export default function InputField({ name, required = false, label, type, placeholder, defaultValue, errorMessage = '', ref = null }) {
+export default function InputField({ name, required = false, label, type, placeholder, defaultValue = '', errorMessage = '', ref = null }) {
     const [value, setValue] = useState(defaultValue)
     
     return(
