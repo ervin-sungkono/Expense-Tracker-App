@@ -1,6 +1,10 @@
 'use client'
+import { useState } from "react";
+import AddExpenseDialog from "../AddExpenseDialog";
 
 export default function AddExpenseButton({ item }) {
+    const [showDialog, setShowDialog] = useState(false);
+
     if (!item) return
     return (
         <div 
@@ -8,10 +12,11 @@ export default function AddExpenseButton({ item }) {
             aria-label={item.label}
         >
             <div className="fab-wrapper">
-                <button onClick={() => console.log("test")}>
+                <button className="fab-button" onClick={() =>setShowDialog(true) }>
                     {item.icon}
                 </button>
             </div>
+            <AddExpenseDialog show={showDialog} hideFn={() => setShowDialog(false)}/>
         </div>
     )
 }
