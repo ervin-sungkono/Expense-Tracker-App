@@ -3,27 +3,37 @@ import Layout from "../_components/layout/Layout";
 import TextContent from "../_components/common/TextContent";
 import Button from "../_components/common/Button";
 import InputField from "../_components/common/InputField";
-import { createRef, useEffect } from "react";
+import { createRef, useEffect, useState } from "react";
 import { useLocalStorage } from "../_lib/hooks";
 import { useRouter } from "next/navigation";
 
 export default function Register() {
     const [username, setUsername] = useLocalStorage('username');
+    const [errorMessage, setErrorMessage] = useState(null);
     const inputRef = createRef();
-    const router = useRouter
+    const router = useRouter();
 
     useEffect(() => {
-        if (username) router.replace('/home');
-    }, [username]);
+        if (username && router) router.replace('/home');
+    }, [username, router]);
 
     const registerUser = () => {
         const input = inputRef.current
         if(!input) return;
 
+        let error = null;
         if (input.value.length === 0) {
-            return alert('Name cannot be empty');
+            error = 'Name cannot be empty!';
+        } else if (input.value.length > 30) {
+            error = 'Name cannot be longer than 30 characters!';
         }
 
+        if (error) {
+            setErrorMessage(error);
+            return;
+        }
+
+        // TODO: replace alert with dialog
         alert('Registration success');
         setUsername(input.value);
     }
@@ -41,6 +51,7 @@ export default function Register() {
                     label={"Your Name"}
                     required
                     placeholder={"Enter your name"}
+                    errorMessage={errorMessage}
                 />
             </div>
             <Button 
