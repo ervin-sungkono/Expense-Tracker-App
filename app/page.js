@@ -13,8 +13,8 @@ export default function Onboarding() {
     const router = useRouter();
 
     useEffect(() => {
-      if (username) router.replace('/home');
-    }, [username]);
+      if(username && router) router.replace('/home');
+    }, [username, router]);
 
     return (
         <Layout pathname="/" hideNavbar>
