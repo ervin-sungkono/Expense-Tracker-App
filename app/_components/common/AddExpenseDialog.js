@@ -4,23 +4,73 @@ import InputField from "./InputField";
 import SelectField from "./SelectField";
 import { db } from "@/app/_lib/db";
 import { useLiveQuery } from "dexie-react-hooks";
+import { useState } from "react";
 import Button from "./Button";
 
 export default function AddExpenseDialog({ show, hideFn }) {
     const categories = useLiveQuery(() => db.getAllCategories());
     const shops = useLiveQuery(() => db.getAllShops());
+    const [errorMessage, setErrorMessage] = useState({});
+
+    const validateDate = (date) => {
+        if (!date || isNaN(new Date(date))) {
+            return 'Date must be valid date!';
+        }
+    }
+
+    const validateAmount = (amount) => {
+        if(!amount) {
+            return 'Amount must be filled.';
+        } else if(amount <= 0) {
+            return 'Amount must be more than 0.';
+        }
+    }
+
+    const validateCategory = (categoryId) => {
+        if(!categoryId) {
+            return 'Category must be filled.';
+        }
+    }
+
+    const validateRemarks = (remarks) => {
+        if(remarks && remarks.length > 120) {
+            return 'Remarks cannot be more than 120 characters.';
+        }
+    }
 
     const handleSubmit = (e) => {
         e.preventDefault();
 
-        const formData = new FormData(e.target);
-        const payload = {}
+        const form = e.target;
+        const formData = new FormData(form);
 
+        // Create payload for add expense
+        const payload = {}
         for(const [key, value] of formData.entries()) {
             payload[key] = value;
         }
 
-        db.addExpense(payload);
+        try{
+            let error = {};
+            const { date, amount, categoryId, remarks } = payload;
+
+            error.date = validateDate(date);
+            error.amount = validateAmount(amount);
+            error.categoryId = validateCategory(categoryId);
+            error.remarks = validateRemarks(remarks);
+
+            setErrorMessage(error);
+            if(Object.values(error).filter(Boolean).length > 0) {
+                return;
+            }
+
+            db.addExpense(payload);
+            form.reset();
+            hideFn();
+        } catch(e) {
+            console.log(e);
+            return;
+        }
     }
 
     return (
@@ -30,48 +80,54 @@ export default function AddExpenseDialog({ show, hideFn }) {
         >
             <div className="flex flex-col gap-4">
                 <div className="text-xl font-bold">Add Expense</div>
-                <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-                    <InputField 
-                        required
-                        name={"date"} 
-                        label={"Date"} 
-                        placeholder={"Enter expense date"} 
-                        type={"date"}
-                        defaultValue={new Date().toISOString().split('T')[0]}
-                    />
-                    <InputField 
-                        required
-                        name={"amount"} 
-                        label={"Amount"} 
-                        placeholder={"Enter amount"}
-                        type={"number"}
-                    />
-                    <SelectField
-                        required
-                        label={"Category"}
-                        name="category"
-                        _options={categories?.map(category => ({
-                            id: category.id,
-                            label: category.name
-                        }))}
-                        placeholder={"--Select Category--"}
-                    />
-                    <SelectField
-                        label={"Shop"}
-                        name="shop"
-                        _options={shops?.map(shop => ({
-                            id: shop.id,
-                            label: shop.name
-                        }))}
-                        placeholder={"--Select Shop--"}
-                    />
-                    <InputField
-                        name={"remarks"} 
-                        label={"Remarks"} 
-                        placeholder={"Enter remarks"}
-                        type={"text"}
-                    />
-                    <Button className="mt-2" type="submit" label={"Add Expense"}/>
+                <form onSubmit={handleSubmit}>
+                    <div className="flex flex-col gap-4 mb-6">
+                        <InputField 
+                            required
+                            name={"date"} 
+                            label={"Date"} 
+                            placeholder={"Enter expense date"} 
+                            type={"date"}
+                            defaultValue={new Date().toISOString().split('T')[0]}
+                            errorMessage={errorMessage?.date}
+                        />
+                        <InputField 
+                            required
+                            name={"amount"} 
+                            label={"Amount"} 
+                            placeholder={"Enter amount"}
+                            type={"number"}
+                            errorMessage={errorMessage?.amount}
+                        />
+                        <SelectField
+                            required
+                            label={"Category"}
+                            name="categoryId"
+                            _options={categories?.map(category => ({
+                                id: category.id,
+                                label: category.name
+                            }))}
+                            placeholder={"--Select Category--"}
+                            errorMessage={errorMessage?.categoryId}
+                        />
+                        <SelectField
+                            label={"Shop"}
+                            name="shopId"
+                            _options={shops?.map(shop => ({
+                                id: shop.id,
+                                label: shop.name
+                            }))}
+                            placeholder={"--Select Shop--"}
+                        />
+                        <InputField
+                            name={"remarks"} 
+                            label={"Remarks"} 
+                            placeholder={"Enter remarks"}
+                            type={"text"}
+                            errorMessage={errorMessage?.remarks}
+                        />
+                    </div>
+                    <Button type="submit" label={"Add Expense"}/>
                 </form>
             </div>
         </Dialog>
