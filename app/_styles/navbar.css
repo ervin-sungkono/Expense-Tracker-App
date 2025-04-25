@@ -27,7 +27,7 @@
 }
 
 .nav-fab {
-    @apply relative flex justify-center;
+    @apply relative flex justify-center z-fixed;
 }
 
 .nav-fab .fab-button {
