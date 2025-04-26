@@ -13,9 +13,9 @@ import { generateRangeOptions } from "@/app/_lib/utils";
 export default function ExpenseData() {
     const expenses = useLiveQuery(() => db.getAllExpenses());
 
-    const [selectedDate, setSelectedDate] = useState(null);
-    const [selectedMonth, setSelectedMonth] = useState(null);
-    const [selectedYear, setSelectedYear] = useState(null);
+    const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
+    const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth());
+    const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
 
     const [dailyExpense, setDailyExpense] = useState([]);
     const [monthlyExpense, setMonthlyExpense] = useState([]);
@@ -64,23 +64,11 @@ export default function ExpenseData() {
 
     useEffect(() => {
         if(expenses) {
-            setDailyExpense(filterExpenseByDate(selectedDate));
-            setMonthlyExpense(filterExpenseByMonth(selectedMonth));
-            setAnnualExpense(filterExpenseByYear(selectedYear));
+            if(selectedDate) setDailyExpense(filterExpenseByDate(selectedDate));
+            if(selectedMonth) setMonthlyExpense(filterExpenseByMonth(selectedMonth));
+            if(selectedYear) setAnnualExpense(filterExpenseByYear(selectedYear));
         }
-    }, [expenses])
-
-    useEffect(() => {
-        if(selectedDate) setDailyExpense(filterExpenseByDate(selectedDate));
-    }, [selectedDate])
-
-    useEffect(() => {
-        if(selectedMonth) setMonthlyExpense(filterExpenseByMonth(selectedMonth));
-    }, [selectedMonth])
-
-    useEffect(() => {
-        if(selectedYear) setAnnualExpense(filterExpenseByYear(selectedYear));
-    }, [selectedYear])
+    }, [expenses, selectedDate, selectedMonth, selectedYear])
 
     const contents = [
         {
@@ -103,7 +91,8 @@ export default function ExpenseData() {
             header: () => (
                 <div className="px-3">
                     <SelectField 
-                        _selected={{id: selectedMonth, label: MONTHS[selectedMonth]}} 
+                        name={"month"}
+                        _selected={{id: selectedMonth, label: MONTHS[selectedMonth]}}
                         _options={MONTHS.map((month, index) => ({
                             id: index,
                             label: month
@@ -120,8 +109,9 @@ export default function ExpenseData() {
             header: () => (
                 <div className="px-3">
                     <SelectField 
-                        _selected={{id: selectedYear, label: selectedYear}} 
-                        _options={generateRangeOptions(1900, 2100).map(year => ({
+                        name={"year"}
+                        _selected={{id: selectedYear, label: selectedYear}}
+                        _options={generateRangeOptions(1980, 2100).map(year => ({
                             id: year,
                             label: year
                         }))}
@@ -136,9 +126,7 @@ export default function ExpenseData() {
     return(
         <div>
             <SubHeader title="My Expense" link="/expenses"/>
-            <Tab selected={'daily'} contents={contents}>
-                
-            </Tab>
+            <Tab selected={'daily'} contents={contents}/>
         </div>
     )
 }
