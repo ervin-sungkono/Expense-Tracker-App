@@ -1,10 +1,17 @@
 'use client'
-import { useState } from "react"
+import { useEffect, useRef, useState } from "react"
 
 export default function SelectField({ label, name, required = false, _selected, placeholder, _options = [], errorMessage, onChange }){
     const [options, _] = useState(_options);
     const [selected, setSelected] = useState(_selected);
     const [showOption, setShowOption] = useState(false);
+    const dropdownRef = useRef();
+
+    useEffect(() => {
+        if(dropdownRef?.current && showOption && selected?.id) {
+            dropdownRef.current.querySelector(`#${name}-${selected.id}`).scrollIntoView({ block: 'center' });
+        }
+    }, [showOption, dropdownRef, selected])
     
     return(
         <div className="flex flex-col gap-2">
@@ -28,14 +35,14 @@ export default function SelectField({ label, name, required = false, _selected, 
                 >
                     {selected ? selected.label : placeholder}
                 </div>
-                {showOption && 
-                <>
+                <div className={`${showOption ? 'block' : 'hidden'}`}>
                     <div className="fixed top-0 left-0 w-full h-full bg-transparent z-10" onClick={() => setShowOption(false)}></div>
-                    <div className="min-w-40 max-w-72 max-h-96 overflow-y-auto absolute left-0 -bottom-2 translate-y-full bg-white dark:bg-neutral-600 py-2 rounded-md z-50">
+                    <div ref={dropdownRef} className="min-w-40 max-w-72 max-h-96 overflow-y-auto absolute left-0 -bottom-2 translate-y-full bg-white dark:bg-neutral-600 py-2 rounded-md z-50">
                         {options.map(option => (
                             <div 
+                                id={`${name}-${option.id}`}
                                 key={option.id}
-                                className="cursor-pointer w-full line-clamp-1 wrap-anywhere px-4 py-1.5 hover:bg-neutral-200 hover:dark:bg-neutral-500 text-base md:text-sm"
+                                className={`cursor-pointer w-full line-clamp-1 wrap-anywhere px-4 py-1.5 ${selected.id === option.id ? 'bg-neutral-200 dark:bg-neutral-500' : 'hover:bg-neutral-200 hover:dark:bg-neutral-500'} text-base md:text-sm`}
                                 onClick={() => {
                                     setSelected(option);
                                     setShowOption(false);
@@ -45,7 +52,7 @@ export default function SelectField({ label, name, required = false, _selected, 
                             </div>
                         ))}
                     </div>
-                </>}
+                </div>
             </div>
             {errorMessage && <p className="text-[10.8px] md:text-xs text-red-600 dark:text-red-400">{errorMessage}</p>}
         </div>
