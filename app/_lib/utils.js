@@ -33,3 +33,17 @@ export function extractText(text) {
 
     return result;
 }
+
+function selectColor(number) {
+    const hue = number * 137.508; // use golden angle approximation
+    return `hsl(${hue},70%,75%)`;
+}
+
+export function generateRandomDistinctColors(amount) {
+    const res = [];
+    for(let i = 1; i <= amount; i++) {
+        res.push(selectColor(i));
+    }
+
+    return res;
+}

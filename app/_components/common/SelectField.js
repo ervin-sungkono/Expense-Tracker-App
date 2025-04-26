@@ -1,7 +1,7 @@
 'use client'
 import { useState } from "react"
 
-export default function SelectField({ label, name, required = false, _selected, placeholder, _options = [], errorMessage }){
+export default function SelectField({ label, name, required = false, _selected, placeholder, _options = [], errorMessage, onChange }){
     const [options, _] = useState(_options);
     const [selected, setSelected] = useState(_selected);
     const [showOption, setShowOption] = useState(false);
@@ -18,6 +18,8 @@ export default function SelectField({ label, name, required = false, _selected, 
                     type="text"
                     value={selected?.id}
                     className={`hidden`}
+                    onChange={onChange}
+                    readOnly
                 />
                 <div 
                     id={`id-${name}`}
@@ -29,11 +31,11 @@ export default function SelectField({ label, name, required = false, _selected, 
                 {showOption && 
                 <>
                     <div className="fixed top-0 left-0 w-full h-full bg-transparent z-10" onClick={() => setShowOption(false)}></div>
-                    <div className="min-w-40 max-w-72 absolute left-0 -bottom-2 translate-y-full bg-white dark:bg-neutral-600 py-2 rounded-md z-50">
+                    <div className="min-w-40 max-w-72 max-h-96 overflow-y-auto absolute left-0 -bottom-2 translate-y-full bg-white dark:bg-neutral-600 py-2 rounded-md z-50">
                         {options.map(option => (
                             <div 
                                 key={option.id}
-                                className="w-full line-clamp-1 wrap-anywhere px-4 py-1.5 hover:bg-neutral-200 hover:dark:bg-neutral-500 text-base md:text-sm"
+                                className="cursor-pointer w-full line-clamp-1 wrap-anywhere px-4 py-1.5 hover:bg-neutral-200 hover:dark:bg-neutral-500 text-base md:text-sm"
                                 onClick={() => {
                                     setSelected(option);
                                     setShowOption(false);
