@@ -3,14 +3,14 @@ import Layout from "../_components/layout/Layout";
 import TextContent from "../_components/common/TextContent";
 import Button from "../_components/common/Button";
 import InputField from "../_components/common/InputField";
-import { createRef, useEffect, useState } from "react";
+import { useRef, useEffect, useState } from "react";
 import { useLocalStorage } from "../_lib/hooks";
 import { useRouter } from "next/navigation";
 
 export default function Register() {
     const [username, setUsername] = useLocalStorage('username');
     const [errorMessage, setErrorMessage] = useState(null);
-    const inputRef = createRef();
+    const inputRef = useRef();
     const router = useRouter();
 
     useEffect(() => {
