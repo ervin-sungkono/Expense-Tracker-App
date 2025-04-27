@@ -25,7 +25,6 @@ export default function SelectField({ label, name, required = false, _selected, 
                     type="text"
                     value={selected?.id}
                     className={`hidden`}
-                    onChange={onChange}
                     readOnly
                 />
                 <div 
@@ -46,6 +45,7 @@ export default function SelectField({ label, name, required = false, _selected, 
                                 onClick={() => {
                                     setSelected(option);
                                     setShowOption(false);
+                                    onChange(option.id)
                                 }}
                             >
                                 {option.label}

@@ -63,12 +63,22 @@ export default function ExpenseData() {
     }
 
     useEffect(() => {
-        if(expenses) {
-            if(selectedDate) setDailyExpense(filterExpenseByDate(selectedDate));
-            if(selectedMonth) setMonthlyExpense(filterExpenseByMonth(selectedMonth));
-            if(selectedYear) setAnnualExpense(filterExpenseByYear(selectedYear));
+        if(expenses && selectedDate) {
+            setDailyExpense(filterExpenseByDate(selectedDate));
         }
-    }, [expenses, selectedDate, selectedMonth, selectedYear])
+    }, [expenses, selectedDate])
+
+    useEffect(() => {
+        if(expenses && selectedMonth) {
+            setMonthlyExpense(filterExpenseByMonth(selectedMonth));
+        }
+    }, [expenses, selectedMonth])
+
+    useEffect(() => {
+        if(expenses && selectedYear) {
+            setAnnualExpense(filterExpenseByYear(selectedYear));
+        }
+    }, [expenses, selectedYear])
 
     const contents = [
         {
@@ -97,7 +107,7 @@ export default function ExpenseData() {
                             id: index,
                             label: month
                         }))} 
-                        onChange={(e) => setSelectedMonth(e.target.value)}
+                        onChange={(val) => setSelectedMonth(val)}
                     />
                 </div>
             ),
@@ -115,7 +125,7 @@ export default function ExpenseData() {
                             id: year,
                             label: year
                         }))}
-                        onChange={(e) => setSelectedYear(e.target.value)}
+                        onChange={(val) => setSelectedYear(val)}
                     />
                 </div>
             ),
