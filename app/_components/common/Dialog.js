@@ -6,9 +6,14 @@ export default function Dialog({ children, show = false, hideFn = null }) {
     const [hidden, setHidden] = useState(true);
 
     useEffect(() => {
-        if(!show) setTimeout(() => setHidden(true), 500);
-        else setHidden(false);
-    }, [show])
+        let hide = null;
+        if(!show && !hidden) hide = setTimeout(() => setHidden(true), 500);
+        else if(show && hidden) {
+            setHidden(false)
+        }
+
+        return () => clearTimeout(hide)
+    }, [show, hidden])
 
     if(!hidden)
     return(
