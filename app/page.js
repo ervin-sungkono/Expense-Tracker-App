@@ -4,18 +4,21 @@ import AppLogo from "./_components/common/AppLogo";
 import SplashImage from "./_components/onboarding/SplashImage";
 import TextContent from "./_components/common/TextContent";
 import LinkButton from "./_components/common/LinkButton";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useLocalStorage } from "./_lib/hooks";
 import { useRouter } from "next/navigation";
 
 export default function Onboarding() {
     const [username, _] = useLocalStorage('username');
+    const [loaded, setLoaded] = useState(false);
     const router = useRouter();
 
     useEffect(() => {
       if(username && router) router.replace('/home');
+      else setLoaded(true);
     }, [username, router]);
 
+    if(!loaded)
     return (
         <Layout pathname="/" hideNavbar>
             <AppLogo position="center" className="mb-12"/>
