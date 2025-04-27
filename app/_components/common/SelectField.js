@@ -42,7 +42,7 @@ export default function SelectField({ label, name, required = false, _selected, 
                             <div 
                                 id={`${name}-${option.id}`}
                                 key={option.id}
-                                className={`cursor-pointer w-full line-clamp-1 wrap-anywhere px-4 py-1.5 ${selected.id === option.id ? 'bg-neutral-200 dark:bg-neutral-500' : 'hover:bg-neutral-200 hover:dark:bg-neutral-500'} text-base md:text-sm`}
+                                className={`cursor-pointer w-full line-clamp-1 wrap-anywhere px-4 py-1.5 ${(selected && selected.id === option.id) ? 'bg-neutral-200 dark:bg-neutral-500' : 'hover:bg-neutral-200 hover:dark:bg-neutral-500'} text-base md:text-sm`}
                                 onClick={() => {
                                     setSelected(option);
                                     setShowOption(false);
