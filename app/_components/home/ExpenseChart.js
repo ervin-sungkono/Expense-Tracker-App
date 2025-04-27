@@ -10,7 +10,6 @@ ChartJS.defaults.font.family = "'Inter', sans-serif"
 ChartJS.defaults.font.size = 14;
 ChartJS.defaults.font.style = 'normal';
 ChartJS.defaults.font.weight = 700;
-ChartJS.defaults.animation = false;
 ChartJS.register(ArcElement, Tooltip, Legend);
 
 export default function ExpenseChart({ expenseData = [] }) {
