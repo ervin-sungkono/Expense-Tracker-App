@@ -10,15 +10,12 @@ import { useRouter } from "next/navigation";
 
 export default function Onboarding() {
     const [username, _] = useLocalStorage('username');
-    const [loaded, setLoaded] = useState(false);
     const router = useRouter();
 
     useEffect(() => {
       if(username && router) router.replace('/home');
-      else setLoaded(true);
     }, [username, router]);
 
-    if(!loaded)
     return (
         <Layout pathname="/" hideNavbar>
             <AppLogo position="center" className="mb-12"/>
