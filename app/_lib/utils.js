@@ -56,3 +56,9 @@ export function generateRangeOptions(start, end) {
 
     return range;
 }
+
+
+export function formatCurrency(value, locale = 'id-ID', currency = 'IDR') {
+    const formatter = new Intl.NumberFormat(locale, { style: 'currency', currency, minimumFractionDigits: 0 });
+    return formatter.format(value);
+}
