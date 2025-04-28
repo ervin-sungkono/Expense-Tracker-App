@@ -134,7 +134,7 @@ export default function ExpenseData() {
     ]
 
     return(
-        <div>
+        <div className="mb-4">
             <SubHeader title="My Expense" link="/expenses"/>
             <Tab selected={'daily'} contents={contents}/>
         </div>
