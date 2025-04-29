@@ -45,10 +45,10 @@ export default function CategoriesCarousel() {
 
     return(
         <div className="mb-4">
-            <SubHeader title="Expense Categories" description={"based on this month's expense"} link="/categories"/>
+            <SubHeader title="Categories" description={"based on this month's expense"} link="/categories"/>
             <SwiperContainer 
                 spaceBetween={12}
-                slidesPerView={1.75}
+                slidesPerView={1.8}
                 items={categoryData?.sort((a,b) => b.totalExpense - a.totalExpense).map(category => ({
                     id: category.name,
                     component: <CategoryCard {...category}/>

@@ -4,7 +4,7 @@ import Link from "next/link";
 
 export default function CategoryCard({ name, totalExpense, slug = '' }) {
     return(
-        <Link href={slug} className="h-32 flex flex-col items-end px-4 py-3 bg-basic-gradient hover:bg-basic-gradient--hover transition-colors duration-300 ease-in-out rounded-lg">
+        <Link href={slug} className="h-28 flex flex-col items-end px-4 py-3 bg-basic-gradient hover:bg-basic-gradient--hover transition-colors duration-300 ease-in-out rounded-lg">
             <div className="w-full flex flex-col gap-0.5">
                 <p className="text-base md:text-lg font-semibold">{name}</p>
                 <p className="text-sm">{formatCurrency(totalExpense)} spent</p>
