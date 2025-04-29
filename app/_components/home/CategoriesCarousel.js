@@ -33,10 +33,8 @@ export default function CategoriesCarousel() {
                 groupCategory[categories[i].name] = 0;
             }
 
-            let sumExpenseAmount = 0;
             for(let i = 0; i < filteredExpenses.length; i++) {
                 if(filteredExpenses[i].categoryId) groupCategory[categoriesMap[filteredExpenses[i].categoryId]] += filteredExpenses[i].amount;
-                sumExpenseAmount += filteredExpenses[i].amount;
             }
 
             setCategoryData(Object.entries(groupCategory).map(([key, value]) => ({ name: key, totalExpense: value })));
@@ -51,7 +49,7 @@ export default function CategoriesCarousel() {
                 slidesPerView={1.8}
                 items={categoryData?.sort((a,b) => b.totalExpense - a.totalExpense).map(category => ({
                     id: category.name,
-                    component: <CategoryCard {...category}/>
+                    component: <CategoryCard {...category} slug={`/expenses?category=${encodeURIComponent(category.name)}`}/>
                 }))}
             />
         </div>
