@@ -11,7 +11,14 @@ export default function SwiperContainer({ spaceBetween = 0, slidesPerView = 1, i
             slidesPerView={slidesPerView}
             freeMode={true}
             modules={[FreeMode]}
+            breakpoints={{
+                640: {
+                    slidesPerView: slidesPerView * 1.2,
+                    spaceBetween: spaceBetween * 1.5
+                }
+            }}
             className="swiper"
+            style={{ overflow: 'visible' }}
         >
             {items.map(item => (
                 <SwiperSlide key={item.id}>{item.component}</SwiperSlide>
