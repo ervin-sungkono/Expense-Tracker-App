@@ -2,6 +2,7 @@
 import Dialog from "./Dialog";
 import InputField from "./InputField";
 import SelectField from "./SelectField";
+import TextField from "./TextField";
 import { db } from "@/app/_lib/db";
 import { useLiveQuery } from "dexie-react-hooks";
 import { useState } from "react";
@@ -34,7 +35,7 @@ export default function AddExpenseDialog({ show, hideFn }) {
 
     const validateRemarks = (remarks) => {
         if(remarks && remarks.length > 120) {
-            return 'Remarks cannot be more than 120 characters.';
+            return 'Notes cannot be more than 120 characters.';
         }
     }
 
@@ -119,11 +120,12 @@ export default function AddExpenseDialog({ show, hideFn }) {
                             }))}
                             placeholder={"--Select Shop--"}
                         />
-                        <InputField
+                        <TextField
                             name={"remarks"} 
-                            label={"Remarks"} 
-                            placeholder={"Enter remarks"}
-                            type={"text"}
+                            label={"Notes (max 120 characters)"} 
+                            placeholder={"Enter notes"}
+                            rows={4}
+                            maxLength={120}
                             errorMessage={errorMessage?.remarks}
                         />
                     </div>
