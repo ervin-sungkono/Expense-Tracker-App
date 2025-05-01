@@ -48,7 +48,8 @@ export default function Register() {
                 <InputField
                     ref={inputRef}
                     name={"username"}
-                    label={"Your Name"}
+                    label={"Your Name (max 30 characters)"}
+                    maxLength={30}
                     required
                     placeholder={"Enter your name"}
                     errorMessage={errorMessage}
