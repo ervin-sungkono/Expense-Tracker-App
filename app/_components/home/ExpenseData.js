@@ -22,13 +22,6 @@ export default function ExpenseData() {
     const [annualExpense, setAnnualExpense] = useState(null);
 
     const filterExpenseByDate = (date) => {
-        if(!date) {
-            date = new Date();
-            setSelectedDate(date.toISOString().split('T')[0]);
-        } else if(isNaN(date)) {
-            date = new Date(date);
-        }
-
         const isSameDate = (targetDate) => {
             return Math.abs(new Date(targetDate).getTime() - date) < (24 * 60 * 60 * 1000);
         }
@@ -36,25 +29,15 @@ export default function ExpenseData() {
         return expenses.filter(expense => isSameDate(expense.date));
     }
 
-    const filterExpenseByMonth = (month) => {
-        if(!month) {
-            month = new Date().getMonth(); // current month
-            setSelectedMonth(month);
-        }
-
+    const filterExpenseByMonth = (month, year) => {
         const isSameMonth = (targetDate) => {
-            return new Date(targetDate).getMonth() === month && new Date(targetDate).getFullYear() === new Date().getFullYear();
+            return new Date(targetDate).getMonth() === month && new Date(targetDate).getFullYear() === selectedYear;
         }
 
         return expenses.filter(expense => isSameMonth(expense.date));
     }
 
     const filterExpenseByYear = (year) => {
-        if(!year) {
-            year = new Date().getFullYear(); // current year
-            setSelectedYear(year);
-        }
-
         const isSameYear = (targetDate) => {
             return new Date(targetDate).getFullYear() === year;
         }
@@ -69,10 +52,10 @@ export default function ExpenseData() {
     }, [expenses, selectedDate])
 
     useEffect(() => {
-        if(expenses && selectedMonth) {
-            setMonthlyExpense(filterExpenseByMonth(selectedMonth));
+        if(expenses && selectedMonth && selectedYear) {
+            setMonthlyExpense(filterExpenseByMonth(selectedMonth, selectedYear));
         }
-    }, [expenses, selectedMonth])
+    }, [expenses, selectedMonth, selectedYear])
 
     useEffect(() => {
         if(expenses && selectedYear) {
@@ -99,8 +82,8 @@ export default function ExpenseData() {
             id: 'monthly',
             label: 'Monthly',
             header: () => (
-                <div className="px-3">
-                    <SelectField 
+                <div className="px-3 grid grid-cols-2 gap-2">
+                    <SelectField
                         name={"month"}
                         _selected={{id: selectedMonth, label: MONTHS[selectedMonth]}}
                         _options={MONTHS.map((month, index) => ({
@@ -108,6 +91,15 @@ export default function ExpenseData() {
                             label: month
                         }))} 
                         onChange={(val) => setSelectedMonth(val)}
+                    />
+                    <SelectField 
+                        name={"year"}
+                        _selected={{id: selectedYear, label: selectedYear}}
+                        _options={generateRangeOptions(1980, 2100).map(year => ({
+                            id: year,
+                            label: year
+                        }))}
+                        onChange={(val) => setSelectedYear(val)}
                     />
                 </div>
             ),
