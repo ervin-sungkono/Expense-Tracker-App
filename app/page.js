@@ -9,11 +9,16 @@ import { useLocalStorage } from "./_lib/hooks";
 import { useRouter } from "next/navigation";
 
 export default function Onboarding() {
+    const [loading, setLoading] = useState(true);
     const [username, _] = useLocalStorage('username');
     const router = useRouter();
 
     useEffect(() => {
-      if(username && router) router.replace('/home');
+      if(username && router) {
+        router.replace('/home');
+      } else {
+        setLoading(false);
+      }
     }, [username, router]);
 
     return (
@@ -28,6 +33,7 @@ export default function Onboarding() {
               label={"Get Started"} 
               className="mt-16 px-8 z-fixed"
               href="/register"
+              disabled={loading}
             />
         </Layout>
     );
