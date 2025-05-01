@@ -13,7 +13,7 @@ export default function Header() {
     if(loading) {
         return(
             <div className="w-full flex flex-col gap-1 mb-5 animate-pulse">
-                <div className="w-1/4 h-4 md:h-5 my-1 bg-neutral-200 dark:bg-neutral-700 rounded-full"></div>
+                <div className="w-2/5 h-4 md:h-5 my-1 bg-neutral-200 dark:bg-neutral-700 rounded-full"></div>
                 <div className="w-3/4 h-7 md:h-8 my-0.5 bg-neutral-200 dark:bg-neutral-700 rounded-full"></div>
             </div>
         )

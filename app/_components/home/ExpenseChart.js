@@ -12,13 +12,15 @@ ChartJS.defaults.font.style = 'normal';
 ChartJS.defaults.font.weight = 700;
 ChartJS.register(ArcElement, Tooltip, Legend);
 
-export default function ExpenseChart({ expenseData = [] }) {
+export default function ExpenseChart({ expenseData }) {
     const categories = useLiveQuery(() => db.getAllCategories());
-    const [labels, setLabels] = useState([])
-    const [data, setData] = useState([])
+    const [labels, setLabels] = useState(null);
+    const [data, setData] = useState(null);
+    const [chartData, setChartData] = useState(null);
+    const [chartOptions, setChartOptions] = useState(null);
 
     useEffect(() => {
-        if(categories && expenseData.length > 0) {
+        if(categories && expenseData && expenseData.length > 0) {
             const categoriesMap = {};
             const groupCategory = {};
             for(let i = 0; i < categories.length; i++) {
@@ -32,53 +34,62 @@ export default function ExpenseChart({ expenseData = [] }) {
                 sumExpenseAmount += expenseData[i].amount;
             }
 
-            setLabels(Array.from(Object.keys(groupCategory)).map(label => `${label} (${Math.round(groupCategory[label] / sumExpenseAmount * 100)}%)`));
-            setData(Array.from(Object.values(groupCategory)));
+            setLabels(Object.keys(groupCategory).map(label => `${label} (${Math.round(groupCategory[label] / sumExpenseAmount * 100)}%)`));
+            setData(Object.values(groupCategory));
         }
     }, [categories, expenseData])
 
-    const chartData = {
-        labels,
-        datasets: [{
-            label: 'IDR spent',
-            data,
-            backgroundColor: generateRandomDistinctColors(labels.length),
-            borderWidth: 0
-        }]
-    }
-
-    const options = {
-        responsive: true,
-        aspectRatio: 16 / 9,
-        layout: {
-            padding: {
-                top: 16,
-                bottom: 16,
-                left: 12,
-                right: 12
-            }
-        },
-        plugins: {
-            legend: {
-                labels: {
-                    boxWidth: 20
+    useEffect(() => {
+        if(labels && data) {
+            setChartData({
+                labels,
+                datasets: [{
+                    label: 'IDR spent',
+                    data,
+                    backgroundColor: generateRandomDistinctColors(labels.length),
+                    borderWidth: 0
+                }]
+            });
+            setChartOptions({
+                responsive: true,
+                aspectRatio: 16 / 9,
+                layout: {
+                    padding: {
+                        top: 16,
+                        bottom: 16,
+                        left: 12,
+                        right: 12
+                    }
                 },
-                position: 'right'
-            }
+                plugins: {
+                    legend: {
+                        labels: {
+                            boxWidth: 20
+                        },
+                        position: 'right'
+                    }
+                }
+            });
         }
-    }
+    }, [labels, data])
 
-    if(expenseData.length === 0) return (
+    if(expenseData && expenseData.length === 0) return (
         <div className="flex justify-center items-center h-48 xs:h-64 px-3">
             <p className="text-sm md:text-base text-center text-dark dark:text-white">No expense data found, please create an expense first.</p>
         </div>
     )
     return(
         <div className="flex justify-start items-center h-48 xs:h-64">
-            <Doughnut 
-                data={chartData}
-                options={options}
-            />
+            {
+                (chartData && chartOptions) ? 
+                <Doughnut 
+                    data={chartData}
+                    options={chartOptions}
+                /> :
+                <div className="w-full h-full px-3 py-4">
+                    <div className="w-full h-full rounded-lg bg-neutral-200 dark:bg-neutral-700 animate-pulse"></div>
+                </div>
+            }
         </div>
     )
 }
