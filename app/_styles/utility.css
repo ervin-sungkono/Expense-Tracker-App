@@ -9,3 +9,11 @@
 @utility bg-basic-gradient--hover {
     @apply bg-linear-to-r from-ocean-blue to-ocean-blue/80;
 }
+
+@utility bg-danger-gradient {
+    @apply bg-linear-to-r from-red-600 to-red-400;
+}
+
+@utility bg-danger-gradient--hover {
+    @apply bg-linear-to-r from-red-600 to-red-600/80;
+}
