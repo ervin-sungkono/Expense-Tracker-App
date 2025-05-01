@@ -53,7 +53,7 @@ export default function CategoriesCarousel() {
                 <SwiperContainer 
                     spaceBetween={12}
                     slidesPerView={1.8}
-                    items={categoryData?.sort((a,b) => b.budget - a.budget).map(category => ({
+                    items={categoryData?.sort((a,b) => a.budget - b.budget).map(category => ({
                         id: category.id,
                         component: <CategoryCard {...category} slug={`/expenses?category=${encodeURIComponent(category.name)}`}/>
                     }))}
