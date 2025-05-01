@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { IoChevronForward as RightIcon } from "react-icons/io5";
 
-export default function SubHeader({ title, description, link, loading = false }) {
+export default function SubHeader({ title, description, linkLabel = 'Manage', link, loading = false }) {
     if(loading) {
         return (
             <div className="w-full flex flex-col gap-0.5 mb-3 animate-pulse">
@@ -9,7 +9,7 @@ export default function SubHeader({ title, description, link, loading = false })
                     <p className="text-lg font-semibold text-transparent bg-neutral-200 dark:bg-neutral-700 rounded-full">{title}</p>
                     {link && 
                     <div className="ml-auto flex items-center gap-1 text-transparent bg-neutral-200 dark:bg-neutral-700 rounded-full">
-                        <p className="text-sm">Manage</p>
+                        <p className="text-sm">{linkLabel}</p>
                         <RightIcon size={20}/>
                     </div>}
                 </div>
@@ -23,7 +23,7 @@ export default function SubHeader({ title, description, link, loading = false })
                     <p className="grow text-lg font-semibold text-dark dark:text-white">{title}</p>
                     {link && 
                     <Link href={link} className="flex items-center gap-1 text-deep-blue dark:text-ocean-blue">
-                        <p className="text-sm">Manage</p>
+                        <p className="text-sm">{linkLabel}</p>
                         <RightIcon size={20}/>
                     </Link>}
                 </div>

@@ -9,13 +9,17 @@ class ExpenseDB extends Dexie {
 
         this.version(DB_VERSION).stores({
             expenses: '++id, date, amount, categoryId, shopId, remarks',
-            categories: '++id, name',
+            categories: '++id, name, budget',
             shops: '++id, name, image, min_price, max_price, location'
         });
     }
 
     getAllExpenses() {
         return this.expenses.toArray();
+    }
+
+    getRecentExpenses(limit) {
+        return this.expenses.orderBy('date').reverse().limit(limit).toArray();
     }
 
     getAllCategories() {
@@ -69,11 +73,43 @@ class ExpenseDB extends Dexie {
     }
 }
 
+function getRandomDate(start, end) {
+    const startDate = start.getTime();
+    const endDate = end.getTime();
+    const randomTime = Math.random() * (endDate - startDate) + startDate;
+    return new Date(randomTime);
+}
+
+function randomBetween(min, max) { // min and max included 
+    return Math.floor(Math.random() * (max - min + 1) + min);
+}
+
+function generateExpenses() {
+    const start = new Date(2020, 0, 1); // January 1, 2020
+    const end = new Date(); // Current date
+
+    const expenses = [];
+    
+    for(let i = 0; i < 500; i++) {
+        const date = getRandomDate(start, end).toISOString().split('T')[0];
+        const amount = randomBetween(1000, 50000);
+        const categoryId = randomBetween(1, 3);
+        const shopId = randomBetween(0, 2) || null;
+        const remarks = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed mollis suscipit congue. Phasellus sit amet nulla vitae lorem semper lobortis. Cras non massa et libero mollis tempus.';
+
+        expenses.push({ date, amount, categoryId, shopId, remarks });
+    }
+
+    return expenses;
+}
+
 async function populate() {
+    await db.expenses.bulkAdd(generateExpenses())
+
     await db.categories.bulkAdd([
-        { name: "Food" },
-        { name: "Transportation" },
-        { name: "Entertainment" }
+        { name: "Food", budget: 500000 },
+        { name: "Transportation", budget: 800000 },
+        { name: "Entertainment", budget: 100000 }
     ]);
 
     await db.shops.bulkAdd([
