@@ -7,7 +7,7 @@ import { useEffect, useState } from "react"
 import ShopCard from "./ShopCard"
 
 export default function ShopsCarousel() {
-    const [shopData, setShopData] = useState([]);
+    const [shopData, setShopData] = useState(null);
     const expenses = useLiveQuery(() => db.getAllExpenses());
     const shops = useLiveQuery(() => db.getAllShops());
 
@@ -29,6 +29,7 @@ export default function ShopsCarousel() {
             const shopsMap = {};
             for(let i = 0; i < shops.length; i++) {
                 shopsMap[shops[i].id] = {
+                    ...shops[i],
                     count: 0,
                     amount: 0
                 };
@@ -41,29 +42,36 @@ export default function ShopsCarousel() {
                 }
             }
 
-            setShopData(Object.entries(shopsMap).map(([key, value]) => { 
-                const shop = shops.find(shop => shop.id == key);
-
+            setShopData(Object.values(shopsMap).map((value) => { 
                 return {
+                    ...value,
                     totalVisit: value.count,
                     averageExpense: value.count > 0 ? Math.round(value.amount / value.count) : 0,
-                    ...shop
                 }
             }));
         }
     }, [expenses, shops])
 
-    return(
-        <div className="mb-4">
-            <SubHeader title="Shops" description={"based on this month's visits"} link="/shops"/>
-            <SwiperContainer 
-                spaceBetween={12}
-                slidesPerView={1.8}
-                items={shopData?.sort((a,b) => b.totalVisit - a.totalVisit).map(shop => ({
-                    id: shop.name,
-                    component: <ShopCard {...shop}/>
-                }))}
-            />
-        </div>
-    )
+    if(!shopData) {
+        return (
+            <div className="mb-4">
+                <SubHeader title="Shops" description={"based on this month's visits"} link="/shops" loading/>
+                <div className="h-56 w-screen bg-neutral-200 dark:bg-neutral-700 animate-pulse rounded-lg"></div>
+            </div>
+        )
+    } else {
+        return(
+            <div className="mb-4">
+                <SubHeader title="Shops" description={"based on this month's visits"} link="/shops"/>
+                <SwiperContainer 
+                    spaceBetween={12}
+                    slidesPerView={1.8}
+                    items={shopData?.sort((a,b) => b.totalVisit - a.totalVisit).map(shop => ({
+                        id: shop.name,
+                        component: <ShopCard {...shop}/>
+                    }))}
+                />
+            </div>
+        )
+    }
 }

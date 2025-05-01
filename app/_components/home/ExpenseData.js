@@ -17,9 +17,9 @@ export default function ExpenseData() {
     const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth());
     const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
 
-    const [dailyExpense, setDailyExpense] = useState([]);
-    const [monthlyExpense, setMonthlyExpense] = useState([]);
-    const [annualExpense, setAnnualExpense] = useState([]);
+    const [dailyExpense, setDailyExpense] = useState(null);
+    const [monthlyExpense, setMonthlyExpense] = useState(null);
+    const [annualExpense, setAnnualExpense] = useState(null);
 
     const filterExpenseByDate = (date) => {
         if(!date) {
@@ -135,7 +135,7 @@ export default function ExpenseData() {
 
     return(
         <div className="mb-4">
-            <SubHeader title="My Expense" link="/expenses"/>
+            <SubHeader loading={!dailyExpense} title="My Expense" link="/expenses"/>
             <Tab selected={'daily'} contents={contents}/>
         </div>
     )
