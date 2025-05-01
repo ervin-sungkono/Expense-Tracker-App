@@ -2,9 +2,9 @@
 import Button from "./Button";
 import Link from "next/link";
 
-export default function LinkButton({ href = '', ...params }) {
+export default function LinkButton({ href = '', disabled, ...params }) {
     return(
-        <Link href={href}>
+        <Link href={ disabled ? '#' : href}>
             <Button {...params}/>
         </Link>
     )
