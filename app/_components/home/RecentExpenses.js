@@ -25,14 +25,14 @@ export default function RecentExpenses() {
         return (
             <div className="mb-4">
                 <SubHeader title={"Recent Expenses"} linkLabel="See all" link={"/expensess"} loading/>
-                <div className="h-48 bg-neutral-200 dark:bg-neutral-700 rounded-lg py-2 animate-pulse"></div>
+                <div className="h-48 bg-neutral-200 dark:bg-neutral-700 rounded-lg py-1.5 animate-pulse"></div>
             </div>
         )
     }
     return(
         <div className="mb-4">
             <SubHeader title={"Recent Expenses"} linkLabel="See all" link={"/expensess"}/>
-            <div className="bg-neutral-200 dark:bg-neutral-700 rounded-lg py-2">
+            <div className="bg-neutral-200 dark:bg-neutral-700 rounded-lg py-1.5">
                 {expenseData.length > 0 ? 
                 expenseData.map(expense => (
                     <RecentExpenseCard key={expense.id} {...expense}/>
