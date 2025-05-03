@@ -5,13 +5,16 @@ import { useEffect, useState } from "react";
 import { db } from "../_lib/db";
 import { liveQuery } from "dexie";
 import { useLiveQuery } from "dexie-react-hooks";
+import SearchBar from "../_components/common/Searchbar";
+import Header from "../_components/common/Header";
 
 export default function Expenses() {
-    const PAGE_SIZE = 10;
-    const createLiveQuery = (pageIndex) => liveQuery(() => db.getPaginatedExpenses(pageIndex, PAGE_SIZE));
+    const PAGE_SIZE = 20;
+    const createLiveQuery = (pageIndex) => liveQuery(() => db.getPaginatedExpenses(pageIndex, PAGE_SIZE, searchText));
     const [liveQueries, setLiveQueries] = useState([createLiveQuery(0)]);
     const [resultArrays, setResultArrays] = useState([]);
     const [expenses, setExpenses] = useState([])
+    const [searchText, setSearchText] = useState("");
     const categories = useLiveQuery(() => db.getAllCategories());
 
     useEffect(() => {
@@ -30,24 +33,45 @@ export default function Expenses() {
     }, [liveQueries])
 
     useEffect(() => {
+        setLiveQueries([createLiveQuery(0)]);
+        setResultArrays([]);
+    }, [searchText])
+
+    useEffect(() => {
         if(resultArrays && categories) {
             const categoriesMap = new Map(categories.map(category => [String(category.id), category.name]));
-            setExpenses(resultArrays.flat(1).map(expense => ({ ...expense, category: categoriesMap.get(String(expense.categoryId)) })))
+            setExpenses(
+                resultArrays.flat(1)
+                .map(expense => ({ ...expense, category: categoriesMap.get(String(expense.categoryId)) }))
+            )
         }
     }, [resultArrays, categories])
 
-    const fetchMoreData = () => {
+    const fetchMoreData = async() => {
         const nextPageIndex = liveQueries.length;
         setLiveQueries(currentLiveQueries => [...currentLiveQueries, createLiveQuery(nextPageIndex)])
     };
 
     return(
         <Layout pathname={"/expenses"}>
-            <VirtualizedExpenseList
-                items={expenses}
-                loadMore={fetchMoreData}
-                hasNextPage={resultArrays.at(-1)?.length === PAGE_SIZE}
-            />
+            <div className="h-full flex flex-col">
+                <div className="mb-4">
+                    <Header title={"Expense List"} textAlign="center"/>
+                    <div className="flex items-center gap-2">
+                        <SearchBar
+                            placeholder={"Search based on notes"}
+                            onSearch={(value) => setSearchText(value.toLowerCase())}
+                        />
+                    </div>
+                </div>
+                <div className="flex grow">
+                    <VirtualizedExpenseList
+                        items={expenses}
+                        loadMore={fetchMoreData}
+                        hasNextPage={resultArrays.at(-1)?.length === PAGE_SIZE}
+                    />
+                </div>
+            </div>
         </Layout>
     )
 }

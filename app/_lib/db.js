@@ -18,6 +18,10 @@ class ExpenseDB extends Dexie {
         return this.expenses.toArray();
     }
 
+    getPaginatedExpenses(pageIndex = 0, pageSize = 10, searchText) {
+        return this.expenses.orderBy('date').filter(expense => expense.remarks.toLowerCase().includes(searchText)).reverse().offset(pageIndex * pageSize).limit(pageSize).toArray();
+    }
+
     getRecentExpenses(limit) {
         return this.expenses.orderBy('date').reverse().limit(limit).toArray();
     }
@@ -90,7 +94,7 @@ function generateExpenses() {
 
     const expenses = [];
     
-    for(let i = 0; i < 500; i++) {
+    for(let i = 0; i < 10000; i++) {
         const date = getRandomDate(start, end).toISOString().split('T')[0];
         const amount = randomBetween(1000, 50000);
         const categoryId = randomBetween(1, 3);
