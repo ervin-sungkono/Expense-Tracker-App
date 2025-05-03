@@ -29,7 +29,7 @@ export default function ExpenseData() {
         return expenses.filter(expense => isSameDate(expense.date));
     }
 
-    const filterExpenseByMonth = (month, year) => {
+    const filterExpenseByMonth = (month) => {
         const isSameMonth = (targetDate) => {
             return new Date(targetDate).getMonth() === month && new Date(targetDate).getFullYear() === selectedYear;
         }
