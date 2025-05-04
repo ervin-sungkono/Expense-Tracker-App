@@ -107,3 +107,27 @@ input:-webkit-autofill:active {
     opacity: 0;
   }
 }
+
+@keyframes scale-in {
+  0% {
+    transform: scale(0);
+  }
+  75% {
+    transform: scale(115%);
+  }
+  100% {
+    transform: scale(100%);
+  }
+}
+
+@keyframes scale-out {
+  0% {
+    transform: scale(100%);
+  }
+  25% {
+    transform: scale(115%);
+  }
+  100% {
+    transform: scale(0);
+  }
+}
