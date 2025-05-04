@@ -3,21 +3,16 @@ import Layout from "../_components/layout/Layout";
 import TextContent from "../_components/common/TextContent";
 import Button from "../_components/common/Button";
 import InputField from "../_components/common/InputField";
-import { useRef, useEffect, useState } from "react";
-import { useLocalStorage } from "../_lib/hooks";
+import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
+import { setCookie } from "cookies-next/client";
 
 export default function Register() {
-    const [username, setUsername] = useLocalStorage('username');
     const [errorMessage, setErrorMessage] = useState(null);
     const inputRef = useRef();
     const router = useRouter();
 
-    useEffect(() => {
-        if (username && router) router.replace('/home');
-    }, [username, router]);
-
-    const registerUser = () => {
+    const registerUser = async() => {
         const input = inputRef.current
         if(!input) return;
 
@@ -33,9 +28,10 @@ export default function Register() {
             return;
         }
 
+        setCookie('username', input.value);
         // TODO: replace alert with dialog
         alert('Registration success');
-        setUsername(input.value);
+        router.replace('/home');
     }
 
     return(

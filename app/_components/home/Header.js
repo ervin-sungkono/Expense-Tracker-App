@@ -1,10 +1,9 @@
 'use client'
-import { useLocalStorage } from "@/app/_lib/hooks"
+import { getCookie } from "cookies-next/client";
 import { useEffect, useState } from "react";
 
 export default function Header() {
     const [loading, setLoading] = useState(true);
-    const [username, _] = useLocalStorage('username');
 
     useEffect(() => {
         setLoading(false);
@@ -22,7 +21,7 @@ export default function Header() {
         return(
             <div className="w-full flex flex-col gap-1 mb-5">
                 <p className="text-dark dark:text-white text-base md:text-lg">Welcome back,</p>
-                <p className="text-dark dark:text-white w-full line-clamp-1 text-2xl md:text-3xl font-bold">{username}</p>
+                <p className="text-dark dark:text-white w-full line-clamp-1 text-2xl md:text-3xl font-bold">{getCookie('username')}</p>
             </div>
         )
     }

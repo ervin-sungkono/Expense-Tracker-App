@@ -7,7 +7,7 @@ export default function AppLogo({
 }) {
     return(
         <Link href={"/"} className={`flex ${className}`} style={{justifyContent: position}}>
-            <Image width={150} height={43} quality={100} src={"/logo-full.png"} alt="App Logo"/>
+            <Image width={150} height={43} quality={100} src={"/assets/logo-full.png"} alt="App Logo"/>
         </Link>
     )
 }

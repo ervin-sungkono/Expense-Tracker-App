@@ -4,16 +4,16 @@
     "theme_color": "#00ff00",
     "background_color": "#ffffff", 
     "display": "standalone", 
-    "orientation": "any", 
+    "orientation": "portrait", 
     "start_url": "/", 
     "icons": [
         { 
-            "src": "/icons/icon-192x192.png", 
+            "src": "/assets/icons/icon-192x192.png", 
             "type": "image/png", 
             "sizes": "192x192" 
         },
         { 
-            "src": "/icons/icon-512x512.png", 
+            "src": "/assets/icons/icon-512x512.png", 
             "type": "image/png", 
             "sizes": "512x512" 
         } 

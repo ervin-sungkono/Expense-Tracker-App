@@ -6,7 +6,7 @@ export default function SplashImage({ className }) {
             <Image 
                 fill
                 quality={100}
-                src={"/onboarding/splash-img.png"} 
+                src={"/assets/onboarding/splash-img.png"} 
                 className="object-contain z-50" 
                 aria-hidden 
                 alt=""
@@ -15,7 +15,7 @@ export default function SplashImage({ className }) {
                 width={39}
                 height={25}
                 quality={100}
-                src={"/onboarding/blob1.png"} 
+                src={"/assets/onboarding/blob1.png"} 
                 className="absolute top-1/5 left-2 z-50 animate-[spin_4s_linear_infinite]" 
                 aria-hidden 
                 alt=""
@@ -24,7 +24,7 @@ export default function SplashImage({ className }) {
                 width={47}
                 height={33}
                 quality={100}
-                src={"/onboarding/blob2.png"} 
+                src={"/assets/onboarding/blob2.png"} 
                 className="absolute top-1 right-6 z-50 animate-[spin_7s_linear_infinite]" 
                 aria-hidden 
                 alt=""
@@ -33,7 +33,7 @@ export default function SplashImage({ className }) {
                 width={46}
                 height={35}
                 quality={100}
-                src={"/onboarding/blob3.png"} 
+                src={"/assets/onboarding/blob3.png"} 
                 className="absolute -bottom-4 right-1/4 z-50 animate-[spin_10s_linear_infinite]" 
                 aria-hidden 
                 alt=""
