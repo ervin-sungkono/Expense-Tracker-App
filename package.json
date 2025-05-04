@@ -23,7 +23,8 @@
     "react-virtualized-auto-sizer": "^1.0.26",
     "react-window": "^1.8.11",
     "react-window-infinite-loader": "^1.0.10",
-    "swiper": "^11.2.6"
+    "swiper": "^11.2.6",
+    "use-long-press": "^3.3.0"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
