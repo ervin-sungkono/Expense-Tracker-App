@@ -18,8 +18,14 @@ class ExpenseDB extends Dexie {
         return this.expenses.toArray();
     }
 
-    getPaginatedExpenses(pageIndex = 0, pageSize = 10, searchText) {
-        return this.expenses.orderBy('date').filter(expense => expense.remarks.toLowerCase().includes(searchText)).reverse().offset(pageIndex * pageSize).limit(pageSize).toArray();
+    getPaginatedExpenses(pageIndex = 0, pageSize = 10, searchText, chosenCategory) {
+        return this.expenses
+            .orderBy('date')
+            .filter(expense => expense.remarks.toLowerCase().includes(searchText) && (!chosenCategory || expense.categoryId === chosenCategory))
+            .reverse()
+            .offset(pageIndex * pageSize)
+            .limit(pageSize)
+            .toArray();
     }
 
     getRecentExpenses(limit) {
