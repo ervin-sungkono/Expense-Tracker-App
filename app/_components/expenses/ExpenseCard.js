@@ -1,7 +1,7 @@
 'use client'
 import { formatCurrency } from "@/app/_lib/utils";
 
-export default function ExpenseCard({ date, category, amount, style, loaded }) {
+export default function ExpenseCard({ date, category, amount, style }) {
     return(
         <div style={style} className="cursor-pointer relative px-4 py-2 flex not-last:border-b border-dark/20 dark:border-white/20 active:bg-neutral-300/30 dark:active:bg-neutral-800/30 transition-colors duration-150 ease-in-out">
             <div className="w-full flex flex-col gap-1">
