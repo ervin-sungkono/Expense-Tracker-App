@@ -42,13 +42,13 @@ export default function ShopsCarousel() {
                 }
             }
 
-            setShopData(Object.values(shopsMap).map((value) => { 
+            setShopData([...Object.values(shopsMap).map((value) => { 
                 return {
                     ...value,
                     totalVisit: value.count,
                     averageExpense: value.count > 0 ? Math.round(value.amount / value.count) : 0,
                 }
-            }));
+            })]);
         }
     }, [expenses, shops])
 

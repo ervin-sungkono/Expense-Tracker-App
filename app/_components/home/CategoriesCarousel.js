@@ -23,19 +23,21 @@ export default function CategoriesCarousel() {
         return expenses.filter(expense => isSameMonth(expense.date));
     }
 
+    console.log(categoryData);
+
     useEffect(() => {
         if(expenses && categories) {
             const filteredExpenses = filterExpenseByMonth();
             const categoriesMap = {};
             for(let i = 0; i < categories.length; i++) {
-                categoriesMap[categories[i].id] = categories[i];
+                categoriesMap[categories[i].id] = {...categories[i]};
             }
 
             for(let i = 0; i < filteredExpenses.length; i++) {
                 if(filteredExpenses[i].categoryId) categoriesMap[filteredExpenses[i].categoryId].budget -= filteredExpenses[i].amount;
             }
 
-            setCategoryData(Object.values(categoriesMap));
+            setCategoryData([...Object.values(categoriesMap)]);
         }
     }, [expenses, categories])
 
