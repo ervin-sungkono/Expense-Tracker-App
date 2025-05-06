@@ -39,6 +39,7 @@ export default function RecentExpenseCard({ id, date, category, amount }) {
                 items={contextMenuItems} 
                 show={showMenu} 
                 hideFn={() => setShowMenu(false)}
+                hideOnItemClick
             />
         </div>
     )
