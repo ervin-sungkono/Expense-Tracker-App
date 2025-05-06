@@ -7,15 +7,20 @@ import { liveQuery } from "dexie";
 import { useLiveQuery } from "dexie-react-hooks";
 import SearchBar from "../_components/common/Searchbar";
 import Header from "../_components/common/Header";
+import { useSearchParams } from "next/navigation";
 
 export default function Expenses() {
     const PAGE_SIZE = 20;
-    const createLiveQuery = (pageIndex) => liveQuery(() => db.getPaginatedExpenses(pageIndex, PAGE_SIZE, searchText));
+    const createLiveQuery = (pageIndex) => liveQuery(() => db.getPaginatedExpenses(pageIndex, PAGE_SIZE, searchText, chosenCategory));
     const [liveQueries, setLiveQueries] = useState([createLiveQuery(0)]);
     const [resultArrays, setResultArrays] = useState([]);
     const [expenses, setExpenses] = useState([])
     const [searchText, setSearchText] = useState("");
+    const [chosenCategory, setChosenCategory] = useState(null);
     const categories = useLiveQuery(() => db.getAllCategories());
+
+    const searchParams = useSearchParams();
+    const category = searchParams.get('category');
 
     useEffect(() => {
         const subscriptions = liveQueries.map((q, i) => q.subscribe(
@@ -35,7 +40,13 @@ export default function Expenses() {
     useEffect(() => {
         setLiveQueries([createLiveQuery(0)]);
         setResultArrays([]);
-    }, [searchText])
+    }, [searchText, chosenCategory])
+
+    useEffect(() => {
+        if(category && categories) {
+            setChosenCategory(categories.find(c => c.name.toLowerCase() === category.toLowerCase())?.id)
+        }
+    }, [category, categories])
 
     useEffect(() => {
         if(resultArrays && categories) {
