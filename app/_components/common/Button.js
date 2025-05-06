@@ -1,7 +1,7 @@
 'use client'
 
 export default function Button({ 
-    label, 
+    label,
     className = '', 
     type='button',
     size = 'medium', 
@@ -10,6 +10,8 @@ export default function Button({
 }) {
     const getSizeClass = () => {
         switch (size) {
+            case 'icon':
+                return 'p-2.5';
             case 'medium':
                 return 'text-base py-2.5 px-6'
             case 'large':
