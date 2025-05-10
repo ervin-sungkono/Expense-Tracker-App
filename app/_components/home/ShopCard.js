@@ -5,7 +5,7 @@ import { IoLocationSharp as LocationIcon } from "react-icons/io5";
 import { IoMdPricetags as PriceIcon } from "react-icons/io";
 import { formatCurrency } from "@/app/_lib/utils";
 
-export default function ShopCard({ id, name, image, location, min_price, max_price, totalVisit, averageExpense }) {    
+export default function ShopCard({ id, name, image, location, totalVisit, averageExpense }) {    
     return(
         <Link href={`/expenses?shop=${encodeURIComponent(name)}`} className="w-full flex flex-col">
             <div className="relative w-full aspect-video bg-neutral-200 dark:bg-neutral-700 rounded-t-lg overflow-hidden">
