@@ -1,16 +1,76 @@
 'use client'
-import { formatCurrency } from "@/app/_lib/utils";
+import dynamic from "next/dynamic";
+import { formatCurrency, formatDateString } from "@/app/_lib/utils";
+import { memo, useState } from "react";
+import { useLongPress } from "use-long-press";
+import ContextMenu from "../common/ContextMenu";
 
-export default function ExpenseCard({ date, category, amount, style }) {
+const AddExpenseDialog = dynamic(() => import("../common/dialog/AddExpenseDialog"));
+const DeleteExpenseDialog = dynamic(() => import("../common/dialog/DeleteExpenseDialog"));
+const InfoExpenseDialog = dynamic(() => import("../common/dialog/InfoExpenseDialog"));
+
+function ExpenseCard({ expense, style }) {
+    const { id, date, category, amount } = expense;
+    const [showMenu, setShowMenu] = useState(false);
+    const [showInfo, setShowInfo] = useState(false);
+    const [showEdit, setShowEdit] = useState(false);
+    const [showDelete, setShowDelete] = useState(false);
+
+    const handlers = useLongPress(() => {
+        setShowMenu(true);
+    }, {
+        threshold: 500
+    });
+
+    const contextMenuItems = [
+        {
+            label: 'Info',
+            onClick: () => setShowInfo(true)
+        },
+        {
+            label: 'Edit',
+            onClick: () => setShowEdit(true)
+        },
+        {
+            label: 'Delete',
+            onClick: () => setShowDelete(true)
+        }
+    ]
+
     return(
-        <div style={style} className="cursor-pointer relative px-4 py-2 flex not-last:border-b border-dark/20 dark:border-white/20 active:bg-neutral-300/30 dark:active:bg-neutral-800/30 transition-colors duration-150 ease-in-out">
-            <div className="w-full flex flex-col gap-1">
-                <div className="w-full flex items-center gap-1.5">
-                    <p className="text-base md:text-lg font-medium grow">{category}</p>
-                    <p className="text-sm md:text-base font-medium">{formatCurrency(amount)}</p>
+        <div style={style} className="relative not-last:border-b border-dark/20 dark:border-white/20 select-none">
+            <div {...handlers()} className="cursor-pointer px-4 py-2 flex active:bg-neutral-300/30 active:dark:bg-neutral-800/30 transition-colors duration-150 ease-in-out">
+                <div className="w-full flex flex-col gap-1">
+                    <div className="w-full flex items-center gap-1.5">
+                        <p className="text-base md:text-lg font-medium grow">{category}</p>
+                        <p className="text-sm md:text-base font-medium">{formatCurrency(amount)}</p>
+                    </div>
+                    <p className="text-xs text-dark/80 dark:text-white/80">{formatDateString(date)}</p>
                 </div>
-                <p className="text-xs text-dark/80 dark:text-white/80">{new Date(date).toLocaleDateString('en-US', { day: 'numeric', month: 'long', year: 'numeric' })}</p>
-            </div> 
+            </div>
+            <ContextMenu 
+                items={contextMenuItems} 
+                show={showMenu} 
+                hideFn={() => setShowMenu(false)}
+                hideOnItemClick
+            />
+            <InfoExpenseDialog 
+                expense={expense} 
+                show={showInfo} 
+                hideFn={() => setShowInfo(false)}
+            />
+            <AddExpenseDialog 
+                expense={expense} 
+                show={showEdit} 
+                hideFn={() => setShowEdit(false)}
+            />
+            <DeleteExpenseDialog 
+                expenseId={id} 
+                show={showDelete} 
+                hideFn={() => setShowDelete(false)}
+            />
         </div>
     )
 }
+
+export default memo(ExpenseCard);

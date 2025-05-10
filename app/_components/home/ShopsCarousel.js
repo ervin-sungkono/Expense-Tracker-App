@@ -38,7 +38,7 @@ export default function ShopsCarousel() {
             for(let i = 0; i < filteredExpenses.length; i++) {
                 if(filteredExpenses[i].shopId) { 
                     shopsMap[filteredExpenses[i].shopId].count++;
-                    shopsMap[filteredExpenses[i].shopId].amount += filteredExpenses[i].amount;
+                    shopsMap[filteredExpenses[i].shopId].amount += Number(filteredExpenses[i].amount);
                 }
             }
 
