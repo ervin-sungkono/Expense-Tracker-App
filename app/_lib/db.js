@@ -21,7 +21,12 @@ class ExpenseDB extends Dexie {
     getPaginatedExpenses(pageIndex = 0, pageSize = 10, searchText, chosenCategory) {
         return this.expenses
             .orderBy('date')
-            .filter(expense => expense.remarks.toLowerCase().includes(searchText) && (!chosenCategory || expense.categoryId === chosenCategory))
+            .filter(expense => {
+                if(!expense.remarks.toLowerCase().includes(searchText)) return false;
+                if(chosenCategory && expense.categoryId !== chosenCategory) return false;
+
+                return true;
+            })
             .reverse()
             .offset(pageIndex * pageSize)
             .limit(pageSize)
@@ -29,7 +34,11 @@ class ExpenseDB extends Dexie {
     }
 
     getRecentExpenses(limit) {
-        return this.expenses.orderBy('date').reverse().limit(limit).toArray();
+        return this.expenses
+            .orderBy('date')
+            .reverse()
+            .limit(limit)
+            .toArray();
     }
 
     getAllCategories() {
@@ -40,32 +49,32 @@ class ExpenseDB extends Dexie {
         return this.shops.toArray();
     }
 
-    addExpense({date, amount, categoryId, shopId, remarks}) {
+    addExpense({ date, amount, categoryId, shopId, remarks }) {
         return this.expenses.add({ date, amount, categoryId, shopId, remarks });
     }
 
-    addCategory({name}) {
-        return this.categories.add({ name });
+    addCategory({ name, budget }) {
+        return this.categories.add({ name, budget });
     }
 
-    addShop({name, image, min_price, max_price, location}) {
+    addShop({ name, image, min_price, max_price, location }) {
         return this.shops.add({ name, image, min_price, max_price, location });
     }
 
-    updateExpense(expenseId, {date, amount, categoryId, shopId}) {
-        return this.expenses.update(expenseId, {date, amount, categoryId, shopId});
+    updateExpense(expenseId, { date, amount, categoryId, shopId, remarks }) {
+        return this.expenses.update(expenseId, {date, amount, categoryId, shopId, remarks});
     }
 
-    updateCategory(categoryId, { name }) {
-        return this.categories.update(categoryId, {name});
+    updateCategory(categoryId, { name, budget }) {
+        return this.categories.update(categoryId, { name, budget });
     }
 
-    updateShop(shopId, {name, image, min_price, max_price, location}) {
+    updateShop(shopId, { name, image, min_price, max_price, location }) {
         return this.shops.update(shopId, {name, image, min_price, max_price, location});
     }
 
     deleteExpense(expenseId) {
-        this.categories.delete(expenseId);
+        this.expenses.delete(expenseId);
     }
 
     deleteCategory(categoryId) {
