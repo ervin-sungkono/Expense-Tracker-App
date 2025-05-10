@@ -10,7 +10,7 @@ class ExpenseDB extends Dexie {
         this.version(DB_VERSION).stores({
             expenses: '++id, date, amount, categoryId, shopId, remarks',
             categories: '++id, name, budget',
-            shops: '++id, name, image, min_price, max_price, location'
+            shops: '++id, name, image, location'
         });
     }
 
@@ -57,8 +57,8 @@ class ExpenseDB extends Dexie {
         return this.categories.add({ name, budget });
     }
 
-    addShop({ name, image, min_price, max_price, location }) {
-        return this.shops.add({ name, image, min_price, max_price, location });
+    addShop({ name, image, location }) {
+        return this.shops.add({ name, image, location });
     }
 
     updateExpense(expenseId, { date, amount, categoryId, shopId, remarks }) {
@@ -69,8 +69,8 @@ class ExpenseDB extends Dexie {
         return this.categories.update(categoryId, { name, budget });
     }
 
-    updateShop(shopId, { name, image, min_price, max_price, location }) {
-        return this.shops.update(shopId, {name, image, min_price, max_price, location});
+    updateShop(shopId, { name, image, location }) {
+        return this.shops.update(shopId, {name, image, location});
     }
 
     deleteExpense(expenseId) {
@@ -103,6 +103,7 @@ function randomBetween(min, max) { // min and max included
     return Math.floor(Math.random() * (max - min + 1) + min);
 }
 
+// TODO: remove this later
 function generateExpenses() {
     const start = new Date(2020, 0, 1); // January 1, 2020
     const end = new Date(); // Current date
@@ -131,19 +132,16 @@ async function populate() {
         { name: "Entertainment", budget: 100000 }
     ]);
 
+    // Todo: remove this later
     await db.shops.bulkAdd([
         {
             name: 'Warung Bu Mila',
             image: 'https://picsum.photos/seed/picsum/200/300',
-            min_price: 20000,
-            max_price: 25000,
             location: 'Senayan'
         },
         {
             name: 'Nasi Goreng',
             image: 'https://picsum.photos/seed/picsum/200/300',
-            min_price: 20000,
-            max_price: 25000,
             location: 'Senayan'
         }
     ])
