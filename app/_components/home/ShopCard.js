@@ -7,7 +7,7 @@ import { formatCurrency } from "@/app/_lib/utils";
 
 export default function ShopCard({ id, name, image, location, min_price, max_price, totalVisit, averageExpense }) {    
     return(
-        <Link href={`/shops/${id}`} className="w-full flex flex-col">
+        <Link href={`/expenses?shop=${encodeURIComponent(name)}`} className="w-full flex flex-col">
             <div className="relative w-full aspect-video bg-neutral-200 dark:bg-neutral-700 rounded-t-lg overflow-hidden">
                 <Image src={image} className="object-contain" fill alt={`${name} Image`}/>
             </div>

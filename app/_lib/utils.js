@@ -62,3 +62,7 @@ export function formatCurrency(value, locale = 'id-ID', currency = 'IDR') {
     const formatter = new Intl.NumberFormat(locale, { style: 'currency', currency, minimumFractionDigits: 0 });
     return formatter.format(value);
 }
+
+export function formatDateString(date, locale = 'en-US') {
+    return new Date(date).toLocaleDateString(locale, { day: 'numeric', month: 'long', year: 'numeric' })
+}

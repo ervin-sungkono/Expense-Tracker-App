@@ -10,20 +10,27 @@ const Row = ({ index, style, data }) => {
   if(!item) return <div style={style} className='flex justify-center items-center animate-pulse'><p>Loading more data..</p></div>
   
   return (
-      <ExpenseCard {...item} style={style}/>
+      <ExpenseCard expense={item} style={style}/>
   );
 };
 
 const VirtualizedExpenseList = ({ items, loadMore, hasNextPage }) => {
   const isItemLoaded = index => !hasNextPage || index < items.length;
 
-  if(items.length === 0) {
+  if(!items) {
+    return (
+      <div className='w-full h-full bg-neutral-200 dark:bg-neutral-700 rounded-lg px-4 py-2.5 flex justify-center items-center text-center'>
+        {/* TODO: add illustration loading here */}
+        <p className='text-dark/80 dark:text-white/80 text-sm md:text-base'>Loading expense data..</p>
+      </div>
+    )
+  }
+  if(items.length === 0 && !hasNextPage) {
     return(
       <div className='w-full h-full bg-neutral-200 dark:bg-neutral-700 rounded-lg px-4 py-2.5 flex justify-center items-center text-center'>
         {/* TODO: add illustration not found here */}
         <p className='text-dark/80 dark:text-white/80 text-sm md:text-base'>No expense found..</p>
       </div>
-      
     )
   }
   return (
@@ -44,6 +51,7 @@ const VirtualizedExpenseList = ({ items, loadMore, hasNextPage }) => {
               ref={ref}
               itemData={items}
               className='bg-neutral-200 dark:bg-neutral-700 rounded-lg'
+              style={{willChange: 'initial'}}
             >
               {Row}
             </FixedSizeList>

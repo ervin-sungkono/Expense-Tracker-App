@@ -1,14 +1,14 @@
 'use client'
 import Dialog from "./Dialog";
-import InputField from "./InputField";
-import SelectField from "./SelectField";
-import TextField from "./TextField";
+import InputField from "../InputField";
+import SelectField from "../SelectField";
+import TextField from "../TextField";
 import { db } from "@/app/_lib/db";
 import { useLiveQuery } from "dexie-react-hooks";
 import { useState } from "react";
-import Button from "./Button";
+import Button from "../Button";
 
-export default function AddExpenseDialog({ show, hideFn }) {
+export default function AddExpenseDialog({ expense = {}, show, hideFn }) {
     const categories = useLiveQuery(() => db.getAllCategories());
     const shops = useLiveQuery(() => db.getAllShops());
     const [errorMessage, setErrorMessage] = useState({});
@@ -65,7 +65,12 @@ export default function AddExpenseDialog({ show, hideFn }) {
                 return;
             }
 
-            db.addExpense(payload);
+            if(expense) {
+                db.updateExpense(expense.id, payload);
+            } else {
+                db.addExpense(payload);
+            }
+            
             form.reset();
             hideFn();
         } catch(e) {
@@ -74,13 +79,17 @@ export default function AddExpenseDialog({ show, hideFn }) {
         }
     }
 
+    const getDialogAction = () => {
+        return expense ? 'Edit Expense' : 'Add Expense';
+    }
+
     return (
         <Dialog 
             show={show} 
             hideFn={hideFn}
         >
             <div className="flex flex-col gap-4">
-                <div className="text-xl font-bold">Add Expense</div>
+                <div className="text-xl font-bold">{getDialogAction()}</div>
                 <form onSubmit={handleSubmit}>
                     <div className="flex flex-col gap-4 mb-6">
                         <InputField 
@@ -89,7 +98,7 @@ export default function AddExpenseDialog({ show, hideFn }) {
                             label={"Date"} 
                             placeholder={"Enter expense date"} 
                             type={"date"}
-                            defaultValue={new Date().toISOString().split('T')[0]}
+                            defaultValue={expense.date ?? new Date().toISOString().split('T')[0]}
                             errorMessage={errorMessage?.date}
                         />
                         <InputField 
@@ -98,38 +107,42 @@ export default function AddExpenseDialog({ show, hideFn }) {
                             label={"Amount"} 
                             placeholder={"Enter amount"}
                             type={"number"}
+                            defaultValue={expense.amount}
                             errorMessage={errorMessage?.amount}
                         />
-                        <SelectField
+                        {categories && <SelectField
                             required
                             label={"Category"}
                             name="categoryId"
-                            _options={categories?.map(category => ({
+                            _selected={expense.categoryId && {id: expense.categoryId, label: expense.category}}
+                            _options={categories.map(category => ({
                                 id: category.id,
                                 label: category.name
                             }))}
                             placeholder={"--Select Category--"}
                             errorMessage={errorMessage?.categoryId}
-                        />
-                        <SelectField
+                        />}
+                        {shops && <SelectField
                             label={"Shop"}
                             name="shopId"
-                            _options={shops?.map(shop => ({
+                            _selected={expense.shopId && {id: expense.shopId, label: shops.find(shop => shop.id == expense.shopId)?.name}}
+                            _options={shops.map(shop => ({
                                 id: shop.id,
                                 label: shop.name
                             }))}
                             placeholder={"--Select Shop--"}
-                        />
+                        />}
                         <TextField
                             name={"remarks"} 
                             label={"Notes (max 120 characters)"} 
                             placeholder={"Enter notes"}
                             rows={4}
                             maxLength={120}
+                            defaultValue={expense.remarks}
                             errorMessage={errorMessage?.remarks}
                         />
                     </div>
-                    <Button type="submit" label={"Add Expense"}/>
+                    <Button type="submit" label={getDialogAction()}/>
                 </form>
             </div>
         </Dialog>

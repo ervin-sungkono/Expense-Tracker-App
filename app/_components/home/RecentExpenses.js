@@ -2,7 +2,7 @@
 import { useLiveQuery } from "dexie-react-hooks";
 import { db } from "@/app/_lib/db";
 import SubHeader from "./SubHeader";
-import RecentExpenseCard from "./RecentExpenseCard";
+import ExpenseCard from "../expenses/ExpenseCard";
 import { useEffect, useState } from "react";
 
 export default function RecentExpenses() {
@@ -24,18 +24,18 @@ export default function RecentExpenses() {
     if(!expenseData) {
         return (
             <div className="mb-4">
-                <SubHeader title={"Recent Expenses"} linkLabel="See all" link={"/expensess"} loading/>
+                <SubHeader title={"Recent Expenses"} linkLabel="See all" link={"/expenses"} loading/>
                 <div className="h-48 bg-neutral-200 dark:bg-neutral-700 rounded-lg py-1.5 animate-pulse"></div>
             </div>
         )
     }
     return(
         <div className="mb-4">
-            <SubHeader title={"Recent Expenses"} linkLabel="See all" link={"/expensess"}/>
+            <SubHeader title={"Recent Expenses"} linkLabel="See all" link={"/expenses"}/>
             <div className="bg-neutral-200 dark:bg-neutral-700 rounded-lg py-1.5">
                 {expenseData.length > 0 ? 
                 expenseData.map(expense => (
-                    <RecentExpenseCard key={expense.id} {...expense}/>
+                    <ExpenseCard key={expense.id} expense={expense}/>
                 )) :
                 <div className="h-48 flex justify-center items-center bg-neutral-200 dark:bg-neutral-700 rounded-lg py-2">
                     <p className="text-center text-sm md:text-base text-dark/80 dark:text-white/80">No recent expenses found.</p>
