@@ -3,6 +3,25 @@ import Dexie from "dexie";
 const DB_NAME = "ExpenseDB";
 const DB_VERSION = 1;
 
+function isInAmountRange(amount, range) {
+    const [min, max] = range;
+
+    if(min && amount < min) return false;
+    if(max && amount > max) return false;
+
+    return true
+}
+
+function isInDateRange(date, range) {
+    const [min, max] = range;
+
+    const currTime = new Date(date).getTime();
+    if(min && currTime < new Date(min).getTime()) return false;
+    if(max && currTime > new Date(max).getTime()) return false;
+
+    return true
+}
+
 class ExpenseDB extends Dexie {
     constructor() {
         super(DB_NAME);
@@ -18,12 +37,15 @@ class ExpenseDB extends Dexie {
         return this.expenses.toArray();
     }
 
-    getPaginatedExpenses(pageIndex = 0, pageSize = 10, searchText, chosenCategory) {
+    getPaginatedExpenses(pageIndex = 0, pageSize = 10, searchText, { categoryId, shopId, amountRange, dateRange }) {
         return this.expenses
             .orderBy('date')
             .filter(expense => {
                 if(!expense.remarks.toLowerCase().includes(searchText)) return false;
-                if(chosenCategory && expense.categoryId !== chosenCategory) return false;
+                if(categoryId && expense.categoryId != categoryId) return false;
+                if(shopId && expense.shopId != shopId) return false
+                if(!isInAmountRange(expense.amount, amountRange)) return false;
+                if(!isInDateRange(expense.date, dateRange)) return false;
 
                 return true;
             })

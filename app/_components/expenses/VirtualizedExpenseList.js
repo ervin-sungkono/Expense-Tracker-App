@@ -1,4 +1,5 @@
 'use client'
+import { memo } from 'react';
 import { FixedSizeList } from 'react-window';
 import AutoSizer from 'react-virtualized-auto-sizer';
 import InfiniteLoader from 'react-window-infinite-loader';
@@ -13,6 +14,8 @@ const Row = ({ index, style, data }) => {
       <ExpenseCard expense={item} style={style}/>
   );
 };
+
+const MemoizedRow = memo(Row);
 
 const VirtualizedExpenseList = ({ items, loadMore, hasNextPage }) => {
   const isItemLoaded = index => !hasNextPage || index < items.length;
@@ -53,7 +56,7 @@ const VirtualizedExpenseList = ({ items, loadMore, hasNextPage }) => {
               className='bg-neutral-200 dark:bg-neutral-700 rounded-lg'
               style={{willChange: 'initial'}}
             >
-              {Row}
+              {MemoizedRow}
             </FixedSizeList>
           )}
         </InfiniteLoader>
