@@ -85,7 +85,7 @@ export default function ExpenseData() {
                 <div className="px-3 grid grid-cols-2 gap-2">
                     <SelectField
                         name={"month"}
-                        _selected={{id: selectedMonth, label: MONTHS[selectedMonth]}}
+                        _selected={selectedMonth}
                         _options={MONTHS.map((month, index) => ({
                             id: index,
                             label: month
@@ -94,7 +94,7 @@ export default function ExpenseData() {
                     />
                     <SelectField 
                         name={"year"}
-                        _selected={{id: selectedYear, label: selectedYear}}
+                        _selected={selectedYear}
                         _options={generateRangeOptions(1980, 2100).map(year => ({
                             id: year,
                             label: year
@@ -112,7 +112,7 @@ export default function ExpenseData() {
                 <div className="px-3">
                     <SelectField 
                         name={"year"}
-                        _selected={{id: selectedYear, label: selectedYear}}
+                        _selected={selectedYear}
                         _options={generateRangeOptions(1980, 2100).map(year => ({
                             id: year,
                             label: year

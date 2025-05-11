@@ -3,9 +3,13 @@ import { useEffect, useRef, useState } from "react"
 
 export default function SelectField({ label, name, required = false, _selected, placeholder, _options = [], errorMessage, onChange }){
     const [options, _] = useState(_options);
-    const [selected, setSelected] = useState(_selected);
+    const [selected, setSelected] = useState(null);
     const [showOption, setShowOption] = useState(false);
     const dropdownRef = useRef();
+
+    useEffect(() => {
+        if(_selected && options) setSelected(options.find(option => option.id == _selected))
+    }, [_selected, options])
 
     useEffect(() => {
         if(dropdownRef?.current && showOption && selected?.id) {
@@ -23,7 +27,7 @@ export default function SelectField({ label, name, required = false, _selected, 
                 <input 
                     name={name}
                     type="text"
-                    value={selected?.id}
+                    defaultValue={selected?.id}
                     className={`hidden`}
                     readOnly
                 />
