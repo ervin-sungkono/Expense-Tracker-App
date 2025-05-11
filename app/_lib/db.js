@@ -71,6 +71,19 @@ class ExpenseDB extends Dexie {
         return this.shops.toArray();
     }
 
+    getPaginatedShops(pageIndex = 0, pageSize = 10, searchText) {
+        return this.shops
+            .orderBy('name')
+            .filter(shop => {
+                if(!shop.name.toLowerCase().includes(searchText)) return false;
+
+                return true;
+            })
+            .offset(pageIndex * pageSize)
+            .limit(pageSize)
+            .toArray();
+    }
+
     addExpense({ date, amount, categoryId, shopId, remarks }) {
         return this.expenses.add({ date, amount, categoryId, shopId, remarks });
     }
