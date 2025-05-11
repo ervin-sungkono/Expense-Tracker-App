@@ -9,17 +9,29 @@ import { useSearchParams } from "next/navigation";
 import SearchBar from "../_components/common/Searchbar";
 import Header from "../_components/common/Header";
 import IconButton from "../_components/common/IconButton";
+import FilterExpenseDialog from "../_components/common/dialog/FilterExpenseDialog";
 import { IoFilter } from "react-icons/io5";
 
 export default function Expenses() {
     const PAGE_SIZE = 20;
-    const createLiveQuery = (pageIndex) => liveQuery(() => db.getPaginatedExpenses(pageIndex, PAGE_SIZE, searchText, chosenCategory, chosenShop));
+    const createLiveQuery = (pageIndex) => liveQuery(
+        () => db.getPaginatedExpenses(
+            pageIndex, 
+            PAGE_SIZE, 
+            searchText, 
+            filterOptions
+        )
+    );
     const [liveQueries, setLiveQueries] = useState([createLiveQuery(0)]);
     const [resultArrays, setResultArrays] = useState([]);
     const [expenses, setExpenses] = useState(null)
     const [searchText, setSearchText] = useState("");
-    const [chosenCategory, setChosenCategory] = useState(null);
-    const [chosenShop, setChosenShop] = useState(null);
+    const [filterOptions, setFilterOptions] = useState({
+        categoryId: null,
+        shopId: null,
+        amountRange: [undefined, undefined],
+        dateRange: [undefined, undefined]
+    })
     const categories = useLiveQuery(() => db.getAllCategories());
     const shops = useLiveQuery(() => db.getAllShops());
 
@@ -44,20 +56,26 @@ export default function Expenses() {
         };
     }, [liveQueries])
 
-    useEffect(() => {
+    useEffect(() => {        
         setLiveQueries([createLiveQuery(0)]);
         setResultArrays([]);
-    }, [searchText, chosenCategory, chosenShop])
+    }, [searchText, filterOptions])
 
     useEffect(() => {
         if(category && categories) {
-            setChosenCategory(categories.find(c => c.name.toLowerCase() === category.toLowerCase())?.id)
+            setFilterOptions((prevOptions) => ({
+                ...prevOptions,
+                categoryId: categories.find(c => c.name.toLowerCase() === category.toLowerCase())?.id
+            }))
         }
     }, [category, categories])
 
     useEffect(() => {
         if(shop && shops) {
-            setChosenShop(shops.find(s => s.name.toLowerCase() === shop.toLowerCase())?.id)
+            setFilterOptions((prevOptions) => ({
+                ...prevOptions,
+                shopId: shops.find(s => s.name.toLowerCase() === shop.toLowerCase())?.id
+            }))
         }
     }, [shop, shops])
 
@@ -104,6 +122,12 @@ export default function Expenses() {
                     />
                 </div>
             </div>
+            <FilterExpenseDialog
+                show={filterMode}
+                hideFn={() => setFilterMode(false)}
+                filterOptions={filterOptions}
+                setFilterOptions={setFilterOptions}
+            />
         </Layout>
     )
 }

@@ -6,7 +6,7 @@ export default function InputField({ name, required = false, label, type, placeh
     const [value, setValue] = useState(defaultValue)
     
     return(
-        <div className="flex flex-col gap-2">
+        <div className="w-full flex flex-col gap-2">
             <label htmlFor={`id-${name}`} className="block font-semibold text-xs md:text-sm text-dark-blue">
                 {label}
                 {required && <span className="text-red-600">*</span>}
