@@ -1,5 +1,5 @@
 import { Swiper, SwiperSlide } from "swiper/react";
-import { FreeMode } from 'swiper/modules'
+import { FreeMode, Virtual } from 'swiper/modules'
 
 import 'swiper/css'
 
@@ -10,7 +10,7 @@ export default function SwiperContainer({ spaceBetween = 0, slidesPerView = 1, i
             spaceBetween={spaceBetween}
             slidesPerView={slidesPerView}
             freeMode={true}
-            modules={[FreeMode]}
+            modules={[FreeMode, Virtual]}
             breakpoints={{
                 640: {
                     slidesPerView: slidesPerView * 1.2,
@@ -19,6 +19,11 @@ export default function SwiperContainer({ spaceBetween = 0, slidesPerView = 1, i
             }}
             className="swiper"
             style={{ overflow: 'visible' }}
+            virtual={{
+                enabled: true,
+                addSlidesBefore: 2,
+                addSlidesAfter: 2
+            }}
         >
             {items.map(item => (
                 <SwiperSlide key={item.id}>{item.component}</SwiperSlide>
