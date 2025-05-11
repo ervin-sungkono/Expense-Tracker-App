@@ -9,7 +9,7 @@ import SearchBar from "../_components/common/Searchbar";
 import Header from "../_components/common/Header";
 import IconButton from "../_components/common/IconButton";
 import FilterExpenseDialog from "../_components/common/dialog/FilterExpenseDialog";
-import { IoFilter } from "react-icons/io5";
+import { IoFilter as FilterIcon } from "react-icons/io5";
 
 export default function Expenses() {
     const PAGE_SIZE = 20;
@@ -87,7 +87,7 @@ export default function Expenses() {
                             onSearch={(value) => setSearchText(value.toLowerCase())}
                         />
                         <div className="relative z-0">
-                            <IconButton icon={<IoFilter size={20}/>} contained onClick={() => setFilterMode(!filterMode)}/>
+                            <IconButton icon={<FilterIcon size={20}/>} contained onClick={() => setFilterMode(!filterMode)}/>
                         </div>
                     </div>
                 </div>
