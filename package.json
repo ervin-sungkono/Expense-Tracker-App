@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@ducanh2912/next-pwa": "^10.2.9",
+    "@formatjs/intl-enumerator": "^1.8.10",
     "chart.js": "^4.4.9",
     "dexie": "^4.0.11",
     "dexie-react-hooks": "^1.1.7",
