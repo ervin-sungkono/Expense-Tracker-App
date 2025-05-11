@@ -2,14 +2,37 @@ import Dialog from "./Dialog";
 import SelectField from "../SelectField";
 import Button from "../Button";
 import { useLiveQuery } from "dexie-react-hooks";
+import { useSearchParams } from "next/navigation";
 import { db } from "@/app/_lib/db";
 import InputField from "../InputField";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 export default function FilterExpenseDialog({ show, hideFn, filterOptions = {}, setFilterOptions }) {
     const categories = useLiveQuery(() => db.getAllCategories());
     const shops = useLiveQuery(() => db.getAllShops());
     const [errorMessage, setErrorMessage] = useState({});
+
+    const searchParams = useSearchParams();
+    const category = searchParams.get('category');
+    const shop = searchParams.get('shop');
+
+    useEffect(() => {
+            if(category && categories) {
+                setFilterOptions((prevOptions) => ({
+                    ...prevOptions,
+                    categoryId: categories.find(c => c.name.toLowerCase() === category.toLowerCase())?.id
+                }))
+            }
+    }, [category, categories])
+
+    useEffect(() => {
+        if(shop && shops) {
+            setFilterOptions((prevOptions) => ({
+                ...prevOptions,
+                shopId: shops.find(s => s.name.toLowerCase() === shop.toLowerCase())?.id
+            }))
+        }
+    }, [shop, shops])
 
     const onHide = () => {
         setErrorMessage({})
