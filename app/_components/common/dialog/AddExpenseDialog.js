@@ -65,6 +65,7 @@ export default function AddExpenseDialog({ expense = {}, show, hideFn }) {
                 return;
             }
 
+            payload.amount = Number(payload.amount); // ensure that value stored is Number type
             if(expense) {
                 db.updateExpense(expense.id, payload);
             } else {
@@ -96,7 +97,6 @@ export default function AddExpenseDialog({ expense = {}, show, hideFn }) {
                             required
                             name={"date"} 
                             label={"Date"} 
-                            placeholder={"Enter expense date"} 
                             type={"date"}
                             defaultValue={expense.date ?? new Date().toISOString().split('T')[0]}
                             errorMessage={errorMessage?.date}
@@ -114,7 +114,7 @@ export default function AddExpenseDialog({ expense = {}, show, hideFn }) {
                             required
                             label={"Category"}
                             name="categoryId"
-                            _selected={expense.categoryId && {id: expense.categoryId, label: expense.category}}
+                            _selected={expense.categoryId}
                             _options={categories.map(category => ({
                                 id: category.id,
                                 label: category.name
@@ -125,7 +125,7 @@ export default function AddExpenseDialog({ expense = {}, show, hideFn }) {
                         {shops && <SelectField
                             label={"Shop"}
                             name="shopId"
-                            _selected={expense.shopId && {id: expense.shopId, label: shops.find(shop => shop.id == expense.shopId)?.name}}
+                            _selected={expense.shopId}
                             _options={shops.map(shop => ({
                                 id: shop.id,
                                 label: shop.name
