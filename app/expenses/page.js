@@ -81,7 +81,7 @@ export default function Expenses() {
             <div className="h-full flex flex-col">
                 <div className="mb-4">
                     <Header title={"Expense List"} textAlign="center"/>
-                    <div className="flex items-center gap-1.5">
+                    <div className="flex items-center gap-2">
                         <SearchBar
                             placeholder={"Search based on notes"}
                             onSearch={(value) => setSearchText(value.toLowerCase())}
