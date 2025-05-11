@@ -1,11 +1,10 @@
 'use client'
 import Layout from "../_components/layout/Layout";
 import VirtualizedExpenseList from "../_components/expenses/VirtualizedExpenseList";
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import { db } from "../_lib/db";
 import { liveQuery } from "dexie";
 import { useLiveQuery } from "dexie-react-hooks";
-import { useSearchParams } from "next/navigation";
 import SearchBar from "../_components/common/Searchbar";
 import Header from "../_components/common/Header";
 import IconButton from "../_components/common/IconButton";
@@ -37,10 +36,6 @@ export default function Expenses() {
 
     const [filterMode, setFilterMode] = useState(false);
 
-    const searchParams = useSearchParams();
-    const category = searchParams.get('category');
-    const shop = searchParams.get('shop');
-
     useEffect(() => {
         const subscriptions = liveQueries.map((q, i) => q.subscribe(
             results => setResultArrays(resultArrays => {
@@ -60,24 +55,6 @@ export default function Expenses() {
         setLiveQueries([createLiveQuery(0)]);
         setResultArrays([]);
     }, [searchText, filterOptions])
-
-    useEffect(() => {
-        if(category && categories) {
-            setFilterOptions((prevOptions) => ({
-                ...prevOptions,
-                categoryId: categories.find(c => c.name.toLowerCase() === category.toLowerCase())?.id
-            }))
-        }
-    }, [category, categories])
-
-    useEffect(() => {
-        if(shop && shops) {
-            setFilterOptions((prevOptions) => ({
-                ...prevOptions,
-                shopId: shops.find(s => s.name.toLowerCase() === shop.toLowerCase())?.id
-            }))
-        }
-    }, [shop, shops])
 
     useEffect(() => {
         if(resultArrays && resultArrays.length > 0 && categories && shops) {
@@ -122,12 +99,14 @@ export default function Expenses() {
                     />
                 </div>
             </div>
-            <FilterExpenseDialog
-                show={filterMode}
-                hideFn={() => setFilterMode(false)}
-                filterOptions={filterOptions}
-                setFilterOptions={setFilterOptions}
-            />
+            <Suspense>
+                <FilterExpenseDialog
+                    show={filterMode}
+                    hideFn={() => setFilterMode(false)}
+                    filterOptions={filterOptions}
+                    setFilterOptions={setFilterOptions}
+                />
+            </Suspense>
         </Layout>
     )
 }
