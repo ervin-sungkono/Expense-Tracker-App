@@ -28,8 +28,8 @@ export default function SelectField({ label, name, required = false, _selected, 
                     name={name}
                     type="text"
                     defaultValue={selected?.id}
-                    className={`hidden`}
                     readOnly
+                    hidden
                 />
                 <div 
                     id={`id-${name}`}
