@@ -105,7 +105,6 @@ export default function FilterExpenseDialog({ show, hideFn, filterOptions = {}, 
             hideFn && hideFn();
         } catch(e) {
             console.log(e);
-            return;
         }
     }
 
