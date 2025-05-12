@@ -73,7 +73,7 @@ export default function AddExpenseDialog({ expense = {}, show, hideFn }) {
             }
             
             form.reset();
-            hideFn();
+            hideFn && hideFn();
         } catch(e) {
             console.log(e);
             return;

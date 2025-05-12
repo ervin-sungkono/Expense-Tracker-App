@@ -102,7 +102,7 @@ export default function FilterExpenseDialog({ show, hideFn, filterOptions = {}, 
                 dateRange: [start_date, end_date]
             });
 
-            hideFn();
+            hideFn && hideFn();
         } catch(e) {
             console.log(e);
             return;
