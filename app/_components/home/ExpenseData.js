@@ -17,58 +17,53 @@ export default function ExpenseData() {
     const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth());
     const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
 
-    const [dailyExpense, setDailyExpense] = useState(null);
-    const [monthlyExpense, setMonthlyExpense] = useState(null);
-    const [annualExpense, setAnnualExpense] = useState(null);
-
-    const filterExpenseByDate = (date) => {
-        const isSameDate = (targetDate) => {
-            return Math.abs(new Date(targetDate).getTime() - date) < (24 * 60 * 60 * 1000);
-        }
-
-        return expenses.filter(expense => isSameDate(expense.date));
-    }
-
-    const filterExpenseByMonth = (month) => {
-        const isSameMonth = (targetDate) => {
-            return new Date(targetDate).getMonth() === month && new Date(targetDate).getFullYear() === selectedYear;
-        }
-
-        return expenses.filter(expense => isSameMonth(expense.date));
-    }
-
-    const filterExpenseByYear = (year) => {
-        const isSameYear = (targetDate) => {
-            return new Date(targetDate).getFullYear() === year;
-        }
-
-        return expenses.filter(expense => isSameYear(expense.date));
-    }
+    const [dateMap, setDateMap] = useState({});
+    const [monthMap, setMonthMap] = useState({});
+    const [yearMap, setYearMap] = useState({});
 
     useEffect(() => {
-        if(expenses && selectedDate) {
-            setDailyExpense(filterExpenseByDate(selectedDate));
-        }
-    }, [expenses, selectedDate])
+        if(expenses) {
+            const newDateMap = {};
+            const newMonthMap = {};
+            const newYearMap = {};
 
-    useEffect(() => {
-        if(expenses && selectedMonth && selectedYear) {
-            setMonthlyExpense(filterExpenseByMonth(selectedMonth, selectedYear));
-        }
-    }, [expenses, selectedMonth, selectedYear])
+            expenses.forEach(expense => {
+                const date = new Date(expense.date);
+                const month = date.getMonth();
+                const year = date.getFullYear();
+                const monthKey = `${year}-${month}`
 
-    useEffect(() => {
-        if(expenses && selectedYear) {
-            setAnnualExpense(filterExpenseByYear(selectedYear));
+                if(!newDateMap[expense.date]) {
+                    newDateMap[expense.date] = [expense];
+                } else {
+                    newDateMap[expense.date].push(expense);
+                }
+
+                if(!newMonthMap[monthKey]) {
+                    newMonthMap[monthKey] = [expense];
+                } else {
+                    newMonthMap[monthKey].push(expense);
+                }
+
+                if(!newYearMap[year]) {
+                    newYearMap[year] = [expense];
+                } else {
+                    newYearMap[year].push(expense);
+                }
+            })
+
+            setDateMap(newDateMap);
+            setMonthMap(newMonthMap);
+            setYearMap(newYearMap);
         }
-    }, [expenses, selectedYear])
+    }, [expenses])
 
     const contents = [
         {
             id: 'daily',
             label: 'Daily',
             header: () => (
-                <div className="px-3">
+                <div className="px-3 pt-2">
                     <InputField
                         type={"date"} 
                         defaultValue={new Date().toISOString().split('T')[0]} 
@@ -76,13 +71,13 @@ export default function ExpenseData() {
                     />
                 </div>
             ),
-            component: <ExpenseChart expenseData={dailyExpense}/>
+            component: <ExpenseChart expenseData={dateMap[selectedDate]}/>
         },
         {
             id: 'monthly',
             label: 'Monthly',
             header: () => (
-                <div className="px-3 grid grid-cols-2 gap-2">
+                <div className="px-3 pt-2 grid grid-cols-2 gap-2">
                     <SelectField
                         name={"month"}
                         _selected={selectedMonth}
@@ -103,13 +98,13 @@ export default function ExpenseData() {
                     />
                 </div>
             ),
-            component: <ExpenseChart expenseData={monthlyExpense}/>
+            component: <ExpenseChart expenseData={monthMap[`${selectedYear}-${selectedMonth}`]}/>
         },
         {
             id: 'annual',
             label: 'Annual',
             header: () => (
-                <div className="px-3">
+                <div className="px-3 pt-2">
                     <SelectField 
                         name={"year"}
                         _selected={selectedYear}
@@ -121,13 +116,13 @@ export default function ExpenseData() {
                     />
                 </div>
             ),
-            component: <ExpenseChart expenseData={annualExpense}/>
+            component: <ExpenseChart expenseData={yearMap[selectedYear]}/>
         }
     ]
 
     return(
         <div className="mb-4">
-            <SubHeader loading={!dailyExpense} title="My Expense" link="/expenses"/>
+            <SubHeader loading={!expenses} title="My Expense" link="/expenses"/>
             <Tab selected={'daily'} contents={contents}/>
         </div>
     )
