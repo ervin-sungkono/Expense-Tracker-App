@@ -1,6 +1,6 @@
 'use client'
 import { useEffect, useState } from "react"
-import { IoMdClose } from "react-icons/io";
+import { IoMdClose as CloseIcon } from "react-icons/io";
 
 export default function Dialog({ children, show = false, hideFn = null, hideCancelButton = false }) {
     const [hidden, setHidden] = useState(true);
@@ -22,7 +22,7 @@ export default function Dialog({ children, show = false, hideFn = null, hideCanc
                 {children}
                 {!hideCancelButton && 
                 <button className="absolute cursor-pointer p-2 bg-basic-gradient rounded-bl-lg right-0 top-0" onClick={hideFn}>
-                    <IoMdClose size={20}/>
+                    <CloseIcon size={20}/>
                 </button>}
             </div>
             <div className="pointer-events-none overlay absolute bg-dark/60 w-full h-full"></div>
