@@ -74,7 +74,7 @@ export default function ExpenseChart({ expenseData }) {
     }, [labels, data])
 
     if(expenseData && expenseData.length === 0) return (
-        <div className="flex justify-center items-center h-48 xs:h-64 px-3">
+        <div className="flex justify-center items-center h-48 xs:h-64 px-3 py-4">
             <p className="text-sm md:text-base text-center text-dark dark:text-white">No expense data found, please create an expense first.</p>
         </div>
     )
