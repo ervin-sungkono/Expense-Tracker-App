@@ -19,10 +19,11 @@ export default function SelectField({ label, name, required = false, _selected, 
     
     return(
         <div className="flex flex-col gap-2">
+            {label &&
             <label htmlFor={`id-${name}`} className="block font-semibold text-xs md:text-sm text-dark-blue">
                 {label}
                 {required && <span className="text-red-600">*</span>}
-            </label>
+            </label>}
             <div className="relative">
                 <input 
                     name={name}
