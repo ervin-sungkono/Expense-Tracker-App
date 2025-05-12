@@ -7,10 +7,11 @@ export default function InputField({ name, required = false, label, type, placeh
     
     return(
         <div className="w-full flex flex-col gap-2">
+            {label && 
             <label htmlFor={`id-${name}`} className="block font-semibold text-xs md:text-sm text-dark-blue">
                 {label}
                 {required && <span className="text-red-600">*</span>}
-            </label>
+            </label>}
             <div className="relative flex flex-col gap-1">
                 <input 
                     ref={ref}
