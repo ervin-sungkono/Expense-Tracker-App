@@ -16,7 +16,7 @@ const Row = ({ columnIndex, rowIndex, style, data }) => {
   if(!item) return <div style={style} className='flex justify-center items-center animate-pulse'><p>Loading more data..</p></div>
   
   return (
-      <ShopCard shop={item} style={style}/>
+      <ShopCard shop={item} isOdd={index % 2 === 1} style={style}/>
   );
 };
 
@@ -52,7 +52,7 @@ const VirtualizedShopList = ({ items, loadMore, hasNextPage }) => {
            {({ onItemsRendered, ref }) => (
               <FixedSizeGrid
                 rowHeight={200}
-                rowCount={items.length / COLUMN_CNT}
+                rowCount={Math.ceil(items.length / COLUMN_CNT)}
                 columnWidth={width / COLUMN_CNT}
                 columnCount={COLUMN_CNT}
                 height={height}
