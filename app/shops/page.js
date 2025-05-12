@@ -8,50 +8,27 @@ import SearchBar from "../_components/common/Searchbar";
 import Header from "../_components/common/Header";
 import IconButton from "../_components/common/IconButton";
 import { IoMdAdd as PlusIcon } from "react-icons/io";
+import { useLiveQuery } from "dexie-react-hooks";
 
 export default function Shops() {
     const PAGE_SIZE = 10;
-    const createLiveQuery = (pageIndex) => liveQuery(
-        () => db.getPaginatedShops(
-            pageIndex, 
-            PAGE_SIZE, 
-            searchText
-        )
-    );
-    const [liveQueries, setLiveQueries] = useState([createLiveQuery(0)]);
-    const [resultArrays, setResultArrays] = useState([]);
-    const [shops, setShops] = useState(null);
+    const [limit, setLimit] = useState(PAGE_SIZE);
     const [searchText, setSearchText] = useState("");
+
+    const shops = useLiveQuery(
+        () => db.getPaginatedShops(limit, searchText), 
+        [limit, searchText]
+    )
+    
     const [showAdd, setShowAdd] = useState(false);
 
-    useEffect(() => {
-        const subscriptions = liveQueries.map((q, i) => q.subscribe(
-            results => setResultArrays(resultArrays => {
-              const arrayClone = [...resultArrays];
-              arrayClone[i] = results;
-              return arrayClone;
-            })
-        ));
-        return () => {
-            for (const s of subscriptions) {
-                s.unsubscribe();
-            }
-        };
-    }, [liveQueries])
-
     useEffect(() => {        
-        setLiveQueries([createLiveQuery(0)]);
-        setResultArrays([]);
+        setLimit(PAGE_SIZE); // Refresh search
     }, [searchText])
 
     const fetchMoreData = async() => {
-        const nextPageIndex = liveQueries.length;
-        setLiveQueries(currentLiveQueries => [...currentLiveQueries, createLiveQuery(nextPageIndex)])
+        setLimit(currentLimit => currentLimit + PAGE_SIZE);
     };
-
-    useEffect(() => {
-        if(resultArrays) setShops(resultArrays.flat(1))
-    }, [resultArrays])
 
     return(
         <Layout pathname={"/shops"}>
@@ -72,7 +49,7 @@ export default function Shops() {
                     <VirtualizedShopList
                         items={shops}
                         loadMore={fetchMoreData}
-                        hasNextPage={resultArrays.at(-1)?.length === PAGE_SIZE}
+                        hasNextPage={shops && shops.length > 0 && shops.length % PAGE_SIZE === 0}
                     />
                 </div>
             </div>
