@@ -66,3 +66,12 @@ export function formatCurrency(value, locale = 'id-ID', currency = 'IDR') {
 export function formatDateString(date, locale = 'en-US') {
     return new Date(date).toLocaleDateString(locale, { day: 'numeric', month: 'long', year: 'numeric' })
 }
+
+export function getBase64(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = error => reject(error);
+  });
+}
