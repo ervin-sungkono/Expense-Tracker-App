@@ -49,7 +49,7 @@ const VirtualizedExpenseList = ({ items, loadMore, hasNextPage }) => {
               height={height}
               width={width}
               itemCount={hasNextPage ? items.length + 1 : items.length}
-              itemSize={65}
+              itemSize={60}
               onItemsRendered={onItemsRendered}
               ref={ref}
               itemData={items}
