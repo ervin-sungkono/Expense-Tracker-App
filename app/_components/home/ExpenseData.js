@@ -33,23 +33,9 @@ export default function ExpenseData() {
                 const year = date.getFullYear();
                 const monthKey = `${year}-${month}`
 
-                if(!newDateMap[expense.date]) {
-                    newDateMap[expense.date] = [expense];
-                } else {
-                    newDateMap[expense.date].push(expense);
-                }
-
-                if(!newMonthMap[monthKey]) {
-                    newMonthMap[monthKey] = [expense];
-                } else {
-                    newMonthMap[monthKey].push(expense);
-                }
-
-                if(!newYearMap[year]) {
-                    newYearMap[year] = [expense];
-                } else {
-                    newYearMap[year].push(expense);
-                }
+                newDateMap[expense.date] = (newDateMap[expense.date] || []).concat(expense);
+                newMonthMap[monthKey] = (newMonthMap[monthKey] || []).concat(expense);
+                newYearMap[year] = (newYearMap[year] || []).concat(expense);
             })
 
             setDateMap(newDateMap);
