@@ -24,7 +24,7 @@ export default function Tab({ header, selected = null, contents = [] }) {
             <div className="w-full border border-ocean-blue rounded-lg rounded-tl-none">
                 {contents.map((content) => (
                     <div key={`content-${content.id}`} className={`${selectedTab === content.id ? 'block' : 'hidden'}`}>
-                        {content.header()}
+                        {content.header && content.header()}
                         {content.component}
                     </div>
                 ))}
