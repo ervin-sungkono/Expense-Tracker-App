@@ -49,11 +49,9 @@ export default function InfoShopDialog({ shop, show, hideFn }) {
 
         payload.image = payload.image || null;
 
-        console.log(payload);
-
         try{
             let error = {};
-            const { image, name, location } = payload;
+            const { name, location } = payload;
 
             error.name = validateName(name);
             error.location = validateLocation(location);
@@ -63,8 +61,12 @@ export default function InfoShopDialog({ shop, show, hideFn }) {
                 return;
             }
 
-
-            db.updateShop(shop.id, payload);
+            if(shop) {
+                db.updateShop(shop.id, payload);
+            } else {
+                db.addShop(payload);
+            }
+            
             form.reset();
             hideFn && hideFn();
         } catch(e) {
@@ -80,13 +82,13 @@ export default function InfoShopDialog({ shop, show, hideFn }) {
                 hideFn={hideFn}
             >
                 <div className="flex flex-col gap-4">
-                    <div className="text-xl font-bold">Shop Detail</div>
+                    <div className="text-xl font-bold">{shop ? 'Shop Detail' : 'Add Shop'}</div>
                     <form onSubmit={handleSubmit}>
                         <div className="flex flex-col gap-4 mb-6">
                             <ImageUploader
                                 name={"image"}
                                 label="Image"
-                                initialValue={shop.image}
+                                initialValue={shop?.image}
                                 dropzoneOptions={{
                                     accept: { 'image/*': [] },
                                     maxSize: 5 * 1000 * 1000, // 5MB
@@ -97,7 +99,7 @@ export default function InfoShopDialog({ shop, show, hideFn }) {
                                 name={"name"} 
                                 label={"Name"} 
                                 placeholder={"Enter shop name"}
-                                defaultValue={shop.name}
+                                defaultValue={shop?.name}
                                 errorMessage={errorMessage?.name}
                             />
                             <InputField 
@@ -105,23 +107,24 @@ export default function InfoShopDialog({ shop, show, hideFn }) {
                                 name={"location"} 
                                 label={"Location"} 
                                 placeholder={"Enter shop location"}
-                                defaultValue={shop.location}
+                                defaultValue={shop?.location}
                                 errorMessage={errorMessage?.location}
                             />
                         </div>
                         <div className="flex justify-end gap-2.5">
-                            <Button label={"Delete"} style="danger" contained onClick={() => setShowDelete(true)}/>
-                            <Button type="submit" label={"Edit"} contained/>
+                            {shop && <Button label={"Delete"} style="danger" contained onClick={() => setShowDelete(true)}/>}
+                            <Button type="submit" label={shop ? 'Edit' : 'Add'} contained/>
                         </div>
                     </form>
                 </div>
             </Dialog>
+            {shop && 
             <DeleteShopDialog
                 shopId={shop.id}
                 show={showDelete}
                 hideFn={() => setShowDelete(false)}
                 onDelete={handleDelete}
-            />
+            />}
         </>
     )
 }
