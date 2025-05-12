@@ -37,7 +37,7 @@ class ExpenseDB extends Dexie {
         return this.expenses.toArray();
     }
 
-    getPaginatedExpenses(pageIndex = 0, pageSize = 10, searchText, { categoryId, shopId, amountRange, dateRange }) {
+    getPaginatedExpenses(limit, searchText, { categoryId, shopId, amountRange, dateRange }) {
         return this.expenses
             .orderBy('date')
             .filter(expense => {
@@ -50,8 +50,7 @@ class ExpenseDB extends Dexie {
                 return true;
             })
             .reverse()
-            .offset(pageIndex * pageSize)
-            .limit(pageSize)
+            .limit(limit)
             .toArray();
     }
 
@@ -71,7 +70,7 @@ class ExpenseDB extends Dexie {
         return this.shops.toArray();
     }
 
-    getPaginatedShops(pageIndex = 0, pageSize = 10, searchText) {
+    getPaginatedShops(limit, searchText) {
         return this.shops
             .orderBy('name')
             .filter(shop => {
@@ -79,8 +78,7 @@ class ExpenseDB extends Dexie {
 
                 return true;
             })
-            .offset(pageIndex * pageSize)
-            .limit(pageSize)
+            .limit(limit)
             .toArray();
     }
 

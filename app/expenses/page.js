@@ -13,17 +13,8 @@ import { IoFilter as FilterIcon } from "react-icons/io5";
 
 export default function Expenses() {
     const PAGE_SIZE = 20;
-    const createLiveQuery = (pageIndex) => liveQuery(
-        () => db.getPaginatedExpenses(
-            pageIndex, 
-            PAGE_SIZE, 
-            searchText, 
-            filterOptions
-        )
-    );
-    const [liveQueries, setLiveQueries] = useState([createLiveQuery(0)]);
-    const [resultArrays, setResultArrays] = useState([]);
-    const [expenses, setExpenses] = useState(null)
+
+    const [limit, setLimit] = useState(PAGE_SIZE);
     const [searchText, setSearchText] = useState("");
     const [filterOptions, setFilterOptions] = useState({
         categoryId: null,
@@ -31,37 +22,28 @@ export default function Expenses() {
         amountRange: [undefined, undefined],
         dateRange: [undefined, undefined]
     })
+
+    const expenseQuery = useLiveQuery(
+        () => db.getPaginatedExpenses(limit, searchText, filterOptions), 
+        [limit, searchText, filterOptions]
+    )
+    
+    const [expenses, setExpenses] = useState(null)
     const categories = useLiveQuery(() => db.getAllCategories());
     const shops = useLiveQuery(() => db.getAllShops());
 
     const [filterMode, setFilterMode] = useState(false);
 
-    useEffect(() => {
-        const subscriptions = liveQueries.map((q, i) => q.subscribe(
-            results => setResultArrays(resultArrays => {
-              const arrayClone = [...resultArrays];
-              arrayClone[i] = results;
-              return arrayClone;
-            })
-        ));
-        return () => {
-            for (const s of subscriptions) {
-                s.unsubscribe();
-            }
-        };
-    }, [liveQueries])
-
     useEffect(() => {        
-        setLiveQueries([createLiveQuery(0)]);
-        setResultArrays([]);
+        setLimit(PAGE_SIZE); // Refresh page limit
     }, [searchText, filterOptions])
 
     useEffect(() => {
-        if(resultArrays && resultArrays.length > 0 && categories && shops) {
+        if(expenseQuery && categories && shops) {
             const categoriesMap = new Map(categories.map(category => [String(category.id), category.name]));
             const shopsMap = new Map(shops.map(shop => [String(shop.id), shop.name]));
             setExpenses(
-                resultArrays.flat(1)
+                expenseQuery
                 .map(expense => ({ 
                     ...expense, 
                     category: categoriesMap.get(String(expense.categoryId)),
@@ -69,11 +51,10 @@ export default function Expenses() {
                 }))
             )
         }
-    }, [resultArrays, categories, shops])
+    }, [expenseQuery, categories, shops])
 
     const fetchMoreData = async() => {
-        const nextPageIndex = liveQueries.length;
-        setLiveQueries(currentLiveQueries => [...currentLiveQueries, createLiveQuery(nextPageIndex)])
+        setLimit(currentLimit => currentLimit + PAGE_SIZE);
     };
 
     return(
@@ -95,7 +76,7 @@ export default function Expenses() {
                     <VirtualizedExpenseList
                         items={expenses}
                         loadMore={fetchMoreData}
-                        hasNextPage={resultArrays.at(-1)?.length === PAGE_SIZE}
+                        hasNextPage={expenseQuery && expenseQuery.length > 0 && expenseQuery.length % PAGE_SIZE === 0}
                     />
                 </div>
             </div>
