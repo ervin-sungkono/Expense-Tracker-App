@@ -52,7 +52,7 @@ export default function ExpenseData() {
                 <div className="px-3 pt-2">
                     <InputField
                         type={"date"} 
-                        defaultValue={new Date().toISOString().split('T')[0]} 
+                        defaultValue={selectedDate} 
                         onChange={(e) => setSelectedDate(e.target.value)}
                     />
                 </div>

@@ -12,7 +12,7 @@ ChartJS.defaults.font.style = 'normal';
 ChartJS.defaults.font.weight = 700;
 ChartJS.register(ArcElement, Tooltip, Legend);
 
-export default function ExpenseChart({ expenseData }) {
+export default function ExpenseChart({ expenseData = [] }) {
     const categories = useLiveQuery(() => db.getAllCategories());
     const [labels, setLabels] = useState(null);
     const [data, setData] = useState(null);
