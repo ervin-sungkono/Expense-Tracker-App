@@ -6,6 +6,7 @@ import Button from "../Button";
 import { useState } from "react";
 import DeleteShopDialog from "./DeleteShopDialog";
 import ImageUploader from "../ImageUploader";
+import { StringValidator } from "@/app/_lib/validator";
 
 export default function InfoShopDialog({ shop, show, hideFn }) {
     const [errorMessage, setErrorMessage] = useState({});
@@ -18,21 +19,16 @@ export default function InfoShopDialog({ shop, show, hideFn }) {
 
     // TODO: make validator utils(?) or just use yup.
     const validateName = (name) => {
-        if(!name) {
-            return 'Name must be filled.';
-        }
-        if(name.length < 3) {
-            return 'Name must be at least 3 characters.'
-        }
+        return new StringValidator("Name", name)
+            .required()
+            .minLength(3)
+            .validate();
     }
 
     const validateLocation = (location) => {
-        if(!location) {
-            return 'Location must be filled';
-        }
-        if(location.length < 3) {
-            return 'Location must be at least 3 characters.'
-        }
+        return new StringValidator("Location", location)
+            .required()
+            .minLength(3)
     }
 
     const handleSubmit = (e) => {

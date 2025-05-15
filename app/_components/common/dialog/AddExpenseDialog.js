@@ -7,6 +7,7 @@ import { db } from "@/app/_lib/db";
 import { useLiveQuery } from "dexie-react-hooks";
 import { useState } from "react";
 import Button from "../Button";
+import { DateValidator, NumberValidator, StringValidator } from "@/app/_lib/validator";
 
 export default function AddExpenseDialog({ expense = {}, show, hideFn }) {
     const categories = useLiveQuery(() => db.getAllCategories());
@@ -14,29 +15,30 @@ export default function AddExpenseDialog({ expense = {}, show, hideFn }) {
     const [errorMessage, setErrorMessage] = useState({});
 
     const validateDate = (date) => {
-        if (!date || isNaN(new Date(date))) {
-            return 'Date must be valid date!';
-        }
+        return new DateValidator("Date", date)
+            .required()
+            .date()
+            .validate();
     }
 
     const validateAmount = (amount) => {
-        if(!amount) {
-            return 'Amount must be filled.';
-        } else if(amount <= 0) {
-            return 'Amount must be more than 0.';
-        }
+        return new NumberValidator("Amount", amount)
+            .required()
+            .min(1)
+            .validate();
     }
 
     const validateCategory = (categoryId) => {
-        if(!categoryId) {
-            return 'Category must be filled.';
-        }
+        return new StringValidator("Category", categoryId)
+            .required()
+            .validate();
     }
 
     const validateRemarks = (remarks) => {
-        if(remarks && remarks.length > 120) {
-            return 'Notes cannot be more than 120 characters.';
-        }
+        return new StringValidator("Notes", remarks)
+            .required()
+            .maxLength(120)
+            .validate();
     }
 
     const handleSubmit = (e) => {
