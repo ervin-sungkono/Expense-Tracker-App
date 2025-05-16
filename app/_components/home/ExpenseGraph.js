@@ -7,11 +7,12 @@ import {
     LineElement,
     Title,
     Tooltip,
-    Legend
+    Legend,
+    Filler
 } from "chart.js";
 import { Line } from "react-chartjs-2";
-import { useEffect, useState } from "react";
-import { formatDateString, nFormatter } from "@/app/_lib/utils";
+import { useEffect, useRef, useState } from "react";
+import { formatCurrency, formatDateString, nFormatter } from "@/app/_lib/utils";
 import { MONTHS } from "@/app/_lib/const";
 
 ChartJS.defaults.font.family = "'Inter', sans-serif"
@@ -25,19 +26,22 @@ ChartJS.register(
     LineElement,
     Title,
     Tooltip,
-    Legend
+    Legend,
+    Filler
 );
 
 export default function ExpenseGraph({ expenseData = [], labels, type = 'MONTHLY' }) {
     const [data, setData] = useState(null);
     const [chartData, setChartData] = useState(null);
-    const [chartOptions, setChartOptions] = useState(null); 
+    const [chartOptions, setChartOptions] = useState(null);
+    const [totalExpense, setTotalExpense] = useState(0);
 
     useEffect(() => {
         if(labels && expenseData && expenseData.length > 0) {
             const labelsMap = {}
             labels.forEach(label => labelsMap[label] = 0);
             
+            let totalExpense = 0;
             expenseData.forEach(expense => {
                 const date = new Date(expense.date);
                 const month = date.getMonth();
@@ -50,9 +54,12 @@ export default function ExpenseGraph({ expenseData = [], labels, type = 'MONTHLY
                 } else if(type === 'ALLTIME') {
                     labelsMap[year] += expense.amount;
                 }
+
+                totalExpense += expense.amount;
             })
 
             setData(Object.values(labelsMap));
+            setTotalExpense(totalExpense);
         }
     }, [labels, expenseData, type])
 
@@ -64,7 +71,9 @@ export default function ExpenseGraph({ expenseData = [], labels, type = 'MONTHLY
                     label: 'IDR Spent',
                     data,
                     borderColor: 'rgb(255, 99, 132)',
-                    backgroundColor: 'rgb(255, 99, 132)'
+                    backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                    fill: 'start',
+                    tension: 0.1
                 }]
             });
             setChartOptions({
@@ -105,10 +114,11 @@ export default function ExpenseGraph({ expenseData = [], labels, type = 'MONTHLY
         </div>
     )
     return(
-        <div className="flex justify-start items-center h-48 xs:h-64">
+        <div className="flex flex-col justify-center items-start min-h-48 xs:min-h-64">
+            <p className="w-full text-center mt-4 font-semibold text-sm md:text-base">Total: {formatCurrency(totalExpense)}</p>
             {
                 (chartData && chartOptions) ? 
-                <Line 
+                <Line
                     data={chartData}
                     options={chartOptions}
                 /> :
