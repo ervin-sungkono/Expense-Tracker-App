@@ -27,7 +27,7 @@ export default function SubHeader({ title, description, linkLabel = 'Manage', li
                         <RightIcon size={20}/>
                     </Link>}
                     {onClick &&
-                    <div onClick={onClick} className="flex items-center gap-1 text-deep-blue dark:text-ocean-blue">
+                    <div onClick={onClick} className="cursor-pointer flex items-center gap-1 text-deep-blue dark:text-ocean-blue">
                         <p className="text-sm">{linkLabel}</p>
                         <RightIcon size={20}/>
                     </div>}
