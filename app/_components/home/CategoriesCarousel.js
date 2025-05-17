@@ -5,9 +5,11 @@ import SubHeader from "./SubHeader"
 import { db } from "@/app/_lib/db"
 import { useEffect, useState } from "react"
 import CategoryCard from "./CategoryCard"
+import CategoryListDialog from "../common/dialog/CategoryListDialog"
 
 export default function CategoriesCarousel() {
     const [categoryData, setCategoryData] = useState(null);
+    const [showDialog, setShowDialog] = useState(false);
     const expenses = useLiveQuery(() => db.getAllExpenses());
     const categories = useLiveQuery(() => db.getAllCategories());
 
@@ -49,7 +51,7 @@ export default function CategoriesCarousel() {
     } else {
         return(
             <div className="mb-4">
-                <SubHeader title="Categories" description={"based on this month's remaining budget"} link="/categories"/>
+                <SubHeader title="Categories" description={"based on this month's remaining budget"} onClick={() => setShowDialog(true)}/>
                 <SwiperContainer 
                     spaceBetween={12}
                     slidesPerView={1.8}
@@ -57,6 +59,11 @@ export default function CategoriesCarousel() {
                         id: category.id,
                         component: <CategoryCard {...category} slug={`/expenses?category=${encodeURIComponent(category.name)}`}/>
                     }))}
+                />
+                <CategoryListDialog
+                    categories={categories}
+                    show={showDialog}
+                    hideFn={() => setShowDialog(false)}
                 />
             </div>
         )
