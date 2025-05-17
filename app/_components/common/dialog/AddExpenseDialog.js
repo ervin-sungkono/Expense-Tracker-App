@@ -68,7 +68,7 @@ export default function AddExpenseDialog({ expense = {}, show, hideFn }) {
             }
 
             payload.amount = Number(payload.amount); // ensure that value stored is Number type
-            if(expense) {
+            if(expense.id) {
                 db.updateExpense(expense.id, payload);
             } else {
                 db.addExpense(payload);
