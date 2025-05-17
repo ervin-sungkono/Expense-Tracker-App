@@ -3,7 +3,7 @@
 }
 
 .navbar-content {
-    @apply max-w-2xl mx-auto px-4 py-5 rounded-2xl bg-white grid grid-cols-5;
+    @apply max-w-2xl mx-auto px-4 py-5 rounded-2xl bg-white dark:bg-neutral-700 grid grid-cols-5 shadow-md shadow-dark/10;
 }
 
 .nav-link {
@@ -11,7 +11,7 @@
 }
 
 .nav-link > a {
-    @apply relative text-dark/60 hover:text-ocean-blue transition-opacity duration-300 ease-in-out after:absolute;
+    @apply relative text-dark/60 dark:text-white/60 hover:text-ocean-blue transition-opacity duration-300 ease-in-out after:absolute;
 }
 
 .nav-link > .nav-active {
