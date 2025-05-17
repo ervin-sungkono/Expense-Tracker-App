@@ -37,7 +37,7 @@ export class StringValidator extends Validator {
      * @param {string} value Value provided for validating.
      */
     constructor(name, value) {
-        super(name, value)
+        super(name, String(value))
     }
 
     betweenLength(min, max) {
@@ -91,7 +91,7 @@ export class NumberValidator extends Validator {
      * @param {number} value Value provided for validating.
      */
     constructor(name, value) {
-        super(name, value)
+        super(name, Number(value))
     }
 
     min(value) {
