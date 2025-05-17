@@ -82,7 +82,7 @@ export default function AddExpenseDialog({ expense = {}, show, hideFn }) {
     }
 
     const getDialogAction = () => {
-        return expense ? 'Edit Expense' : 'Add Expense';
+        return expense.id ? 'Edit Expense' : 'Add Expense';
     }
 
     return (
