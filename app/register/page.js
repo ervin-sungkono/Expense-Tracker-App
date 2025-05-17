@@ -6,15 +6,21 @@ import InputField from "../_components/common/InputField";
 import { useRef, useEffect, useState } from "react";
 import { useLocalStorage } from "../_lib/hooks";
 import { useRouter } from "next/navigation";
+import Loading from "../_components/layout/Loading";
 
 export default function Register() {
     const [username, setUsername] = useLocalStorage('username');
     const [errorMessage, setErrorMessage] = useState(null);
+    const [loading, setLoading] = useState(true);
     const inputRef = useRef();
     const router = useRouter();
 
     useEffect(() => {
-        if (username && router) router.replace('/home');
+        if (username && router) {
+            router.replace('/home');
+        } else {
+            setLoading(false);
+        }
     }, [username, router]);
 
     const registerUser = () => {
@@ -38,6 +44,9 @@ export default function Register() {
         setUsername(input.value);
     }
 
+    if(loading) {
+        return <Loading/>
+    }
     return(
         <Layout pathname={'/register'} hideNavbar>
             <div className="h-full flex flex-col justify-center gap-4">

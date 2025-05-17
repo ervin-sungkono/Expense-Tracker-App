@@ -7,6 +7,7 @@ import LinkButton from "./_components/common/LinkButton";
 import { useEffect, useState } from "react";
 import { useLocalStorage } from "./_lib/hooks";
 import { useRouter } from "next/navigation";
+import Loading from "./_components/layout/Loading";
 
 export default function Onboarding() {
     const [loading, setLoading] = useState(true);
@@ -21,6 +22,9 @@ export default function Onboarding() {
       }
     }, [username, router]);
 
+    if(loading) {
+      return <Loading/>
+    }
     return (
         <Layout pathname="/" hideNavbar>
             <AppLogo position="center" className="mb-12"/>
