@@ -3,6 +3,7 @@ import { memo } from 'react';
 import { FixedSizeList } from 'react-window';
 import AutoSizer from 'react-virtualized-auto-sizer';
 import CategoryCard from './CategoryCard';
+import LoadingSpinner from '../common/LoadingSpinner';
 
 const Row = ({ index, style, data }) => {
   const item = data[index];
@@ -19,9 +20,9 @@ const MemoizedRow = memo(Row);
 const VirtualizedCategoryList = ({ items }) => {
   if(!items) {
     return (
-      <div className='w-full h-full px-4 py-2.5 flex justify-center items-center text-center'>
-        {/* TODO: add illustration loading here */}
-        <p className='text-dark/80 dark:text-white/80 text-sm md:text-base'>Loading expense data..</p>
+      <div className='w-full h-full flex flex-col justify-center items-center gap-4 bg-neutral-200 dark:bg-neutral-700 rounded-lg px-4 py-2.5'>
+        <LoadingSpinner/>
+        <p className='text-dark/80 dark:text-white/80 text-sm md:text-base text-center'>Loading expense data..</p>
       </div>
     )
   }
