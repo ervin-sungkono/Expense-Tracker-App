@@ -6,8 +6,8 @@ import ContextMenu from "../common/ContextMenu";
 import { IoWallet as BudgetIcon } from "react-icons/io5";
 import { IoMdMore as MoreIcon } from "react-icons/io";
 
-// const AddExpenseDialog = dynamic(() => import("../common/dialog/AddExpenseDialog"));
-// const DeleteExpenseDialog = dynamic(() => import("../common/dialog/DeleteExpenseDialog"));
+const AddCategoryDialog = dynamic(() => import("../common/dialog/AddCategoryDialog"));
+const DeleteCategoryDialog = dynamic(() => import("../common/dialog/DeleteCategoryDialog"));
 
 function CategoryCard({ category, style }) {
     const { id, name, budget } = category;
@@ -28,7 +28,7 @@ function CategoryCard({ category, style }) {
 
     return(
         <div style={style} className="relative not-last:border-b border-dark/20 dark:border-white/20 select-none">
-            <div className="cursor-pointer pl-2 py-2 flex">
+            <div className="pl-2 py-2 flex">
                 <div className="w-full flex gap-2 items-center">
                     <div className="flex flex-col gap-1 grow">
                         <p className="text-base font-semibold grow">{name}</p>
@@ -37,7 +37,7 @@ function CategoryCard({ category, style }) {
                             <p className="text-sm font-medium">{formatCurrency(budget)}</p>
                         </div>
                     </div>
-                    <div onClick={() => setShowMenu(true)} className="p-2 rounded-full active:bg-neutral-300/30 active:dark:bg-neutral-800/30">
+                    <div onClick={() => setShowMenu(true)} className="cursor-pointer p-2 rounded-full active:bg-neutral-300/30 active:dark:bg-neutral-800/30 transition-colors duration-150 ease-in-out">
                         <MoreIcon size={24}/>
                     </div>
                 </div>
@@ -48,16 +48,16 @@ function CategoryCard({ category, style }) {
                 hideFn={() => setShowMenu(false)}
                 hideOnItemClick
             />
-            {/* <AddExpenseDialog 
-                expense={expense} 
+            <AddCategoryDialog 
+                category={category}
                 show={showEdit} 
                 hideFn={() => setShowEdit(false)}
             />
-            <DeleteExpenseDialog 
-                expenseId={id} 
+            <DeleteCategoryDialog 
+                categoryId={id} 
                 show={showDelete} 
                 hideFn={() => setShowDelete(false)}
-            /> */}
+            />
         </div>
     )
 }
