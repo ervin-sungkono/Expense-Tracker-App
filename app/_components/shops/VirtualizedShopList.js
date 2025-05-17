@@ -4,6 +4,7 @@ import { FixedSizeGrid } from 'react-window';
 import AutoSizer from 'react-virtualized-auto-sizer';
 import InfiniteLoader from 'react-window-infinite-loader';
 import ShopCard from './ShopCard';
+import LoadingSpinner from '../common/LoadingSpinner';
 
 const COLUMN_CNT = 2;
 
@@ -27,8 +28,8 @@ const VirtualizedShopList = ({ items, loadMore, hasNextPage }) => {
 
   if(!items) {
     return (
-      <div className='w-full h-full px-4 py-2.5 flex justify-center items-center text-center'>
-        {/* TODO: add illustration loading here */}
+      <div className='w-full h-full px-4 py-2.5 flex flex-col gap-4 justify-center items-center text-center'>
+        <LoadingSpinner/>
         <p className='text-dark/80 dark:text-white/80 text-sm md:text-base'>Loading shop data..</p>
       </div>
     )
