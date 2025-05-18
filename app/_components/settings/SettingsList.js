@@ -1,20 +1,19 @@
 'use client';
+import dynamic from "next/dynamic";
 import List from "../common/List"
 import CategoryList from "../common/CategoryList";
 import { useEffect, useState } from "react";
-import ToggleSwitch from "../common/ToggleSwitch";
 import Button from "../common/Button";
-import { IoSunny as LightIcon, IoMoon as DarkIcon } from "react-icons/io5";
 import ChangeUsernameDialog from "../common/dialog/ChangeUsernameDialog";
 import { db } from "@/app/_lib/db";
 import { saveAs } from "file-saver";
 import ImportDataDialog from "../common/dialog/ImportDataDialog";
+import ThemeSwitch from "../common/ThemeSwitch";
 
 export default function SettingsList() {
     const [showCategory, setShowCategory] = useState(false);
     const [showUsername, setShowUsername] = useState(false);
-    const [themeSwitch, setThemeSwitch] = useState(false);
-    const [theme, setTheme] = useState('');
+    // const [themeSwitch, setThemeSwitch] = useState(false);
     const [showImport, setShowImport] = useState(false);
     const [showAbout, setShowAbout] = useState(false);
     const [deleteAccount, setDeleteAccount] = useState(false);
@@ -96,8 +95,7 @@ export default function SettingsList() {
             id: 'theme',
             title: 'Theme',
             description: 'Set theme preferences',
-            control: <ToggleSwitch icon={themeSwitch ? <DarkIcon className="text-sm md:text-base"/> : <LightIcon className="text-sm md:text-base"/>} switchStatus={themeSwitch}/>,
-            onClick: () => setThemeSwitch(!themeSwitch)
+            control: <ThemeSwitch/>
         },
         {
             id: 'import-data',
