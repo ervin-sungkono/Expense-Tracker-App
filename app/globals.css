@@ -57,6 +57,17 @@ input[type="date"] {
     background: transparent;
 }
 
+input[type="date"] {
+  appearance: none;
+  -webkit-appearance: none;
+}
+
+input[type="date"]::-webkit-inner-spin-button,
+input[type="date"]::-webkit-calendar-picker-indicator {
+  appearance: none;
+  -webkit-appearance: none;
+}
+
 input[type="date"]::-webkit-calendar-picker-indicator {
   opacity: 0;
   position: absolute;
