@@ -17,7 +17,6 @@ export default function InfoShopDialog({ shop, show, hideFn }) {
         hideFn && hideFn();
     }
 
-    // TODO: make validator utils(?) or just use yup.
     const validateName = (name) => {
         return new StringValidator("Name", name)
             .required()
@@ -85,9 +84,8 @@ export default function InfoShopDialog({ shop, show, hideFn }) {
                                 name={"image"}
                                 label="Image"
                                 initialValue={shop?.image}
-                                dropzoneOptions={{
-                                    accept: { 'image/*': [] },
-                                    maxSize: 5 * 1000 * 1000, // 5MB
+                                dropzoneOptions={{         
+                                    maxSize: 5 * 1000 * 1000 // 5MB
                                 }}
                             />
                             <InputField 
