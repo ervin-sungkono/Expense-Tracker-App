@@ -5,6 +5,7 @@ import { useState } from "react";
 import ToggleSwitch from "../common/ToggleSwitch";
 import Button from "../common/Button";
 import { IoSunny as LightIcon, IoMoon as DarkIcon } from "react-icons/io5";
+import ChangeUsernameDialog from "../common/dialog/ChangeUsernameDialog";
 
 export default function SettingsList() {
     const [showCategory, setShowCategory] = useState(false);
@@ -69,6 +70,10 @@ export default function SettingsList() {
                 hideFn={() => setShowCategory(false)}
             />
             <Button style="danger" label={"Delete Account"} onClick={() => setDeleteAccount(true)} className="mt-8"/>
+            <ChangeUsernameDialog
+                show={showUsername}
+                hideFn={() => setShowUsername(false)}
+            />
         </>
     )
 }
