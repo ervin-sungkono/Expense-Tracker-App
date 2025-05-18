@@ -1,5 +1,4 @@
 'use client';
-import dynamic from "next/dynamic";
 import List from "../common/List"
 import CategoryList from "../common/CategoryList";
 import { useEffect, useState } from "react";
@@ -10,6 +9,7 @@ import { saveAs } from "file-saver";
 import ImportDataDialog from "../common/dialog/ImportDataDialog";
 import ThemeSwitch from "../common/ThemeSwitch";
 import DeleteAccountDialog from "../common/dialog/DeleteAccountDialog";
+import AboutAppPage from "../common/dialog/AboutAppPage";
 
 export default function SettingsList() {
     const [showCategory, setShowCategory] = useState(false);
@@ -144,6 +144,10 @@ export default function SettingsList() {
             <DeleteAccountDialog
                 show={deleteAccount}
                 hideFn={() => setDeleteAccount(false)}
+            />
+            <AboutAppPage
+                show={showAbout}
+                hideFn={() => setShowAbout(false)}
             />
         </>
     )
