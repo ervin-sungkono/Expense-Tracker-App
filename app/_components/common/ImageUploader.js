@@ -10,6 +10,7 @@ export default function ImageUploader({ label, name, initialValue, dropzoneOptio
     const [previewImage, setPreviewImage] = useState(initialValue);
     const { acceptedFiles, getRootProps, getInputProps, fileRejections } = useDropzone({
         ...dropzoneOptions,
+        accept: { 'image/*': [] },
         multiple: false,
         maxFiles: 1
     });
@@ -53,7 +54,7 @@ export default function ImageUploader({ label, name, initialValue, dropzoneOptio
 
     return(
         <div className="w-full flex flex-col gap-2">
-            {label && <div className="block font-semibold text-xs md:text-sm text-dark-blue">{label} (max {(dropzoneOptions.maxSize / (1000 * 1000)).toFixed(0)} MB)</div>}
+            {label && <div className="block font-semibold text-xs md:text-sm text-dark-blue">{label} {dropzoneOptions.maxSize && <span>(max {(dropzoneOptions.maxSize / (1000 * 1000)).toFixed(0)}</span>} MB)</div>}
             <div {...getRootProps({className: 'relative dropzone cursor-pointer border focus:border-sky-blue border-deep-blue dark:border-ocean-blue/60 px-3 md:px-4 py-2 md:py-2.5 rounded-md'})}>
                 <div className="relative flex justify-center items-center w-full h-48 bg-neutral-100 dark:bg-neutral-600 rounded-sm mb-2">
                     {previewImage ? 
