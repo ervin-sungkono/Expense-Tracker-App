@@ -139,61 +139,18 @@ class ExpenseDB extends Dexie {
 
         return this.export({ progressCallback });
     }
-}
 
-function getRandomDate(start, end) {
-    const startDate = start.getTime();
-    const endDate = end.getTime();
-    const randomTime = Math.random() * (endDate - startDate) + startDate;
-    return new Date(randomTime);
-}
-
-function randomBetween(min, max) { // min and max included 
-    return Math.floor(Math.random() * (max - min + 1) + min);
-}
-
-// TODO: remove this later
-function generateExpenses() {
-    const start = new Date(2020, 0, 1); // January 1, 2020
-    const end = new Date(); // Current date
-
-    const expenses = [];
-    
-    for(let i = 0; i < 10000; i++) {
-        const date = getRandomDate(start, end).toISOString().split('T')[0];
-        const amount = randomBetween(1000, 50000);
-        const categoryId = randomBetween(1, 3);
-        const shopId = randomBetween(0, 2) || null;
-        const remarks = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed mollis suscipit congue. Phasellus sit amet nulla vitae lorem semper lobortis. Cras non massa et libero mollis tempus.';
-
-        expenses.push({ date, amount, categoryId, shopId, remarks });
+    resetDB() {
+        return this.delete({ disableAutoOpen: false });
     }
-
-    return expenses;
 }
 
 async function populate() {
-    await db.expenses.bulkAdd(generateExpenses())
-
     await db.categories.bulkAdd([
         { name: "Food", budget: 500000 },
         { name: "Transportation", budget: 800000 },
         { name: "Entertainment", budget: 100000 }
     ]);
-
-    // Todo: remove this later
-    await db.shops.bulkAdd([
-        {
-            name: 'Warung Bu Mila',
-            image: 'https://picsum.photos/seed/picsum/200/300',
-            location: 'Senayan'
-        },
-        {
-            name: 'Nasi Goreng',
-            image: 'https://picsum.photos/seed/picsum/200/300',
-            location: 'Senayan'
-        }
-    ])
 }
 
 export const db = new ExpenseDB();

@@ -9,11 +9,11 @@ import { db } from "@/app/_lib/db";
 import { saveAs } from "file-saver";
 import ImportDataDialog from "../common/dialog/ImportDataDialog";
 import ThemeSwitch from "../common/ThemeSwitch";
+import DeleteAccountDialog from "../common/dialog/DeleteAccountDialog";
 
 export default function SettingsList() {
     const [showCategory, setShowCategory] = useState(false);
     const [showUsername, setShowUsername] = useState(false);
-    // const [themeSwitch, setThemeSwitch] = useState(false);
     const [showImport, setShowImport] = useState(false);
     const [showAbout, setShowAbout] = useState(false);
     const [deleteAccount, setDeleteAccount] = useState(false);
@@ -140,6 +140,10 @@ export default function SettingsList() {
             <ImportDataDialog
                 show={showImport}
                 hideFn={() => setShowImport(false)}
+            />
+            <DeleteAccountDialog
+                show={deleteAccount}
+                hideFn={() => setDeleteAccount(false)}
             />
         </>
     )
