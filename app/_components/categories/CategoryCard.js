@@ -37,7 +37,7 @@ function CategoryCard({ category, style }) {
                             <p className="text-sm font-medium">{formatCurrency(budget)}</p>
                         </div>
                     </div>
-                    <div onClick={() => setShowMenu(true)} className="cursor-pointer p-2 rounded-full active:bg-neutral-300/30 active:dark:bg-neutral-800/30 transition-colors duration-150 ease-in-out">
+                    <div onClick={() => setShowMenu(true)} className="cursor-pointer select-none p-2 rounded-full active:bg-neutral-300/30 active:dark:bg-neutral-800/30 transition-colors duration-150 ease-in-out">
                         <MoreIcon size={24}/>
                     </div>
                 </div>
