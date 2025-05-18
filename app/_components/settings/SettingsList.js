@@ -1,7 +1,7 @@
 'use client';
 import List from "../common/List"
 import CategoryList from "../common/CategoryList";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import ToggleSwitch from "../common/ToggleSwitch";
 import Button from "../common/Button";
 import { IoSunny as LightIcon, IoMoon as DarkIcon } from "react-icons/io5";
@@ -21,6 +21,8 @@ export default function SettingsList() {
 
     const [isExporting, setIsExporting] = useState(false);
     const [exportDescription, setExportDescription] = useState(null);
+    const [installPrompt, setInstallPrompt] = useState(null);
+    const [installDisable, setInstallDisable] = useState(false);
 
     const exportCallback = ({ totalRows, completedRows, done }) => {
         setExportDescription(`${completedRows} out of ${totalRows} rows downloaded.`)
@@ -42,6 +44,40 @@ export default function SettingsList() {
 
         saveAs(exportedData, `expense-tracker-export_${new Date().getTime()}.json`);
     }
+
+    function disableInAppInstallPrompt() {
+        setInstallPrompt(null);
+        setInstallDisable(true);
+    }
+
+    const beforeInstallPromptListener = (event) => {
+        event.preventDefault();
+        setInstallPrompt(event);
+        setInstallDisable(false);
+    }
+
+    const appInstalledListener = () => {
+        disableInAppInstallPrompt();
+    }
+
+    const installApp = async() => {
+        if (!installPrompt) {
+            return;
+        }
+        await installPrompt.prompt();
+
+        disableInAppInstallPrompt();
+    }
+
+    useEffect(() => {
+        window.addEventListener("beforeinstallprompt", beforeInstallPromptListener);
+        window.addEventListener("appinstalled", appInstalledListener);
+
+        return () => {
+            window.removeEventListener("beforeinstallprompt", beforeInstallPromptListener);
+            window.removeEventListener("appinstalled", appInstalledListener);
+        }
+    }, [])
     
     const SETTING_ITEMS = [
         {
@@ -80,7 +116,8 @@ export default function SettingsList() {
             id: 'download',
             title: 'Download',
             description: 'Install app on device',
-            onClick: () => setShowCategory(true)
+            onClick: installApp,
+            disabled: !installPrompt || installDisable
         },
         {
             id: 'about-app',
