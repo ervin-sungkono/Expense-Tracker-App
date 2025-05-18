@@ -6,6 +6,9 @@ import ToggleSwitch from "../common/ToggleSwitch";
 import Button from "../common/Button";
 import { IoSunny as LightIcon, IoMoon as DarkIcon } from "react-icons/io5";
 import ChangeUsernameDialog from "../common/dialog/ChangeUsernameDialog";
+import { db } from "@/app/_lib/db";
+import { saveAs } from "file-saver";
+import ImportDataDialog from "../common/dialog/ImportDataDialog";
 
 export default function SettingsList() {
     const [showCategory, setShowCategory] = useState(false);
@@ -15,6 +18,30 @@ export default function SettingsList() {
     const [showImport, setShowImport] = useState(false);
     const [showAbout, setShowAbout] = useState(false);
     const [deleteAccount, setDeleteAccount] = useState(false);
+
+    const [isExporting, setIsExporting] = useState(false);
+    const [exportDescription, setExportDescription] = useState(null);
+
+    const exportCallback = ({ totalRows, completedRows, done }) => {
+        setExportDescription(`${completedRows} out of ${totalRows} rows downloaded.`)
+        if(done) {
+            setExportDescription(null);
+        }
+    }
+
+    const handleExportData = async() => {
+        if(isExporting) return;
+
+        setIsExporting(true);
+        const exportedData = await db.exportDB({ progressCallback: exportCallback });
+        // Decided not to encode the data as JWT for several reasons:
+        // 1. Size is larger when encoded
+        // 2. Takes longer time to encode because hitting API, tested on mid and low devices needs > 30 seconds.
+        // 3. Encoding doesn't work when offline
+        setIsExporting(false);
+
+        saveAs(exportedData, `expense-tracker-export_${new Date().getTime()}.json`);
+    }
     
     const SETTING_ITEMS = [
         {
@@ -40,13 +67,14 @@ export default function SettingsList() {
             id: 'import-data',
             title: 'Import Data',
             description: 'Import user data',
-            onClick: () => setShowImport(true) // TODO: import user data
+            onClick: () => setShowImport(true), // TODO: import user data
+            // disabled: !isOnline,
         },
         {
             id: 'export-data',
             title: 'Export Data',
-            description: 'Export user data',
-            onClick: () => setShowCategory(true) // TODO: export user data
+            description: exportDescription ?? 'Export user data',
+            onClick: handleExportData
         },
         {
             id: 'download',
@@ -73,6 +101,10 @@ export default function SettingsList() {
             <ChangeUsernameDialog
                 show={showUsername}
                 hideFn={() => setShowUsername(false)}
+            />
+            <ImportDataDialog
+                show={showImport}
+                hideFn={() => setShowImport(false)}
             />
         </>
     )
