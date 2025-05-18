@@ -61,7 +61,6 @@ export default function CategoriesCarousel() {
                     }))}
                 />
                 <CategoryList
-                    categories={categories}
                     show={showDialog}
                     hideFn={() => setShowDialog(false)}
                 />
