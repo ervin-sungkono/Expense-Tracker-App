@@ -36,7 +36,6 @@ export default function AddExpenseDialog({ expense = {}, show, hideFn }) {
 
     const validateRemarks = (remarks) => {
         return new StringValidator("Notes", remarks)
-            .required()
             .maxLength(120)
             .validate();
     }
