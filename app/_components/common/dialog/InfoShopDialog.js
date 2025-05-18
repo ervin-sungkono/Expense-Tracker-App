@@ -21,6 +21,7 @@ export default function InfoShopDialog({ shop, show, hideFn }) {
         return new StringValidator("Name", name)
             .required()
             .minLength(3)
+            .maxLength(30)
             .validate();
     }
 
@@ -28,6 +29,7 @@ export default function InfoShopDialog({ shop, show, hideFn }) {
         return new StringValidator("Location", location)
             .required()
             .minLength(3)
+            .validate();
     }
 
     const handleSubmit = (e) => {
