@@ -4,6 +4,7 @@ import "./globals.css";
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata = {
+  manifest: "/manifest.json", 
   title: "Expense Tracker App",
   description: "Track and manage your expense with ET",
 };
