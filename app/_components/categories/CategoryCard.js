@@ -27,7 +27,7 @@ function CategoryCard({ category, style }) {
     ]
 
     return(
-        <div style={style} className="relative not-last:border-b border-dark/20 dark:border-white/20 select-none">
+        <div style={style} className="relative not-last:border-b border-dark/20 dark:border-white/20">
             <div className="pl-2 py-2 flex">
                 <div className="w-full flex gap-2 items-center">
                     <div className="flex flex-col gap-1 grow">
@@ -37,7 +37,7 @@ function CategoryCard({ category, style }) {
                             <p className="text-sm font-medium">{formatCurrency(budget)}</p>
                         </div>
                     </div>
-                    <div onClick={() => setShowMenu(true)} className="cursor-pointer select-none p-2 rounded-full active:bg-neutral-300/30 active:dark:bg-neutral-800/30 transition-colors duration-150 ease-in-out">
+                    <div onClick={() => setShowMenu(true)} className="cursor-pointer p-2 rounded-full active:bg-neutral-300/30 active:dark:bg-neutral-800/30 transition-colors duration-150 ease-in-out">
                         <MoreIcon size={24}/>
                     </div>
                 </div>

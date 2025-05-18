@@ -3,6 +3,13 @@
 @import "./_styles/utility.css";
 @import "./_styles/navbar.css";
 
+* {
+  -moz-user-select:none;
+  -webkit-user-select:none;
+  -ms-user-select:none;
+  user-select:none
+}
+
 :root {
   --background: #f5f5f5;
   --foreground: #2b2b2b;

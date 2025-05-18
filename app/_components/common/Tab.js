@@ -15,7 +15,7 @@ export default function Tab({ header, selected = null, contents = [] }) {
                     <div 
                         key={`tab-${content.id}`} 
                         onClick={() => setSelectedTab(content.id)}
-                        className={`cursor-pointer select-none py-1.5 px-2.5 rounded-t-lg font-semibold text-dark dark:text-white border ${selectedTab === content.id ? 'text-white bg-basic-gradient border-transparent' : 'border-ocean-blue'}`}
+                        className={`cursor-pointer py-1.5 px-2.5 rounded-t-lg font-semibold text-dark dark:text-white border ${selectedTab === content.id ? 'text-white bg-basic-gradient border-transparent' : 'border-ocean-blue'}`}
                     >
                         {content.label}
                     </div>
