@@ -4,16 +4,16 @@
 @import "./_styles/navbar.css";
 
 :root {
-  --background: #fbfbfb;
+  --background: #f5f5f5;
   --foreground: #2b2b2b;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+[data-theme='dark'] {
+  --background: #2b2b2b;
+  --foreground: #ededed;
 }
+
+@variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
 
 body {
   background: var(--background);
@@ -71,9 +71,9 @@ input:-webkit-autofill:hover,
 input:-webkit-autofill:focus,
 input:-webkit-autofill:active {
   /* Revert text color */
-  -webkit-text-fill-color: white !important;
-  color: white !important;
-  caret-color: white !important;
+  -webkit-text-fill-color: var(--foreground) !important;
+  color: var(--foreground) !important;
+  caret-color: var(--foreground) !important;
 
   /* Revert background color */
   transition: background-color 5000s ease-in-out 0s;
