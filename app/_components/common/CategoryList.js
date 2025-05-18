@@ -26,11 +26,10 @@ export default function CategoryList({ show, hideFn }) {
                 <div className="flex justify-center">
                     <Button label={"Add New Category"} onClick={() => setShowDialog(true)}/>
                 </div>
-                {showDialog &&
                 <AddCategoryDialog
                     show={showDialog}
                     hideFn={() => setShowDialog(false)}
-                />}
+                />
             </div>
         </Page>
     )
