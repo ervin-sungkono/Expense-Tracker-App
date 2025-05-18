@@ -123,6 +123,22 @@ class ExpenseDB extends Dexie {
           this.shops.delete(shopId);
         });
     }
+
+    async importDB({ file, clearTablesBeforeImport = false, overwriteValues = false, progressCallback }) {
+        if(typeof window !== 'undefined') {
+            await import('dexie-export-import');
+        }
+
+        return this.import(file, { overwriteValues, clearTablesBeforeImport, progressCallback });
+    }
+
+    async exportDB({ progressCallback }) {
+        if(typeof window !== 'undefined') {
+            await import('dexie-export-import');
+        }
+
+        return this.export({ progressCallback });
+    }
 }
 
 function getRandomDate(start, end) {
