@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { sign } from "jsonwebtoken";
 
 export async function POST(req) {
-    const { data } = await req.body();
+    const { data } = await req.json();
 
     let resultToken = null;
     try{

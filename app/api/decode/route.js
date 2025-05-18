@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { verify } from "jsonwebtoken";
 
 export async function POST(req) {
-    const { token } = await req.body();
+    const { token } = await req.json();
     let decoded = null;
 
     try {
