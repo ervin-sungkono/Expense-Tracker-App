@@ -9,7 +9,7 @@ export default function ShopCard({ shop, isOdd, style }) {
 
     return (
         <div>
-            <div onClick={() => setShowDialog(true)} style={style} className={`cursor-pointer select-none w-full h-full flex flex-col ${!isOdd ? 'pr-2' : ''} pb-2`}>
+            <div onClick={() => setShowDialog(true)} style={style} className={`cursor-pointer w-full h-full flex flex-col ${!isOdd ? 'pr-2' : ''} pb-2`}>
                 <div className="relative w-full aspect-video bg-neutral-200 dark:bg-neutral-700 rounded-t-lg overflow-hidden">
                     {image && <Image src={image} className="object-contain" fill alt={`${name} Image`}/>}
                 </div>

@@ -35,7 +35,7 @@ export default function SelectField({ label, name, required = false, _selected, 
                 <div 
                     id={`id-${name}`}
                     onClick={() => setShowOption(true)}
-                    className={`cursor-pointer select-none w-full outline-none focus:border-sky-blue px-3 md:px-4 py-2 md:py-2.5 rounded-md bg-transparent border ${errorMessage ? "border-red-600 dark:border-red-400" : "border-deep-blue dark:border-ocean-blue/60"} text-dark dark:text-white text-sm transition-colors duration-200 ease-in-out`}
+                    className={`cursor-pointer w-full outline-none focus:border-sky-blue px-3 md:px-4 py-2 md:py-2.5 rounded-md bg-transparent border ${errorMessage ? "border-red-600 dark:border-red-400" : "border-deep-blue dark:border-ocean-blue/60"} text-dark dark:text-white text-sm transition-colors duration-200 ease-in-out`}
                 >
                     {selected ? selected.label : placeholder}
                 </div>
@@ -46,7 +46,7 @@ export default function SelectField({ label, name, required = false, _selected, 
                             <div 
                                 id={`${name}-${option.id}`}
                                 key={option.id}
-                                className={`cursor-pointer select-none w-full line-clamp-1 wrap-anywhere px-4 py-1.5 ${(selected && selected.id == option.id) ? 'bg-neutral-200 dark:bg-neutral-500' : 'hover:bg-neutral-200 hover:dark:bg-neutral-500'} text-sm`}
+                                className={`cursor-pointer w-full line-clamp-1 wrap-anywhere px-4 py-1.5 ${(selected && selected.id == option.id) ? 'bg-neutral-200 dark:bg-neutral-500' : 'hover:bg-neutral-200 hover:dark:bg-neutral-500'} text-sm`}
                                 onClick={() => {
                                     setSelected(option);
                                     setShowOption(false);

@@ -21,7 +21,7 @@ export default function Page({ children, title, show = false, hideFn = null, hid
             <div className={`relative w-full h-full flex flex-col overflow-y-auto max-w-2xl bg-white dark:bg-neutral-700 px-6 pb-8 z-50 ${show ? 'animate-[slide-in_.4s_forwards_ease-in-out]' : 'animate-[slide-out_.4s_forwards_ease-in-out]'}`}>
                 <div className="relative h-14 md:h-16 flex gap-4 justify-center items-center">
                     {!hideBackButton && 
-                    <div onClick={hideFn} className="absolute left-0 cursor-pointer select-none p-2.5 rounded-full active:bg-neutral-300/30 dark:active:bg-neutral-800/30">
+                    <div onClick={hideFn} className="absolute left-0 cursor-pointer p-2.5 rounded-full active:bg-neutral-300/30 dark:active:bg-neutral-800/30">
                         <BackIcon size={20}/>
                     </div>}
                     <p className="font-semibold text-lg md:text-xl">{title}</p>

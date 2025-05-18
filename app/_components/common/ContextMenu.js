@@ -26,7 +26,7 @@ export default function ContextMenu({ items = [], show = false, hideFn = null, h
                                 item.onClick && item.onClick();
                                 hideOnItemClick && hideFn();
                             }}
-                            className="cursor-pointer select-none px-4 py-2 hover:bg-neutral-300/30 active:bg-neutral-300/30 dark:hover:bg-neutral-800/30 dark:active:bg-neutral-800/30"
+                            className="cursor-pointer px-4 py-2 hover:bg-neutral-300/30 active:bg-neutral-300/30 dark:hover:bg-neutral-800/30 dark:active:bg-neutral-800/30"
                         >
                             {item.label}
                         </div>
