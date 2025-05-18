@@ -7,6 +7,7 @@ import { useRef, useEffect, useState } from "react";
 import { useLocalStorage } from "../_lib/hooks";
 import { useRouter } from "next/navigation";
 import Loading from "../_components/layout/Loading";
+import { StringValidator } from "../_lib/validator";
 
 export default function Register() {
     const [username, setUsername] = useLocalStorage('username');
@@ -27,12 +28,7 @@ export default function Register() {
         const input = inputRef.current
         if(!input) return;
 
-        let error = null;
-        if (input.value.length === 0) {
-            error = 'Name cannot be empty!';
-        } else if (input.value.length > 30) {
-            error = 'Name cannot be longer than 30 characters!';
-        }
+        const error = new StringValidator("Name", input.value).required().minLength(3).maxLength(30).validate();
 
         if (error) {
             setErrorMessage(error);
