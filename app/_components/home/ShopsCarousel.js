@@ -5,6 +5,7 @@ import SubHeader from "./SubHeader"
 import { db } from "@/app/_lib/db"
 import { useEffect, useState } from "react"
 import ShopCard from "./ShopCard"
+import LinkButton from "../common/LinkButton"
 
 export default function ShopsCarousel() {
     const [shopData, setShopData] = useState(null);
@@ -59,19 +60,23 @@ export default function ShopsCarousel() {
                 <div className="h-56 w-screen bg-neutral-200 dark:bg-neutral-700 animate-pulse rounded-lg"></div>
             </div>
         )
-    } else {
-        return(
-            <div className="mb-4">
-                <SubHeader title="Shops" description={"based on this month's visits"} link="/shops"/>
-                <SwiperContainer 
-                    spaceBetween={12}
-                    slidesPerView={1.8}
-                    items={shopData?.sort((a,b) => b.totalVisit - a.totalVisit).map(shop => ({
-                        id: shop.name,
-                        component: <ShopCard {...shop}/>
-                    }))}
-                />
-            </div>
-        )
     }
+    return(
+        <div className="mb-4">
+            <SubHeader title="Shops" description={"based on this month's visits"} link="/shops"/>
+            {shopData.length > 0 ?
+            <SwiperContainer 
+                spaceBetween={12}
+                slidesPerView={1.8}
+                items={shopData?.sort((a,b) => b.totalVisit - a.totalVisit).map(shop => ({
+                    id: shop.name,
+                    component: <ShopCard {...shop}/>
+                }))}
+            /> :
+            <div className="h-40 flex flex-col justify-center items-center gap-4 w-full bg-neutral-200 dark:bg-neutral-700 rounded-lg py-6 px-4">
+                <p className="text-sm md:text-base text-center font-medium text-dark/80 dark:text-white/80">No shop found, please create a new shop</p>
+                <LinkButton href="/shops" label="Add New Shop" contained/>
+            </div>}
+        </div>
+    )
 }
