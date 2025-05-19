@@ -103,6 +103,10 @@ export default function ExpenseGraph({ expenseData = [], labels, type = 'MONTHLY
                             }
                         }
                     }
+                },
+                interaction: {
+                    mode: 'index',
+                    intersect: false
                 }
             }); 
         }
