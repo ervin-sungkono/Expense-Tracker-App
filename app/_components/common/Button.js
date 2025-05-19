@@ -14,9 +14,9 @@ export default function Button({
             case 'icon':
                 return 'p-2.5';
             case 'medium':
-                return 'text-base py-2.5 px-6'
+                return 'text-sm md:text-base py-2.5 px-6'
             case 'large':
-                return 'text-xl py-4 px-10'
+                return 'text-lg md:text-xl py-4 px-10'
         }
     }
 
