@@ -17,7 +17,7 @@ export default function ContextMenu({ items = [], show = false, hideFn = null, h
     if(!hidden)
     return(
         <>
-            <div className={`absolute z-50 min-w-[120px] translate-y-full origin-top-right ${show ? 'animate-[scale-in_.25s_forwards_ease-in-out]' : 'animate-[scale-out_.25s_forwards_ease-in-out]'}`} style={{ bottom: 0, right: 0 }}>
+            <div className={`absolute z-50 min-w-[120px] shadow-lg translate-y-full origin-top-right ${show ? 'animate-[scale-in_.25s_forwards_ease-in-out]' : 'animate-[scale-out_.25s_forwards_ease-in-out]'}`} style={{ bottom: 0, right: 0 }}>
                 <div className="w-full relative z-50 py-1.5 bg-neutral-100 dark:bg-neutral-600 rounded-md">
                     {items.map((item, index) => (
                         <div 

@@ -41,7 +41,7 @@ export default function SelectField({ label, name, required = false, _selected, 
                 </div>
                 <div className={`${showOption ? 'block' : 'hidden'}`}>
                     <div className="fixed top-0 left-0 w-full h-full bg-transparent z-10" onClick={() => setShowOption(false)}></div>
-                    <div ref={dropdownRef} className="min-w-40 max-w-72 max-h-96 overflow-y-auto absolute left-0 -bottom-2 translate-y-full bg-white dark:bg-neutral-600 py-2 rounded-md z-50">
+                    <div ref={dropdownRef} className="min-w-40 max-w-72 max-h-96 overflow-y-auto absolute left-0 -bottom-2 translate-y-full shadow-lg bg-white dark:bg-neutral-600 py-2 rounded-md z-50">
                         {options.map(option => (
                             <div 
                                 id={`${name}-${option.id}`}
