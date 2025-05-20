@@ -1,6 +1,6 @@
 { 
-    "name": "Expense Tracker App",
-    "short_name": "Expense Tracker",
+    "name": "Xpense (Expense Tracker)",
+    "short_name": "Xpense",
     "theme_color": "#209AB8",
     "background_color": "#f5f5f5", 
     "display": "standalone", 
