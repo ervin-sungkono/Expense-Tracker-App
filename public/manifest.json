@@ -1,6 +1,6 @@
 { 
-    "name": "Xpense (Expense Tracker)",
-    "short_name": "Xpense",
+    "name": "Xpensed (Expense Tracker)",
+    "short_name": "Xpensed",
     "theme_color": "#209AB8",
     "background_color": "#f5f5f5", 
     "display": "standalone", 
