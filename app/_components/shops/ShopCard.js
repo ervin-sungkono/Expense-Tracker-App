@@ -1,7 +1,7 @@
 import Image from "next/image";
 import { IoLocationSharp as LocationIcon } from "react-icons/io5";
 import { useState } from "react";
-import InfoShopDialog from "../common/dialog/InfoShopDialog";
+import InfoShopDialog from "./InfoShopDialog";
 
 export default function ShopCard({ shop, isOdd, style }) {
     const { image, name, location } = shop;

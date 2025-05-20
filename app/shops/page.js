@@ -3,13 +3,12 @@ import Layout from "../_components/layout/Layout";
 import VirtualizedShopList from "../_components/shops/VirtualizedShopList";
 import { useEffect, useState } from "react";
 import { db } from "../_lib/db";
-import { liveQuery } from "dexie";
 import SearchBar from "../_components/common/Searchbar";
 import Header from "../_components/common/Header";
 import IconButton from "../_components/common/IconButton";
 import { IoMdAdd as PlusIcon } from "react-icons/io";
 import { useLiveQuery } from "dexie-react-hooks";
-import InfoShopDialog from "../_components/common/dialog/InfoShopDialog";
+import InfoShopDialog from "../_components/shops/InfoShopDialog";
 
 export default function Shops() {
     const PAGE_SIZE = 10;

@@ -1,10 +1,10 @@
-import Dialog from "./Dialog";
-import SelectField from "../SelectField";
-import Button from "../Button";
+import Dialog from "../common/Dialog";
+import SelectField from "../common/SelectField";
+import Button from "../common/Button";
 import { useLiveQuery } from "dexie-react-hooks";
 import { useSearchParams } from "next/navigation";
 import { db } from "@/app/_lib/db";
-import InputField from "../InputField";
+import InputField from "../common/InputField";
 import { useState, useEffect } from "react";
 
 export default function FilterExpenseDialog({ show, hideFn, filterOptions = {}, setFilterOptions }) {

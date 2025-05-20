@@ -3,13 +3,13 @@ import List from "../common/List"
 import CategoryList from "../common/CategoryList";
 import { useEffect, useState } from "react";
 import Button from "../common/Button";
-import ChangeUsernameDialog from "../common/dialog/ChangeUsernameDialog";
+import ChangeUsernameDialog from "./ChangeUsernameDialog";
 import { db } from "@/app/_lib/db";
 import { saveAs } from "file-saver";
-import ImportDataDialog from "../common/dialog/ImportDataDialog";
+import ImportDataDialog from "./ImportDataDialog";
 import ThemeSwitch from "../common/ThemeSwitch";
-import DeleteAccountDialog from "../common/dialog/DeleteAccountDialog";
-import AboutAppPage from "../common/dialog/AboutAppPage";
+import DeleteAccountDialog from "./DeleteAccountDialog";
+import AboutAppPage from "./AboutAppPage";
 
 export default function SettingsList() {
     const [showCategory, setShowCategory] = useState(false);

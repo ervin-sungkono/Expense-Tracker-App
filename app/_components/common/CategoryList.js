@@ -3,7 +3,7 @@ import { useState } from "react";
 import VirtualizedCategoryList from "../categories/VirtualizedCategoryList";
 import Button from "./Button";
 import Page from "./Page";
-import AddCategoryDialog from "./dialog/AddCategoryDialog";
+import AddCategoryDialog from "../categories/AddCategoryDialog";
 import { useLiveQuery } from "dexie-react-hooks";
 import { db } from "@/app/_lib/db";
 

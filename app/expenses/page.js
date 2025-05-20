@@ -3,12 +3,11 @@ import Layout from "../_components/layout/Layout";
 import VirtualizedExpenseList from "../_components/expenses/VirtualizedExpenseList";
 import { useEffect, useState, Suspense } from "react";
 import { db } from "../_lib/db";
-import { liveQuery } from "dexie";
 import { useLiveQuery } from "dexie-react-hooks";
 import SearchBar from "../_components/common/Searchbar";
 import Header from "../_components/common/Header";
 import IconButton from "../_components/common/IconButton";
-import FilterExpenseDialog from "../_components/common/dialog/FilterExpenseDialog";
+import FilterExpenseDialog from "../_components/expenses/FilterExpenseDialog";
 import { IoFilter as FilterIcon } from "react-icons/io5";
 
 export default function Expenses() {

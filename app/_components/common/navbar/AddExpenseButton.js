@@ -1,6 +1,6 @@
 'use client'
 import { useState } from "react";
-import AddExpenseDialog from "../dialog/AddExpenseDialog";
+import AddExpenseDialog from "../../expenses/AddExpenseDialog";
 
 export default function AddExpenseButton({ item }) {
     const [showDialog, setShowDialog] = useState(false);

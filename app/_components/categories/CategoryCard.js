@@ -6,8 +6,8 @@ import ContextMenu from "../common/ContextMenu";
 import { IoWallet as BudgetIcon } from "react-icons/io5";
 import { IoMdMore as MoreIcon } from "react-icons/io";
 
-const AddCategoryDialog = dynamic(() => import("../common/dialog/AddCategoryDialog"));
-const DeleteCategoryDialog = dynamic(() => import("../common/dialog/DeleteCategoryDialog"));
+const AddCategoryDialog = dynamic(() => import("../categories/AddCategoryDialog"));
+const DeleteCategoryDialog = dynamic(() => import("../categories/DeleteCategoryDialog"));
 
 function CategoryCard({ category, style }) {
     const { id, name, budget } = category;

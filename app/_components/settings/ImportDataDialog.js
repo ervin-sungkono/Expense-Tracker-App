@@ -1,7 +1,7 @@
-import FileUploader from "../FileUploader";
-import Dialog from "./Dialog";
-import Button from "../Button";
-import ToggleSwitch from "../ToggleSwitch";
+import FileUploader from "../common/FileUploader";
+import Dialog from "../common/Dialog";
+import Button from "../common/Button";
+import ToggleSwitch from "../common/ToggleSwitch";
 import { db } from "@/app/_lib/db";
 import { useState } from "react";
 
