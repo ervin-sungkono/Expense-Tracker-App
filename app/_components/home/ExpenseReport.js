@@ -11,6 +11,8 @@ import { generateRangeOptions, getMonthlyLabels } from "@/app/_lib/utils";
 
 export default function ExpenseReport() {
     const expenses = useLiveQuery(() => db.getAllExpenses());
+    const categories = useLiveQuery(() => db.getAllCategories());
+    const shops = useLiveQuery(() => db.getAllShops());
 
     const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth());
     const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
@@ -19,15 +21,20 @@ export default function ExpenseReport() {
     const [yearMap, setYearMap] = useState({});
 
     useEffect(() => {
-        if(expenses) {
+        if(expenses && categories && shops) {
             const newMonthMap = {};
             const newYearMap = {};
+            const categoriesMap = new Map(categories.map(category => [String(category.id), category.name]));
+            const shopsMap = new Map(shops.map(shop => [String(shop.id), shop.name]));
 
             expenses.forEach(expense => {
                 const date = new Date(expense.date);
                 const month = date.getMonth();
                 const year = date.getFullYear();
                 const monthKey = `${year}-${month}`
+
+                expense.category = categoriesMap.get(expense.categoryId);
+                expense.shop = expense.shopId ? categoriesMap.get(expense.shopId) : '';
 
                 newMonthMap[monthKey] = (newMonthMap[monthKey] || []).concat(expense);
                 newYearMap[year] = (newYearMap[year] || []).concat(expense);
@@ -36,7 +43,7 @@ export default function ExpenseReport() {
             setMonthMap(newMonthMap);
             setYearMap(newYearMap);
         }
-    }, [expenses])
+    }, [expenses, categories, shops])
 
     const contents = [
         {

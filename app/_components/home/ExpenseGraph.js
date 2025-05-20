@@ -14,6 +14,8 @@ import { Line } from "react-chartjs-2";
 import { useEffect, useRef, useState } from "react";
 import { formatCurrency, formatDateString, nFormatter } from "@/app/_lib/utils";
 import { MONTHS } from "@/app/_lib/const";
+import Button from "../common/Button";
+import xlsx from "json-as-xlsx";
 
 ChartJS.defaults.font.family = "'Inter', sans-serif"
 ChartJS.defaults.font.size = 14;
@@ -35,6 +37,41 @@ export default function ExpenseGraph({ expenseData = [], labels, type = 'MONTHLY
     const [chartData, setChartData] = useState(null);
     const [chartOptions, setChartOptions] = useState(null);
     const [totalExpense, setTotalExpense] = useState(0);
+
+    const handleDownloadReport = () => {
+        const sum = expenseData.reduce((sum, curr) => {
+            return sum += Number(curr.amount);
+        }, 0);
+
+        const data = [
+            {
+                sheet: 'Expense',
+                columns: [
+                    { label: "Date", value: "date", format: "dd-mmm-yy" },
+                    { label: "Category", value: "category" },
+                    { label: "Amount", value: "amount", format: "Rp #.##0;-Rp #.##0" },
+                    { label: "Shop", value: "shop" },
+                    { label: "Notes", value: "remarks" }
+                ],
+                content: [
+                    ...expenseData.sort((a,b) => new Date(a.date).getTime() - new Date(b.date).getTime()),
+                    { date: '', category: 'Total', amount: sum, shop: '' }
+                ]
+            }
+        ]
+
+        const settings = {
+            fileName: `expense_report-${new Date().getTime()}`,
+            extraLength: 3,
+            writeMode: 'writeFile'
+        }
+
+        const callback = () => {
+            console.log('Download complete');
+        }
+
+        xlsx(data, settings, callback);
+    }
 
     useEffect(() => {
         if(labels && expenseData && expenseData.length > 0) {
@@ -130,6 +167,9 @@ export default function ExpenseGraph({ expenseData = [], labels, type = 'MONTHLY
                     <div className="w-full h-full rounded-lg bg-neutral-200 dark:bg-neutral-700 animate-pulse"></div>
                 </div>
             }
+            <div className="w-full px-4 mt-2 pb-4">
+                <Button label={"Download Report"} onClick={handleDownloadReport}/>
+            </div>
         </div>
     )
 }
