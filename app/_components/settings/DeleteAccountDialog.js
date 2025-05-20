@@ -1,7 +1,7 @@
 import { db } from "@/app/_lib/db";
 import { useRouter } from "next/navigation";
-import Dialog from "./Dialog";
-import Button from "../Button";
+import Dialog from "../common/Dialog";
+import Button from "../common/Button";
 import { useLocalStorage } from "@/app/_lib/hooks";
 
 export default function DeleteAccountDialog({ categoryId, show, hideFn }) {

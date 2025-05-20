@@ -1,12 +1,12 @@
 'use client'
-import Dialog from "./Dialog";
-import InputField from "../InputField";
-import SelectField from "../SelectField";
-import TextField from "../TextField";
+import Dialog from "../common/Dialog";
+import InputField from "../common/InputField";
+import SelectField from "../common/SelectField";
+import TextField from "../common/TextField";
 import { db } from "@/app/_lib/db";
 import { useLiveQuery } from "dexie-react-hooks";
 import { useState } from "react";
-import Button from "../Button";
+import Button from "../common/Button";
 import { DateValidator, NumberValidator, StringValidator } from "@/app/_lib/validator";
 
 export default function AddExpenseDialog({ expense = {}, show, hideFn }) {

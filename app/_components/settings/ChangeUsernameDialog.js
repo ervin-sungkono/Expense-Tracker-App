@@ -1,8 +1,8 @@
 'use client'
-import Dialog from "./Dialog";
-import InputField from "../InputField";
+import Dialog from "../common/Dialog";
+import InputField from "../common/InputField";
 import { useState } from "react";
-import Button from "../Button";
+import Button from "../common/Button";
 import { StringValidator } from "@/app/_lib/validator";
 import { useLocalStorage } from "@/app/_lib/hooks";
 

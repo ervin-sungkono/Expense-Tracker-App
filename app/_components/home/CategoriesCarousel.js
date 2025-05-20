@@ -7,7 +7,7 @@ import { useEffect, useState } from "react"
 import CategoryCard from "./CategoryCard"
 import CategoryList from "../common/CategoryList"
 import Button from "../common/Button"
-import AddCategoryDialog from "../common/dialog/AddCategoryDialog"
+import AddCategoryDialog from "../categories/AddCategoryDialog"
 
 export default function CategoriesCarousel() {
     const [categoryData, setCategoryData] = useState(null);

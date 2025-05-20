@@ -1,6 +1,6 @@
 import { db } from "@/app/_lib/db";
-import Dialog from "./Dialog";
-import Button from "../Button";
+import Dialog from "../common/Dialog";
+import Button from "../common/Button";
 
 export default function DeleteExpenseDialog({ expenseId, show, hideFn, onDelete }) {
     const handleDeleteExpense = () => {

@@ -2,8 +2,8 @@
 import { useState } from "react";
 import AddExpenseDialog from "./AddExpenseDialog";
 import DeleteExpenseDialog from "./DeleteExpenseDialog";
-import Dialog from "./Dialog";
-import Button from "../Button";
+import Dialog from "../common/Dialog";
+import Button from "../common/Button";
 import { formatCurrency, formatDateString } from "@/app/_lib/utils";
 
 export default function InfoExpenseDialog({ expense, show, hideFn }) {

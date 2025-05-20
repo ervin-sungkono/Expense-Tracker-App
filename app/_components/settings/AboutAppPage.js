@@ -1,5 +1,5 @@
 import { version } from "@/app/_lib/version";
-import Page from "../Page";
+import Page from "../common/Page";
 import { IoLogoGithub as GithubIcon, IoLogoLinkedin as LinkedInIcon } from "react-icons/io";
 
 export default function AboutAppPage({ show, hideFn }) {

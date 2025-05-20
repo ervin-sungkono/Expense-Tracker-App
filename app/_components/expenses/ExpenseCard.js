@@ -6,9 +6,9 @@ import { useLongPress } from "use-long-press";
 import ContextMenu from "../common/ContextMenu";
 import { isMobile } from "react-device-detect";
 
-const AddExpenseDialog = dynamic(() => import("../common/dialog/AddExpenseDialog"));
-const DeleteExpenseDialog = dynamic(() => import("../common/dialog/DeleteExpenseDialog"));
-const InfoExpenseDialog = dynamic(() => import("../common/dialog/InfoExpenseDialog"));
+const AddExpenseDialog = dynamic(() => import("../expenses/AddExpenseDialog"));
+const DeleteExpenseDialog = dynamic(() => import("../expenses/DeleteExpenseDialog"));
+const InfoExpenseDialog = dynamic(() => import("../expenses/InfoExpenseDialog"));
 
 function ExpenseCard({ expense, style }) {
     const { id, date, category, amount } = expense;
