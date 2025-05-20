@@ -4,6 +4,7 @@ import { FixedSizeList } from 'react-window';
 import AutoSizer from 'react-virtualized-auto-sizer';
 import CategoryCard from './CategoryCard';
 import LoadingSpinner from '../common/LoadingSpinner';
+import Image from 'next/image';
 
 const Row = ({ index, style, data }) => {
   const item = data[index];
@@ -28,9 +29,11 @@ const VirtualizedCategoryList = ({ items }) => {
   }
   if(items.length === 0) {
     return(
-      <div className='w-full h-full px-4 py-2.5 flex justify-center items-center text-center'>
-        {/* TODO: add illustration not found here */}
-        <p className='text-dark/80 dark:text-white/80 text-sm md:text-base'>No expense found..</p>
+      <div className='w-full h-full flex flex-col justify-center items-center text-center gap-2 bg-neutral-200 dark:bg-neutral-700 rounded-lg px-4 py-2.5'>
+        <div className='relative w-full aspect-[16/10]'>
+          <Image fill src={'/not-found.png'} alt='' className='object-contain opacity-60 saturate-0'/>
+        </div>
+        <p className='text-dark/80 dark:text-white/80 text-sm md:text-base'>No category found..</p>
       </div>
     )
   }
