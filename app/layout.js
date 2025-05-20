@@ -1,6 +1,7 @@
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "next-themes";
+import { GoogleAnalytics } from "@next/third-parties/google";
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -17,6 +18,7 @@ export default function RootLayout({ children }) {
         <ThemeProvider enableColorScheme enableSystem>
           {children}
         </ThemeProvider>
+        <GoogleAnalytics gaId="G-FG6W314EEP"/>
       </body>
     </html>
   );
