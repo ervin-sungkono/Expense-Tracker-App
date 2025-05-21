@@ -49,7 +49,7 @@ export default function ExpenseGraph({ expenseData = [], labels, type = 'MONTHLY
                 columns: [
                     { label: "Date", value: "date", format: "dd-mmm-yy" },
                     { label: "Category", value: "category" },
-                    { label: "Amount", value: "amount", format: "Rp #.##0;-Rp #.##0" },
+                    { label: "Amount", value: "amount", format: "Rp#.##0;-Rp#.##0" },
                     { label: "Shop", value: "shop" },
                     { label: "Notes", value: "remarks" }
                 ],
