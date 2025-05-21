@@ -11,7 +11,7 @@ import {
     Filler
 } from "chart.js";
 import { Line } from "react-chartjs-2";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { formatCurrency, formatDateString, nFormatter } from "@/app/_lib/utils";
 import { MONTHS } from "@/app/_lib/const";
 import Button from "../common/Button";
@@ -131,7 +131,19 @@ export default function ExpenseGraph({ expenseData = [], labels, type = 'MONTHLY
                 },
                 scales: {
                     x: {
-                        display: false
+                        display: true,
+                        ticks: {
+                            autoSkip: true,
+                            maxTicksLimit: 12,
+                            maxRotation: 0,
+                            callback: function(value) {
+                                let labelValue = this.getLabelForValue(value);
+
+                                if(type === 'MONTHLY') return new Date(labelValue).toLocaleDateString('en-US', { day: '2-digit', month: '2-digit', year: 'numeric' });
+                                if(type === 'ANNUAL') return labelValue.slice(0,3);
+                                return labelValue;
+                            }
+                        }
                     },
                     y: {
                         ticks: {
