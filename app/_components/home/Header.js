@@ -22,7 +22,7 @@ export default function Header() {
         return(
             <div className="w-full flex flex-col gap-1 mb-5">
                 <p className="text-dark dark:text-white text-base md:text-lg">Welcome back,</p>
-                <p className="text-dark dark:text-white w-full line-clamp-1 text-2xl md:text-3xl font-bold">{username}</p>
+                <p className="text-dark dark:text-white w-full line-clamp-1 text-2xl md:text-3xl font-bold break-all">{username}</p>
             </div>
         )
     }

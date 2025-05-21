@@ -14,7 +14,7 @@ export default function ChangeUsernameDialog({ show, hideFn }) {
         return new StringValidator("Name", name)
             .required()
             .minLength(3)
-            .maxLength(30)
+            .maxLength(25)
             .validate();
     }
 
@@ -63,8 +63,9 @@ export default function ChangeUsernameDialog({ show, hideFn }) {
                             required
                             name={"name"} 
                             label={"New Username"} 
-                            placeholder={"Enter new username"}
+                            placeholder={"Enter new username (max 25 characters)"}
                             type={"text"}
+                            maxLength={25}
                             defaultValue={username}
                             errorMessage={errorMessage?.name}
                         />
