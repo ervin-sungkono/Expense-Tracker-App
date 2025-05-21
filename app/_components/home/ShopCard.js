@@ -13,18 +13,18 @@ export default function ShopCard({ name, image, location, totalVisit, averageExp
 
     return(
         <Link href={`/expenses?shop=${encodeURIComponent(name)}`} className="w-full flex flex-col">
-            <div className="relative w-full aspect-video bg-neutral-200 dark:bg-neutral-700 rounded-t-lg overflow-hidden">
-                <Image src={image} className="object-contain" fill alt={`${name} Image`}/>
+            <div className="relative w-full aspect-video bg-neutral-300 dark:bg-neutral-600 rounded-t-lg overflow-hidden">
+                {image && <Image src={image} className="object-contain" fill alt={`${name} Image`}/>}
             </div>
             <div className="pt-2.5 pb-4 px-4 rounded-b-lg bg-white dark:bg-neutral-700">
                 <p className="text-base md:text-lg font-semibold mb-2">{name}</p>
                 <div className="flex flex-col gap-1">
                     <div className="text-sm text-dark/80 dark:text-white/80 flex items-center gap-1">
-                        <PriceIcon size={20}/>
+                        <PriceIcon size={18} className="shrink-0"/>
                         <p>{formatCurrency(averageExpense)}</p>
                     </div>
-                    <div className="text-sm text-dark/80 dark:text-white/80 flex items-center gap-1">
-                        <LocationIcon size={20}/>
+                    <div className="text-sm text-dark/80 dark:text-white/80 flex items-start gap-1">
+                        <LocationIcon size={18} className="shrink-0"/>
                         <p>{location}</p>
                     </div>
                 </div>
