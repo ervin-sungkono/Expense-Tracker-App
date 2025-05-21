@@ -14,11 +14,11 @@ export default function ShopCard({ shop, isOdd, style }) {
                     {image && <Image src={image} className="object-contain" fill alt={`${name} Image`}/>}
                 </div>
                 <div className="pt-2.5 pb-4 px-4 rounded-b-lg bg-white dark:bg-neutral-700 grow">
-                    <p className="text-base md:text-lg font-semibold mb-2">{name}</p>
+                    <p className="text-sm md:text-base font-semibold mb-2 line-clamp-2">{name}</p>
                     <div className="flex flex-col gap-1">
-                        <div className="text-sm text-dark/80 dark:text-white/80 flex items-center gap-1">
-                            <LocationIcon size={20}/>
-                            <p>{location}</p>
+                        <div className="text-xs md:text-sm text-dark/80 dark:text-white/80 flex items-start gap-1">
+                            <LocationIcon size={18} className="shrink-0"/>
+                            <p className="line-clamp-2">{location}</p>
                         </div>
                     </div>
                 </div>
