@@ -59,8 +59,8 @@ export default function FilterExpenseDialog({ show, hideFn, filterOptions = {}, 
             return 'End Date must be valid date!';
         }
 
-        if(new Date(startDate).getTime() >= new Date(endDate).getTime()) {
-            return 'Start Date must be earlier than End Date';
+        if(new Date(startDate).getTime() > new Date(endDate).getTime()) {
+            return 'Start Date must not be later than End Date';
         }
     }
 
