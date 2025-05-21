@@ -28,7 +28,7 @@ export default function Register() {
         const input = inputRef.current
         if(!input) return;
 
-        const error = new StringValidator("Name", input.value).required().minLength(3).maxLength(30).validate();
+        const error = new StringValidator("Name", input.value).required().minLength(3).maxLength(25).validate();
 
         if (error) {
             setErrorMessage(error);
@@ -53,8 +53,8 @@ export default function Register() {
                 <InputField
                     ref={inputRef}
                     name={"username"}
-                    label={"Your Name (max 30 characters)"}
-                    maxLength={30}
+                    label={"Your Name (max 25 characters)"}
+                    maxLength={25}
                     required
                     placeholder={"Enter your name"}
                     errorMessage={errorMessage}
