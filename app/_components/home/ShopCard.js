@@ -5,7 +5,12 @@ import { IoLocationSharp as LocationIcon } from "react-icons/io5";
 import { IoMdPricetags as PriceIcon } from "react-icons/io";
 import { formatCurrency } from "@/app/_lib/utils";
 
-export default function ShopCard({ id, name, image, location, totalVisit, averageExpense }) {    
+export default function ShopCard({ name, image, location, totalVisit, averageExpense }) {    
+    const showTotalVisit = () => {
+        if (totalVisit === 0) return 'Not visited';
+        return `Visited ${totalVisit} ${totalVisit > 1 ? 'times' : 'time'}`;
+    }
+
     return(
         <Link href={`/expenses?shop=${encodeURIComponent(name)}`} className="w-full flex flex-col">
             <div className="relative w-full aspect-video bg-neutral-200 dark:bg-neutral-700 rounded-t-lg overflow-hidden">
@@ -23,7 +28,7 @@ export default function ShopCard({ id, name, image, location, totalVisit, averag
                         <p>{location}</p>
                     </div>
                 </div>
-                <p className="text-sm text-dark/80 dark:text-white/80 mt-1.5">visited {totalVisit} times</p>
+                <p className="text-sm text-dark/80 dark:text-white/80 mt-1.5">{showTotalVisit()}</p>
             </div>
         </Link>
     )
