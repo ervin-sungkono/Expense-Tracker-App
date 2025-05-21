@@ -52,6 +52,8 @@ export default function AddExpenseDialog({ expense = {}, show, hideFn }) {
             payload[key] = value;
         }
 
+        console.log(payload.date)
+
         try{
             let error = {};
             const { date, amount, categoryId, remarks } = payload;
@@ -97,8 +99,8 @@ export default function AddExpenseDialog({ expense = {}, show, hideFn }) {
                             required
                             name={"date"} 
                             label={"Date"} 
-                            type={"date"}
-                            defaultValue={expense.date ?? new Date().toISOString().split('T')[0]}
+                            type={"datetime-local"}
+                            defaultValue={expense.date ?? new Date().toISOString().split('.')[0]}
                             errorMessage={errorMessage?.date}
                         />
                         <InputField 
