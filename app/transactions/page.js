@@ -1,16 +1,16 @@
 'use client'
 import Layout from "../_components/layout/Layout";
-import VirtualizedExpenseList from "../_components/expenses/VirtualizedExpenseList";
+import VirtualizedTransactionList from "../_components/transactions/VirtualizedTransactionList";
 import { useEffect, useState, Suspense } from "react";
 import { db } from "../_lib/db";
 import { useLiveQuery } from "dexie-react-hooks";
 import SearchBar from "../_components/common/Searchbar";
 import Header from "../_components/common/Header";
 import IconButton from "../_components/common/IconButton";
-import FilterExpenseDialog from "../_components/expenses/FilterExpenseDialog";
+import FilterTransactionDialog from "../_components/transactions/FilterTransactionDialog";
 import { IoFilter as FilterIcon } from "react-icons/io5";
 
-export default function Expenses() {
+export default function Transactions() {
     const PAGE_SIZE = 20;
 
     const [limit, setLimit] = useState(PAGE_SIZE);
@@ -22,12 +22,12 @@ export default function Expenses() {
         dateRange: [undefined, undefined]
     })
 
-    const expenseQuery = useLiveQuery(
-        () => db.getPaginatedExpenses(limit, searchText, filterOptions), 
+    const transactionQuery = useLiveQuery(
+        () => db.getPaginatedTransactions(limit, searchText, "Expense", filterOptions), 
         [limit, searchText, filterOptions]
     )
     
-    const [expenses, setExpenses] = useState(null)
+    const [transactions, setTransactions] = useState(null)
     const categories = useLiveQuery(() => db.getAllCategories());
     const shops = useLiveQuery(() => db.getAllShops());
 
@@ -38,29 +38,29 @@ export default function Expenses() {
     }, [searchText, filterOptions])
 
     useEffect(() => {
-        if(expenseQuery && categories && shops) {
+        if(transactionQuery && categories && shops) {
             const categoriesMap = new Map(categories.map(category => [String(category.id), category.name]));
             const shopsMap = new Map(shops.map(shop => [String(shop.id), shop.name]));
-            setExpenses(
-                expenseQuery
-                .map(expense => ({ 
-                    ...expense, 
-                    category: categoriesMap.get(String(expense.categoryId)),
-                    shop: shopsMap.get(String(expense.shopId))
+            setTransactions(
+                transactionQuery
+                .map(transaction => ({ 
+                    ...transaction, 
+                    category: categoriesMap.get(String(transaction.categoryId)),
+                    shop: shopsMap.get(String(transaction.shopId))
                 }))
             )
         }
-    }, [expenseQuery, categories, shops])
+    }, [transactionQuery, categories, shops])
 
     const fetchMoreData = async() => {
         setLimit(currentLimit => currentLimit + PAGE_SIZE);
     };
 
     return(
-        <Layout pathname={"/expenses"}>
+        <Layout pathname={"/transactions"}>
             <div className="h-full flex flex-col">
                 <div className="mb-4">
-                    <Header title={"Expense List"} textAlign="center"/>
+                    <Header title={"Transaction List"} textAlign="center"/>
                     <div className="flex items-center gap-2">
                         <SearchBar
                             placeholder={"Search based on notes"}
@@ -72,15 +72,15 @@ export default function Expenses() {
                     </div>
                 </div>
                 <div className="flex grow">
-                    <VirtualizedExpenseList
-                        items={expenses}
+                    <VirtualizedTransactionList
+                        items={transactions}
                         loadMore={fetchMoreData}
-                        hasNextPage={expenseQuery && expenseQuery.length > 0 && expenseQuery.length % PAGE_SIZE === 0}
+                        hasNextPage={transactionQuery && transactionQuery.length > 0 && transactionQuery.length % PAGE_SIZE === 0}
                     />
                 </div>
             </div>
             <Suspense>
-                <FilterExpenseDialog
+                <FilterTransactionDialog
                     show={filterMode}
                     hideFn={() => setFilterMode(false)}
                     filterOptions={filterOptions}

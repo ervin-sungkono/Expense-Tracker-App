@@ -5,14 +5,14 @@ import { IoLocationSharp as LocationIcon } from "react-icons/io5";
 import { IoMdPricetags as PriceIcon } from "react-icons/io";
 import { formatCurrency } from "@/app/_lib/utils";
 
-export default function ShopCard({ name, image, location, totalVisit, averageExpense }) {    
+export default function ShopCard({ name, image, location, totalVisit, averageTransaction }) {    
     const showTotalVisit = () => {
         if (totalVisit === 0) return 'Not visited';
         return `Visited ${totalVisit} ${totalVisit > 1 ? 'times' : 'time'}`;
     }
 
     return(
-        <Link href={`/expenses?shop=${encodeURIComponent(name)}`} className="w-full flex flex-col">
+        <Link href={`/transactions?shop=${encodeURIComponent(name)}`} className="w-full flex flex-col">
             <div className="relative w-full aspect-video bg-neutral-300 dark:bg-neutral-600 rounded-t-lg overflow-hidden">
                 {image && <Image src={image} className="object-contain" fill alt={`${name} Image`}/>}
             </div>
@@ -21,7 +21,7 @@ export default function ShopCard({ name, image, location, totalVisit, averageExp
                 <div className="flex flex-col gap-1">
                     <div className="text-sm text-dark/80 dark:text-white/80 flex items-center gap-1">
                         <PriceIcon size={18} className="shrink-0"/>
-                        <p>{formatCurrency(averageExpense)}</p>
+                        <p>{formatCurrency(averageTransaction)}</p>
                     </div>
                     <div className="text-sm text-dark/80 dark:text-white/80 flex items-start gap-1">
                         <LocationIcon size={18} className="shrink-0"/>

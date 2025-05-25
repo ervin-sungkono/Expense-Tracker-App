@@ -6,12 +6,12 @@ import { useLongPress } from "use-long-press";
 import ContextMenu from "../common/ContextMenu";
 import { isMobile } from "react-device-detect";
 
-const AddExpenseDialog = dynamic(() => import("../expenses/AddExpenseDialog"));
-const DeleteExpenseDialog = dynamic(() => import("../expenses/DeleteExpenseDialog"));
-const InfoExpenseDialog = dynamic(() => import("../expenses/InfoExpenseDialog"));
+const AddTransactionDialog = dynamic(() => import("./AddTransactionDialog"));
+const DeleteTransactionDialog = dynamic(() => import("./DeleteTransactionDialog"));
+const InfoTransactionDialog = dynamic(() => import("./InfoTransactionDialog"));
 
-function ExpenseCard({ expense, style }) {
-    const { id, date, category, amount } = expense;
+function TransactionCard({ transaction, style }) {
+    const { id, date, category, amount } = transaction;
     const [showMenu, setShowMenu] = useState(false);
     const [showInfo, setShowInfo] = useState(false);
     const [showEdit, setShowEdit] = useState(false);
@@ -56,18 +56,18 @@ function ExpenseCard({ expense, style }) {
                 hideFn={() => setShowMenu(false)}
                 hideOnItemClick
             />
-            <InfoExpenseDialog 
-                expense={expense} 
+            <InfoTransactionDialog 
+                transaction={transaction} 
                 show={showInfo} 
                 hideFn={() => setShowInfo(false)}
             />
-            <AddExpenseDialog 
-                expense={expense} 
+            <AddTransactionDialog 
+                transaction={transaction} 
                 show={showEdit} 
                 hideFn={() => setShowEdit(false)}
             />
-            <DeleteExpenseDialog 
-                expenseId={id} 
+            <DeleteTransactionDialog 
+                transactionId={id} 
                 show={showDelete} 
                 hideFn={() => setShowDelete(false)}
             />
@@ -75,4 +75,4 @@ function ExpenseCard({ expense, style }) {
     )
 }
 
-export default memo(ExpenseCard);
+export default memo(TransactionCard);

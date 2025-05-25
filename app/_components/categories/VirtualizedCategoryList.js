@@ -23,7 +23,7 @@ const VirtualizedCategoryList = ({ items }) => {
     return (
       <div className='w-full h-full flex flex-col justify-center items-center gap-4 bg-neutral-200 dark:bg-neutral-700 rounded-lg px-4 py-2.5'>
         <LoadingSpinner/>
-        <p className='text-dark/80 dark:text-white/80 text-sm md:text-base text-center'>Loading expense data..</p>
+        <p className='text-dark/80 dark:text-white/80 text-sm md:text-base text-center'>Loading transaction data..</p>
       </div>
     )
   }

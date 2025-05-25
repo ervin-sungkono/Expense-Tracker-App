@@ -1,7 +1,7 @@
 'use client'
 import { useLiveQuery } from "dexie-react-hooks";
 import Tab from "../common/Tab";
-import ExpenseChart from "./ExpenseChart";
+import TransactionChart from "./TransactionChart";
 import { db } from "@/app/_lib/db";
 import { useEffect, useState } from "react";
 import SubHeader from "./SubHeader";
@@ -10,8 +10,8 @@ import InputField from "../common/InputField";
 import { MONTHS } from "@/app/_lib/const";
 import { generateRangeOptions } from "@/app/_lib/utils";
 
-export default function ExpenseData() {
-    const expenses = useLiveQuery(() => db.getAllExpenses());
+export default function TransactionData() {
+    const transactions = useLiveQuery(() => db.getAllTransactions());
 
     const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
     const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth());
@@ -22,27 +22,27 @@ export default function ExpenseData() {
     const [yearMap, setYearMap] = useState({});
 
     useEffect(() => {
-        if(expenses) {
+        if(transactions) {
             const newDateMap = {};
             const newMonthMap = {};
             const newYearMap = {};
 
-            expenses.forEach(expense => {
-                const date = new Date(expense.date);
+            transactions.forEach(transaction => {
+                const date = new Date(transaction.date);
                 const month = date.getMonth();
                 const year = date.getFullYear();
                 const monthKey = `${year}-${month}`
 
-                newDateMap[expense.date] = (newDateMap[expense.date] || []).concat(expense);
-                newMonthMap[monthKey] = (newMonthMap[monthKey] || []).concat(expense);
-                newYearMap[year] = (newYearMap[year] || []).concat(expense);
+                newDateMap[transaction.date] = (newDateMap[transaction.date] || []).concat(transaction);
+                newMonthMap[monthKey] = (newMonthMap[monthKey] || []).concat(transaction);
+                newYearMap[year] = (newYearMap[year] || []).concat(transaction);
             })
 
             setDateMap(newDateMap);
             setMonthMap(newMonthMap);
             setYearMap(newYearMap);
         }
-    }, [expenses])
+    }, [transactions])
 
     const contents = [
         {
@@ -57,7 +57,7 @@ export default function ExpenseData() {
                     />
                 </div>
             ),
-            component: <ExpenseChart expenseData={dateMap[selectedDate]}/>
+            component: <TransactionChart transactionData={dateMap[selectedDate]}/>
         },
         {
             id: 'monthly',
@@ -84,7 +84,7 @@ export default function ExpenseData() {
                     />
                 </div>
             ),
-            component: <ExpenseChart expenseData={monthMap[`${selectedYear}-${selectedMonth}`]}/>
+            component: <TransactionChart transactionData={monthMap[`${selectedYear}-${selectedMonth}`]}/>
         },
         {
             id: 'annual',
@@ -102,13 +102,13 @@ export default function ExpenseData() {
                     />
                 </div>
             ),
-            component: <ExpenseChart expenseData={yearMap[selectedYear]}/>
+            component: <TransactionChart transactionData={yearMap[selectedYear]}/>
         }
     ]
 
     return(
         <div className="mb-4">
-            <SubHeader loading={!expenses} title="My Expense" link="/expenses"/>
+            <SubHeader loading={!transactions} title="My Transaction" link="/transactions"/>
             <Tab selected={'daily'} contents={contents}/>
         </div>
     )

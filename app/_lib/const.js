@@ -9,12 +9,12 @@ export const NAV_ITEMS = [
         url: '/home'
     },
     {
-        label: 'Expenses',
+        label: 'Transactions',
         icon: <ListIcon size={24}/>,
-        url: '/expenses'
+        url: '/transactions'
     },
     {
-        label: 'Add Expense',
+        label: 'Add Transaction',
         icon: <PlusIcon size={28}/>
     },
     {

@@ -19,7 +19,7 @@ export default function DeleteCategoryDialog({ categoryId, show, hideFn, onDelet
                 <div className="flex flex-col gap-2">
                     <div className="text-xl font-bold">Delete Category</div>
                     <p className="text-dark/80 dark:text-white/80 text-sm md:text-base">Are you sure you want to delete this category?</p>
-                    <p className="text-dark/80 dark:text-white/80 text-sm md:text-base"><b>Note:</b> all expenses referencing this category will be <b>DELETED.</b></p>
+                    <p className="text-dark/80 dark:text-white/80 text-sm md:text-base"><b>Note:</b> all transactions referencing this category will be <b>DELETED.</b></p>
                 </div>
                 <div className="flex justify-end gap-2.5">
                     <Button label={"Cancel"} contained onClick={hideFn}/>

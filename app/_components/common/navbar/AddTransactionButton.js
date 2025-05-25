@@ -1,8 +1,8 @@
 'use client'
 import { useState } from "react";
-import AddExpenseDialog from "../../expenses/AddExpenseDialog";
+import AddTransactionDialog from "../../transactions/AddTransactionDialog";
 
-export default function AddExpenseButton({ item }) {
+export default function AddTransactionButton({ item }) {
     const [showDialog, setShowDialog] = useState(false);
 
     if (!item) return
@@ -16,7 +16,7 @@ export default function AddExpenseButton({ item }) {
                     {item.icon}
                 </button>
             </div>
-            <AddExpenseDialog show={showDialog} hideFn={() => setShowDialog(false)}/>
+            <AddTransactionDialog show={showDialog} hideFn={() => setShowDialog(false)}/>
         </div>
     )
 }

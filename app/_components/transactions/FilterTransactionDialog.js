@@ -7,7 +7,7 @@ import { db } from "@/app/_lib/db";
 import InputField from "../common/InputField";
 import { useState, useEffect } from "react";
 
-export default function FilterExpenseDialog({ show, hideFn, filterOptions = {}, setFilterOptions }) {
+export default function FilterTransactionDialog({ show, hideFn, filterOptions = {}, setFilterOptions }) {
     const categories = useLiveQuery(() => db.getAllCategories());
     const shops = useLiveQuery(() => db.getAllShops());
     const [errorMessage, setErrorMessage] = useState({});
@@ -70,7 +70,7 @@ export default function FilterExpenseDialog({ show, hideFn, filterOptions = {}, 
         const form = e.target;
         const formData = new FormData(form);
 
-        // Create payload for add expense
+        // Create payload for add transaction
         const payload = {}
         for(const [key, value] of formData.entries()) {
             payload[key] = value;
@@ -114,7 +114,7 @@ export default function FilterExpenseDialog({ show, hideFn, filterOptions = {}, 
             hideFn={onHide}
         >
             <div className="flex flex-col gap-4">
-                    <div className="text-xl font-bold">Filter Expenses</div>
+                    <div className="text-xl font-bold">Filter Transaction</div>
                     <form onSubmit={handleSubmit}>
                         <div className="flex flex-col gap-4 mb-6">
                             {categories && <SelectField

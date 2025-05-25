@@ -1,4 +1,4 @@
-import AddExpenseButton from "./AddExpenseButton";
+import AddTransactionButton from "./AddTransactionButton";
 import NavbarItem from "./NavbarItem";
 
 export default function Navbar({ items, pathname = "/" }) {
@@ -7,7 +7,7 @@ export default function Navbar({ items, pathname = "/" }) {
             <div className="navbar-content">
                 {items.map((item, index) => (
                     index === 2 ? 
-                    <AddExpenseButton key={item.label} item={item}/> : 
+                    <AddTransactionButton key={item.label} item={item}/> : 
                     <NavbarItem key={item.label} item={item} active={pathname === item.url}/>
                 ))}
             </div>
