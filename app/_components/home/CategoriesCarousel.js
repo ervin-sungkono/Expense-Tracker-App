@@ -13,10 +13,10 @@ export default function CategoriesCarousel() {
     const [categoryData, setCategoryData] = useState(null);
     const [showDialog, setShowDialog] = useState(false);
     const [showAdd, setShowAdd] = useState(false);
-    const expenses = useLiveQuery(() => db.getAllExpenses());
+    const transactions = useLiveQuery(() => db.getAllTransactions());
     const categories = useLiveQuery(() => db.getAllCategories());
 
-    const filterExpenseByMonth = (month) => {
+    const filterTransactionByMonth = (month) => {
         if(!month) {
             month = new Date().getMonth(); // current month
         }
@@ -25,24 +25,24 @@ export default function CategoriesCarousel() {
             return new Date(targetDate).getMonth() === month && new Date(targetDate).getFullYear() === new Date().getFullYear();
         }
 
-        return expenses.filter(expense => isSameMonth(expense.date));
+        return transactions.filter(transaction => isSameMonth(transaction.date));
     }
 
     useEffect(() => {
-        if(expenses && categories) {
-            const filteredExpenses = filterExpenseByMonth();
+        if(transactions && categories) {
+            const filteredTransactions = filterTransactionByMonth();
             const categoriesMap = {};
             for(let i = 0; i < categories.length; i++) {
                 categoriesMap[categories[i].id] = {...categories[i]};
             }
 
-            for(let i = 0; i < filteredExpenses.length; i++) {
-                if(filteredExpenses[i].categoryId) categoriesMap[filteredExpenses[i].categoryId].budget -= Number(filteredExpenses[i].amount);
+            for(let i = 0; i < filteredTransactions.length; i++) {
+                if(filteredTransactions[i].categoryId) categoriesMap[filteredTransactions[i].categoryId].budget -= Number(filteredTransactions[i].amount);
             }
 
             setCategoryData([...Object.values(categoriesMap)]);
         }
-    }, [expenses, categories])
+    }, [transactions, categories])
 
     if(!categoryData) {
         return (
@@ -61,7 +61,7 @@ export default function CategoriesCarousel() {
                     slidesPerView={1.8}
                     items={categoryData?.sort((a,b) => a.budget - b.budget).map(category => ({
                         id: category.id,
-                        component: <CategoryCard {...category} slug={`/expenses?category=${encodeURIComponent(category.name)}`}/>
+                        component: <CategoryCard {...category} slug={`/transactions?category=${encodeURIComponent(category.name)}`}/>
                     }))}
                 /> :
                 <div className="h-40 flex flex-col justify-center items-center gap-4 w-full bg-neutral-200 dark:bg-neutral-700 rounded-lg py-6 px-4">

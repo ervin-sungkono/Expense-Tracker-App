@@ -12,15 +12,16 @@ ChartJS.defaults.font.style = 'normal';
 ChartJS.defaults.font.weight = 700;
 ChartJS.register(ArcElement, Tooltip, Legend);
 
-export default function ExpenseChart({ expenseData = [] }) {
+export default function TransactionChart({ transactionData = [] }) {
     const categories = useLiveQuery(() => db.getAllCategories());
     const [labels, setLabels] = useState(null);
     const [data, setData] = useState(null);
     const [chartData, setChartData] = useState(null);
     const [chartOptions, setChartOptions] = useState(null);
+    const [maxData, setMaxData] = useState(6);
 
     useEffect(() => {
-        if(categories && expenseData && expenseData.length > 0) {
+        if(categories && transactionData && transactionData.length > 0) {
             const categoriesMap = {};
             const groupCategory = {};
             for(let i = 0; i < categories.length; i++) {
@@ -28,16 +29,46 @@ export default function ExpenseChart({ expenseData = [] }) {
                 groupCategory[categories[i].name] = 0;
             }
 
-            let sumExpenseAmount = 0;
-            for(let i = 0; i < expenseData.length; i++) {
-                if(expenseData[i].categoryId) groupCategory[categoriesMap[expenseData[i].categoryId]] += expenseData[i].amount;
-                sumExpenseAmount += expenseData[i].amount;
+            let sumTransactionAmount = 0;
+            for(let i = 0; i < transactionData.length; i++) {
+                if(transactionData[i].categoryId) groupCategory[categoriesMap[transactionData[i].categoryId]] += transactionData[i].amount;
+                sumTransactionAmount += transactionData[i].amount;
             }
 
-            setLabels(Object.keys(groupCategory).map(label => `${label} (${Math.round(groupCategory[label] / sumExpenseAmount * 100)}%)`));
-            setData(Object.values(groupCategory));
+            const result = Object.entries(groupCategory)
+                .map(([key, value]) => ({key, value}))
+                .sort((a,b) => b.value - a.value);
+
+            // no need to trim because category length is lesser than maxData
+            if(result.length <= maxData) {
+                setLabels(result.map(r => r.key));
+                setData(result.map(r => r.value));
+            } else {
+                const otherSum = result.slice(maxData).reduce((sum, acc) => sum += acc.value, 0);
+                setLabels([...result.map(r => r.key).slice(0, maxData - 1), 'Others']);
+                setData([...result.map(r => r.value).slice(0, maxData - 1), otherSum]);
+            }
         }
-    }, [categories, expenseData])
+    }, [categories, transactionData, maxData])
+
+    useEffect(() => {
+        const handleResize = () => {
+            if(window.matchMedia("(min-width: 600px)").matches) {
+                setMaxData(16);
+            } else if(window.matchMedia("(min-width: 480px)").matches) {
+                setMaxData(8);
+            } else {
+                setMaxData(6);
+            }
+        }
+
+        window.addEventListener('resize', handleResize);
+        handleResize();
+
+        return () => {
+            window.removeEventListener('resize', handleResize);
+        }
+    }, [])
 
     useEffect(() => {
         if(labels && data) {
@@ -53,6 +84,7 @@ export default function ExpenseChart({ expenseData = [] }) {
             setChartOptions({
                 responsive: true,
                 aspectRatio: 16 / 9,
+                maintainAspectRatio: false,
                 layout: {
                     padding: {
                         top: 16,
@@ -64,18 +96,20 @@ export default function ExpenseChart({ expenseData = [] }) {
                 plugins: {
                     legend: {
                         labels: {
-                            boxWidth: 20
+                            usePointStyle: true,
+                            textAlign: 'left'
                         },
-                        position: 'right'
+                        position: 'right',
+                        maxWidth: ({chart}) => chart.width * 0.9
                     }
                 }
             });
         }
-    }, [labels, data])
+    }, [labels, data, maxData])
 
-    if(expenseData && expenseData.length === 0) return (
+    if(transactionData && transactionData.length === 0) return (
         <div className="flex justify-center items-center h-48 xs:h-64 px-3 py-4">
-            <p className="text-sm md:text-base text-center text-dark dark:text-white">No expense data found, please create an expense first.</p>
+            <p className="text-sm md:text-base text-center text-dark dark:text-white">No transaction data found, please create an transaction first.</p>
         </div>
     )
     return(

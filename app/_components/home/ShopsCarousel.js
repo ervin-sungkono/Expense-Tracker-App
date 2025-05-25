@@ -9,10 +9,10 @@ import LinkButton from "../common/LinkButton"
 
 export default function ShopsCarousel() {
     const [shopData, setShopData] = useState(null);
-    const expenses = useLiveQuery(() => db.getAllExpenses());
+    const transactions = useLiveQuery(() => db.getAllTransactions());
     const shops = useLiveQuery(() => db.getAllShops());
 
-    const filterExpenseByMonth = (month) => {
+    const filterTransactionByMonth = (month) => {
         if(!month) {
             month = new Date().getMonth(); // current month
         }
@@ -21,12 +21,12 @@ export default function ShopsCarousel() {
             return new Date(targetDate).getMonth() === month && new Date(targetDate).getFullYear() === new Date().getFullYear();
         }
 
-        return expenses.filter(expense => isSameMonth(expense.date));
+        return transactions.filter(transaction => isSameMonth(transaction.date));
     }
 
     useEffect(() => {
-        if(expenses && shops) {
-            const filteredExpenses = filterExpenseByMonth();
+        if(transactions && shops) {
+            const filteredTransactions = filterTransactionByMonth();
             const shopsMap = {};
             for(let i = 0; i < shops.length; i++) {
                 shopsMap[shops[i].id] = {
@@ -36,10 +36,10 @@ export default function ShopsCarousel() {
                 };
             }
 
-            for(let i = 0; i < filteredExpenses.length; i++) {
-                if(filteredExpenses[i].shopId) { 
-                    shopsMap[filteredExpenses[i].shopId].count++;
-                    shopsMap[filteredExpenses[i].shopId].amount += Number(filteredExpenses[i].amount);
+            for(let i = 0; i < filteredTransactions.length; i++) {
+                if(filteredTransactions[i].shopId) { 
+                    shopsMap[filteredTransactions[i].shopId].count++;
+                    shopsMap[filteredTransactions[i].shopId].amount += Number(filteredTransactions[i].amount);
                 }
             }
 
@@ -47,11 +47,11 @@ export default function ShopsCarousel() {
                 return {
                     ...value,
                     totalVisit: value.count,
-                    averageExpense: value.count > 0 ? Math.round(value.amount / value.count) : 0,
+                    averageTransaction: value.count > 0 ? Math.round(value.amount / value.count) : 0,
                 }
             })]);
         }
-    }, [expenses, shops])
+    }, [transactions, shops])
 
     if(!shopData) {
         return (

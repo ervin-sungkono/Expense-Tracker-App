@@ -1,4 +1,5 @@
 import Dexie from "dexie";
+import { generateBudgets, generateTransactions, getCategories, getShops } from "./seeder";
 
 const DB_NAME = "ExpenseDB";
 const DB_VERSION = 1;
@@ -28,7 +29,7 @@ class ExpenseDB extends Dexie {
 
         this.version(DB_VERSION).stores({
             transactions: '++id, date, amount, categoryId, shopId, owner, type, remarks',
-            categories: '++id, name, type, parentId',
+            categories: '++id, name, type, parentId, mutable',
             budgets: '++id, amount, categoryId, start_date, end_date, repeat',
             shops: '++id, name, image, location'
         });
@@ -187,12 +188,13 @@ class ExpenseDB extends Dexie {
 }
 
 async function populate() {
-    await db.categories.bulkAdd([
-        { name: "Food", type: "Expense", parentId: null },
-        { name: "Transportation", type: "Expense", parentId: null },
-        { name: "Entertainment", type: "Expense", parentId: null },
-        { name: "Salary", type: "Income", parentId: null }
-    ]);
+    await db.transactions.bulkAdd(generateTransactions(100000));
+
+    await db.categories.bulkAdd(getCategories());
+
+    await db.shops.bulkAdd(getShops());
+
+    await db.budgets.bulkAdd(generateBudgets(500));
 }
 
 export const db = new ExpenseDB();

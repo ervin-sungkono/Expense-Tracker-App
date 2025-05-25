@@ -9,10 +9,11 @@ import { useState } from "react";
 import Button from "../common/Button";
 import { DateValidator, NumberValidator, StringValidator } from "@/app/_lib/validator";
 
-export default function AddExpenseDialog({ expense = {}, show, hideFn }) {
+export default function AddTransactionDialog({ transaction = {}, show, hideFn }) {
     const categories = useLiveQuery(() => db.getAllCategories());
     const shops = useLiveQuery(() => db.getAllShops());
     const [errorMessage, setErrorMessage] = useState({});
+    const [selectedCategory, setSelectedCategory] = useState(null); 
 
     const validateDate = (date) => {
         return new DateValidator("Date", date)
@@ -46,13 +47,11 @@ export default function AddExpenseDialog({ expense = {}, show, hideFn }) {
         const form = e.target;
         const formData = new FormData(form);
 
-        // Create payload for add expense
+        // Create payload for add transaction
         const payload = {}
         for(const [key, value] of formData.entries()) {
             payload[key] = value;
         }
-
-        console.log(payload.date)
 
         try{
             let error = {};
@@ -69,10 +68,10 @@ export default function AddExpenseDialog({ expense = {}, show, hideFn }) {
             }
 
             payload.amount = Number(payload.amount); // ensure that value stored is Number type
-            if(expense.id) {
-                db.updateExpense(expense.id, payload);
+            if(transaction.id) {
+                db.updateTransaction(transaction.id, payload);
             } else {
-                db.addExpense(payload);
+                db.addTransaction(payload);
             }
             
             form.reset();
@@ -83,7 +82,7 @@ export default function AddExpenseDialog({ expense = {}, show, hideFn }) {
     }
 
     const getDialogAction = () => {
-        return expense.id ? 'Edit Expense' : 'Add Expense';
+        return transaction.id ? 'Edit Transaction' : 'Add Transaction';
     }
 
     return (
@@ -100,7 +99,7 @@ export default function AddExpenseDialog({ expense = {}, show, hideFn }) {
                             name={"date"} 
                             label={"Date"} 
                             type={"datetime-local"}
-                            defaultValue={expense.date ?? new Date().toISOString().split('.')[0]}
+                            defaultValue={transaction.date ?? new Date().toISOString().slice(0,16)}
                             errorMessage={errorMessage?.date}
                         />
                         <InputField 
@@ -109,30 +108,40 @@ export default function AddExpenseDialog({ expense = {}, show, hideFn }) {
                             label={"Amount"} 
                             placeholder={"Enter amount"}
                             type={"number"}
-                            defaultValue={expense.amount}
+                            defaultValue={transaction.amount}
                             errorMessage={errorMessage?.amount}
                         />
                         {categories && <SelectField
                             required
                             label={"Category"}
                             name="categoryId"
-                            _selected={expense.categoryId}
+                            _selected={transaction.categoryId}
                             _options={categories.map(category => ({
                                 id: category.id,
                                 label: category.name
                             }))}
                             placeholder={"--Select Category--"}
                             errorMessage={errorMessage?.categoryId}
+                            onChange={(categoryId) => setSelectedCategory(categories.find(category => category.id === categoryId))}
                         />}
-                        {shops && <SelectField
+                        {shops && selectedCategory?.type === 'Expense' && 
+                        <SelectField
                             label={"Shop"}
                             name="shopId"
-                            _selected={expense.shopId}
+                            _selected={transaction.shopId}
                             _options={shops.map(shop => ({
                                 id: shop.id,
                                 label: shop.name
                             }))}
                             placeholder={"--Select Shop--"}
+                        />}
+                        {selectedCategory?.type === 'DebtLoan' && 
+                        <InputField 
+                            name={"owner"} 
+                            label={selectedCategory.name === 'Loan' ? 'Borrower' : 'Lender'} 
+                            placeholder={selectedCategory.name === 'Loan' ? 'Enter Borrower\'s name' : 'Enter Lender\s name'}
+                            defaultValue={transaction.owner ?? 'someone'}
+                            errorMessage={errorMessage?.owner}
                         />}
                         <TextField
                             name={"remarks"} 
@@ -140,7 +149,7 @@ export default function AddExpenseDialog({ expense = {}, show, hideFn }) {
                             placeholder={"Enter notes"}
                             rows={4}
                             maxLength={120}
-                            defaultValue={expense.remarks}
+                            defaultValue={transaction.remarks}
                             errorMessage={errorMessage?.remarks}
                         />
                     </div>

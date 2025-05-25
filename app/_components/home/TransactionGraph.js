@@ -32,20 +32,20 @@ ChartJS.register(
     Filler
 );
 
-export default function ExpenseGraph({ expenseData = [], labels, type = 'MONTHLY' }) {
+export default function TransactionGraph({ transactionData = [], labels, type = 'MONTHLY' }) {
     const [data, setData] = useState(null);
     const [chartData, setChartData] = useState(null);
     const [chartOptions, setChartOptions] = useState(null);
-    const [totalExpense, setTotalExpense] = useState(0);
+    const [totalTransaction, setTotalTransaction] = useState(0);
 
     const handleDownloadReport = () => {
-        const sum = expenseData.reduce((sum, curr) => {
+        const sum = transactionData.reduce((sum, curr) => {
             return sum += Number(curr.amount);
         }, 0);
 
         const data = [
             {
-                sheet: 'Expense',
+                sheet: 'Transaction',
                 columns: [
                     { label: "Date", value: "date", format: "dd-mmm-yy" },
                     { label: "Category", value: "category" },
@@ -54,14 +54,14 @@ export default function ExpenseGraph({ expenseData = [], labels, type = 'MONTHLY
                     { label: "Notes", value: "remarks" }
                 ],
                 content: [
-                    ...expenseData.sort((a,b) => new Date(a.date).getTime() - new Date(b.date).getTime()),
+                    ...transactionData.sort((a,b) => new Date(a.date).getTime() - new Date(b.date).getTime()),
                     { date: '', category: 'Total', amount: sum, shop: '' }
                 ]
             }
         ]
 
         const settings = {
-            fileName: `expense_report-${new Date().getTime()}`,
+            fileName: `transaction_report-${new Date().getTime()}`,
             extraLength: 3,
             writeMode: 'writeFile'
         }
@@ -74,31 +74,31 @@ export default function ExpenseGraph({ expenseData = [], labels, type = 'MONTHLY
     }
 
     useEffect(() => {
-        if(labels && expenseData && expenseData.length > 0) {
+        if(labels && transactionData && transactionData.length > 0) {
             const labelsMap = {}
             labels.forEach(label => labelsMap[label] = 0);
             
-            let totalExpense = 0;
-            expenseData.forEach(expense => {
-                const date = new Date(expense.date);
+            let totalTransaction = 0;
+            transactionData.forEach(transaction => {
+                const date = new Date(transaction.date);
                 const month = date.getMonth();
                 const year = date.getFullYear();
 
                 if(type === 'MONTHLY') {
-                    labelsMap[formatDateString(date)] += expense.amount;
+                    labelsMap[formatDateString(date)] += transaction.amount;
                 } else if(type === 'ANNUAL') {
-                    labelsMap[MONTHS[month]] += expense.amount;
+                    labelsMap[MONTHS[month]] += transaction.amount;
                 } else if(type === 'ALLTIME') {
-                    labelsMap[year] += expense.amount;
+                    labelsMap[year] += transaction.amount;
                 }
 
-                totalExpense += expense.amount;
+                totalTransaction += transaction.amount;
             })
 
             setData(Object.values(labelsMap));
-            setTotalExpense(totalExpense);
+            setTotalTransaction(totalTransaction);
         }
-    }, [labels, expenseData, type])
+    }, [labels, transactionData, type])
 
     useEffect(() => {
         if(labels && data) {
@@ -161,14 +161,14 @@ export default function ExpenseGraph({ expenseData = [], labels, type = 'MONTHLY
         }
     }, [labels, data])
 
-    if(expenseData && expenseData.length === 0) return (
+    if(transactionData && transactionData.length === 0) return (
         <div className="flex justify-center items-center h-48 xs:h-64 px-3 py-4">
-            <p className="text-sm md:text-base text-center text-dark dark:text-white">No expense data found, please create an expense first.</p>
+            <p className="text-sm md:text-base text-center text-dark dark:text-white">No transaction data found, please create an transaction first.</p>
         </div>
     )
     return(
         <div className="flex flex-col justify-center items-start min-h-48 xs:min-h-64">
-            <p className="w-full text-center mt-4 font-semibold text-sm md:text-base">Total: {formatCurrency(totalExpense)}</p>
+            <p className="w-full text-center mt-4 font-semibold text-sm md:text-base">Total: {formatCurrency(totalTransaction)}</p>
             {
                 (chartData && chartOptions) ? 
                 <Line

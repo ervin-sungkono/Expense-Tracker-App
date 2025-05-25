@@ -38,7 +38,7 @@ export default function InfoShopDialog({ shop, show, hideFn }) {
         const form = e.target;
         const formData = new FormData(form);
 
-        // Create payload for add expense
+        // Create payload for add transaction
         const payload = {}
         for(const [key, value] of formData.entries()) {
             payload[key] = value;

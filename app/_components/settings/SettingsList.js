@@ -41,7 +41,7 @@ export default function SettingsList() {
         // 3. Encoding doesn't work when offline
         setIsExporting(false);
 
-        saveAs(exportedData, `expense-tracker-export_${new Date().getTime()}.json`);
+        saveAs(exportedData, `transaction-tracker-export_${new Date().getTime()}.json`);
     }
 
     function disableInAppInstallPrompt() {

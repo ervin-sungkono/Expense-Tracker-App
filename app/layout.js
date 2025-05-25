@@ -8,7 +8,7 @@ const inter = Inter({ subsets: ['latin'] })
 export const metadata = {
   manifest: "/manifest.json", 
   title: "Xpensed",
-  description: "Track and manage your expense with Xpensed",
+  description: "Track and manage your spendings with Xpensed",
 };
 
 export default function RootLayout({ children }) {
