@@ -27,25 +27,27 @@ class ExpenseDB extends Dexie {
         super(DB_NAME);
 
         this.version(DB_VERSION).stores({
-            expenses: '++id, date, amount, categoryId, shopId, remarks',
-            categories: '++id, name, budget',
+            transactions: '++id, date, amount, categoryId, shopId, owner, type, remarks',
+            categories: '++id, name, type, parentId',
+            budgets: '++id, amount, categoryId, start_date, end_date, repeat',
             shops: '++id, name, image, location'
         });
     }
 
-    getAllExpenses() {
-        return this.expenses.toArray();
+    getAllTransactions() {
+        return this.transactions.toArray();
     }
 
-    getPaginatedExpenses(limit, searchText, { categoryId, shopId, amountRange, dateRange }) {
-        return this.expenses
+    getPaginatedTransactions(limit, searchText, type, { categoryId, shopId, amountRange, dateRange }) {
+        return this.transactions
             .orderBy('date')
-            .filter(expense => {
-                if(!expense.remarks.toLowerCase().includes(searchText)) return false;
-                if(categoryId && expense.categoryId != categoryId) return false;
-                if(shopId && expense.shopId != shopId) return false
-                if(!isInAmountRange(expense.amount, amountRange)) return false;
-                if(!isInDateRange(expense.date, dateRange)) return false;
+            .filter(transaction => {
+                if(!transaction.remarks.toLowerCase().includes(searchText)) return false;
+                if(categoryId && transaction.categoryId != categoryId) return false;
+                if(shopId && transaction.shopId != shopId) return false;
+                if(type && transaction.type != type) return false;
+                if(!isInAmountRange(transaction.amount, amountRange)) return false;
+                if(!isInDateRange(transaction.date, dateRange)) return false;
 
                 return true;
             })
@@ -54,8 +56,8 @@ class ExpenseDB extends Dexie {
             .toArray();
     }
 
-    getRecentExpenses(limit) {
-        return this.expenses
+    getRecentTransactions(limit) {
+        return this.transactions
             .orderBy('date')
             .reverse()
             .limit(limit)
@@ -63,7 +65,15 @@ class ExpenseDB extends Dexie {
     }
 
     getAllCategories() {
-        return this.categories.toArray();
+        return this.categories.orderBy('name').toArray();
+    }
+
+    getParentCategories() {
+        return this.categories.orderBy('name').where({ parentId: null }).toArray();
+    }
+
+    getChildCategories(categoryId) {
+        return this.categories.orderBy('name').where({ parentId: categoryId }).toArray();
     }
 
     getAllShops() {
@@ -82,46 +92,77 @@ class ExpenseDB extends Dexie {
             .toArray();
     }
 
-    addExpense({ date, amount, categoryId, shopId, remarks }) {
-        return this.expenses.add({ date, amount, categoryId, shopId, remarks });
+    getAllBudgets() {
+        return this.budgets.toArray();
     }
 
-    addCategory({ name, budget }) {
-        return this.categories.add({ name, budget });
+    getActiveBudget(dateRange) {
+        return this.budgets
+            .filter(budget => {
+                return isInDateRange(budget.start_date, dateRange) && isInDateRange(budget.end_date, dateRange);
+            })
+            .toArray();
+    }
+
+    addTransaction({ date, amount, categoryId, shopId, owner, type, remarks }) {
+        return this.transactions.add({ date, amount, categoryId, shopId, owner, type, remarks });
+    }
+
+    addCategory({ name, type, parentId }) {
+        return this.categories.add({ name, type, parentId });
     }
 
     addShop({ name, image, location }) {
         return this.shops.add({ name, image, location });
     }
 
-    updateExpense(expenseId, { date, amount, categoryId, shopId, remarks }) {
-        return this.expenses.update(expenseId, {date, amount, categoryId, shopId, remarks});
+    addBudget({ amount, categoryId, start_date, end_date, repeat }) {
+        return this.budgets.add({ amount, categoryId, start_date, end_date, repeat });
     }
 
-    updateCategory(categoryId, { name, budget }) {
-        return this.categories.update(categoryId, { name, budget });
+    updateTransaction(transactionId, { date, amount, categoryId, shopId, owner, type, remarks }) {
+        return this.transactions.update(transactionId, {date, amount, categoryId, shopId, owner, type, remarks});
+    }
+
+    updateCategory(categoryId, { name, type, parentId }) {
+        return this.transaction('rw', this.categories, () => {
+            // In case modifying parentId of category that has a sub category,
+            // modify all sub category to have the same parent as the category
+            if(parentId) this.categories.where({ parentId: categoryId }).modify({ parentId });
+            this.categories.update(categoryId, { name, type, parentId });
+        })
     }
 
     updateShop(shopId, { name, image, location }) {
         return this.shops.update(shopId, {name, image, location});
     }
 
-    deleteExpense(expenseId) {
-        this.expenses.delete(expenseId);
+    updateBudget(budgetId, { amount, categoryId, start_date, end_date, repeat }) {
+        return this.budgets.update(budgetId, { amount, categoryId, start_date, end_date, repeat });
+    }
+
+    deleteTransaction(transactionId) {
+        this.transactions.delete(transactionId);
     }
 
     deleteCategory(categoryId) {
-        return this.transaction('rw', this.expenses, this.categories, () => {
-          this.expenses.where({ categoryId }).delete();
+        return this.transaction('rw', this.transactions, this.categories, () => {
+          this.transactions.where({ categoryId }).delete();
+          this.budgets.where({ categoryId }).delete();
+          this.categories.where({ parentId: categoryId }).delete();
           this.categories.delete(categoryId);
         });
     }
 
     deleteShop(shopId) {
-        return this.transaction('rw', this.expenses, this.shops, () => {
-          this.expenses.where({ shopId }).modify({ shopId: null });
+        return this.transaction('rw', this.transactions, this.shops, () => {
+          this.transactions.where({ shopId }).modify({ shopId: null });
           this.shops.delete(shopId);
         });
+    }
+
+    deleteBudget(budgetId) {
+        return this.budgets.delete(budgetId);
     }
 
     async importDB({ file, clearTablesBeforeImport = false, overwriteValues = false, progressCallback }) {
@@ -147,9 +188,10 @@ class ExpenseDB extends Dexie {
 
 async function populate() {
     await db.categories.bulkAdd([
-        { name: "Food", budget: 500000 },
-        { name: "Transportation", budget: 800000 },
-        { name: "Entertainment", budget: 100000 }
+        { name: "Food", type: "Expense", parentId: null },
+        { name: "Transportation", type: "Expense", parentId: null },
+        { name: "Entertainment", type: "Expense", parentId: null },
+        { name: "Salary", type: "Income", parentId: null }
     ]);
 }
 
