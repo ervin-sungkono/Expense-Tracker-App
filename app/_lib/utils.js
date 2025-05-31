@@ -101,3 +101,22 @@ export function nFormatter(num, digits) {
   const item = lookup.findLast(item => num >= item.value);
   return item ? (num / item.value).toFixed(digits).replace(regexp, "").concat(item.symbol) : "0";
 }
+
+function isDebtLoanExpense(name) {
+    return name && (name === 'Repayment' || name === 'Loan')
+}
+
+function isDebtLoanIncome(name) {
+    return name && (name === 'Debt' || name === 'Debt Collection')
+}
+
+/**
+ * 
+ * @param {string} name 
+ * @returns Debt Loan type (Income or Expense)
+ */
+export function getDebtLoanType(name) {
+    if(isDebtLoanExpense(name)) return 'Expense';
+    if(isDebtLoanIncome(name)) return 'Income';
+    return null;
+}
