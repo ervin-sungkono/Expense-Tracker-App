@@ -30,7 +30,7 @@ class ExpenseDB extends Dexie {
         this.version(DB_VERSION).stores({
             transactions: '++id, date, amount, categoryId, shopId, owner, type, remarks',
             expenses: null,
-            categories: '++id, name, type, parentId, mutable',
+            categories: '++id, icon, name, type, parentId, mutable',
             budgets: '++id, amount, categoryId, start_date, end_date, repeat',
             shops: '++id, name, image, location'
         });
@@ -71,11 +71,11 @@ class ExpenseDB extends Dexie {
     }
 
     getParentCategories() {
-        return this.categories.orderBy('name').where({ parentId: null }).toArray();
+        return this.categories.where({ parentId: null }).toArray();
     }
 
     getChildCategories(categoryId) {
-        return this.categories.orderBy('name').where({ parentId: categoryId }).toArray();
+        return this.categories.where({ parentId: categoryId }).toArray();
     }
 
     getAllShops() {
@@ -110,8 +110,8 @@ class ExpenseDB extends Dexie {
         return this.transactions.add({ date, amount, categoryId, shopId, owner, type, remarks });
     }
 
-    addCategory({ name, type, parentId }) {
-        return this.categories.add({ name, type, parentId });
+    addCategory({ icon, name, type, parentId, mutable = true }) {
+        return this.categories.add({ icon, name, type, parentId, mutable });
     }
 
     addShop({ name, image, location }) {
@@ -126,12 +126,12 @@ class ExpenseDB extends Dexie {
         return this.transactions.update(transactionId, {date, amount, categoryId, shopId, owner, type, remarks});
     }
 
-    updateCategory(categoryId, { name, type, parentId }) {
+    updateCategory(categoryId, { icon, name, type, parentId }) {
         return this.transaction('rw', this.categories, () => {
             // In case modifying parentId of category that has a sub category,
             // modify all sub category to have the same parent as the category
             if(parentId) this.categories.where({ parentId: categoryId }).modify({ parentId });
-            this.categories.update(categoryId, { name, type, parentId });
+            this.categories.update(categoryId, { icon, name, type, parentId });
         })
     }
 
@@ -147,8 +147,21 @@ class ExpenseDB extends Dexie {
         this.transactions.delete(transactionId);
     }
 
+    // Keep the sub categories and transactions by merging it with a new prent category
+    mergeCategory(categoryId, newParentId) {
+         return this.transaction('rw', this.transactions, this.budgets, this.categories, () => {
+            if(newParentId) {
+                this.transactions.where({ categoryId }).modify({ categoryId: newParentId });
+                this.budgets.where({ categoryId }).modify({ categoryId: newParentId });
+                this.categories.where({ parentId: categoryId }).modify({ parentId: newParentId });
+            }
+            this.categories.delete(categoryId);
+        })
+    }
+
+    // delete the sub categories and transactions along with parent category
     deleteCategory(categoryId) {
-        return this.transaction('rw', this.transactions, this.categories, () => {
+        return this.transaction('rw', this.transactions, this.budgets, this.categories, () => {
           this.transactions.where({ categoryId }).delete();
           this.budgets.where({ categoryId }).delete();
           this.categories.where({ parentId: categoryId }).delete();

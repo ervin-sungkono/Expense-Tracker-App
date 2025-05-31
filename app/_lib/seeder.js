@@ -24,9 +24,9 @@ export function generateTransactions(count) {
         const amount = randomBetween(1000, 50000);
         const categoryId = randomBetween(1, 12);
         const category = categoryMap.get(String(categoryId));
-        const shopId = category.type === 'Expense' && !(category.name === 'Loan' || category.name === 'Repayment') ? (randomBetween(0, shops.length) || null) : null;
+        const shopId = category.type === 'Expense' ? (randomBetween(0, shops.length) || null) : null;
         const remarks = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed mollis suscipit congue. Phasellus sit amet nulla vitae lorem semper lobortis. Cras non massa et libero mollis tempus.';
-        const owner = (category.name === 'Debt' || category.name === 'Loan') ? ownerName[randomBetween(0, 4)] : null;
+        const owner = category.type === 'DebtLoan' ? ownerName[randomBetween(0, 4)] : null;
 
         transactions.push({ date, amount, categoryId, shopId, type, owner, remarks });
     }
@@ -60,10 +60,10 @@ export function getCategories() {
         { id: 2, name: "Transportation", type: "Expense", parentId: null, mutable: true },
         { id: 3, name: "Entertainment", type: "Expense", parentId: null, mutable: true },
         { id: 4, name: "Salary", type: "Income", parentId: null, mutable: true },
-        { id: 5, name: "Debt", type: "Income", parentId: null, mutable: false },
-        { id: 6, name: "Debt Collection", type: "Income", parentId: null, mutable: false },
-        { id: 7, name: "Loan", type: "Expense", parentId: null, mutable: false },
-        { id: 8, name: "Repayment", type: "Expense", parentId: null, mutable: false },
+        { id: 5, name: "Debt", type: "DebtLoan", parentId: null, mutable: false },
+        { id: 6, name: "Debt Collection", type: "DebtLoan", parentId: null, mutable: false },
+        { id: 7, name: "Loan", type: "DebtLoan", parentId: null, mutable: false },
+        { id: 8, name: "Repayment", type: "DebtLoan", parentId: null, mutable: false },
         { id: 9, name: "Beverage", type: "Expense", parentId: 1, mutable: true },
         { id: 10, name: "Snacks", type: "Expense", parentId: 1, mutable: true },
         { id: 11, name: "Bus", type: "Expense", parentId: 2, mutable: true },
