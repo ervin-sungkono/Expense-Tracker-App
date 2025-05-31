@@ -2,7 +2,7 @@ import Dexie from "dexie";
 import { generateBudgets, generateTransactions, getCategories, getShops } from "./seeder";
 
 const DB_NAME = "ExpenseDB";
-const DB_VERSION = 1;
+const DB_VERSION = 2;
 
 function isInAmountRange(amount, range) {
     const [min, max] = range;
@@ -29,6 +29,7 @@ class ExpenseDB extends Dexie {
 
         this.version(DB_VERSION).stores({
             transactions: '++id, date, amount, categoryId, shopId, owner, type, remarks',
+            expenses: null,
             categories: '++id, name, type, parentId, mutable',
             budgets: '++id, amount, categoryId, start_date, end_date, repeat',
             shops: '++id, name, image, location'

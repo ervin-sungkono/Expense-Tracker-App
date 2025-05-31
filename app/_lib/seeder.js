@@ -56,18 +56,18 @@ export function generateBudgets(count) {
 
 export function getCategories() {
     return [
-        { id: 1, name: "Food", type: "Expense", parentId: null },
-        { id: 2, name: "Transportation", type: "Expense", parentId: null },
-        { id: 3, name: "Entertainment", type: "Expense", parentId: null },
-        { id: 4, name: "Salary", type: "Income", parentId: null },
-        { id: 5, name: "Debt", type: "DebtLoan", parentId: null, mutable: false },
-        { id: 6, name: "Debt Collection", type: "DebtLoan", parentId: null, mutable: false },
-        { id: 7, name: "Loan", type: "DebtLoan", parentId: null, mutable: false },
-        { id: 8, name: "Repayment", type: "DebtLoan", parentId: null, mutable: false },
-        { id: 9, name: "Beverage", type: "Expense", parentId: 1 },
-        { id: 10, name: "Snacks", type: "Expense", parentId: 1 },
-        { id: 11, name: "Bus", type: "Expense", parentId: 2 },
-        { id: 12, name: "Motorcycle", type: "Expense", parentId: 2 }
+        { id: 1, name: "Food", type: "Expense", parentId: null, mutable: true },
+        { id: 2, name: "Transportation", type: "Expense", parentId: null, mutable: true },
+        { id: 3, name: "Entertainment", type: "Expense", parentId: null, mutable: true },
+        { id: 4, name: "Salary", type: "Income", parentId: null, mutable: true },
+        { id: 5, name: "Debt", type: "Income", parentId: null, mutable: false },
+        { id: 6, name: "Debt Collection", type: "Income", parentId: null, mutable: false },
+        { id: 7, name: "Loan", type: "Expense", parentId: null, mutable: false },
+        { id: 8, name: "Repayment", type: "Expense", parentId: null, mutable: false },
+        { id: 9, name: "Beverage", type: "Expense", parentId: 1, mutable: true },
+        { id: 10, name: "Snacks", type: "Expense", parentId: 1, mutable: true },
+        { id: 11, name: "Bus", type: "Expense", parentId: 2, mutable: true },
+        { id: 12, name: "Motorcycle", type: "Expense", parentId: 2, mutable: true }
     ]
 }
 
