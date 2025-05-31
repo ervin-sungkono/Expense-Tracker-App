@@ -10,7 +10,7 @@ function randomBetween(min, max) { // min and max included
 }
 
 export function generateTransactions(count) {
-    const categoryMap = new Map(getCategories().map(category => [String(category.id), category.type]));
+    const categoryMap = new Map(getCategories().map(category => [String(category.id), category]));
     const shops = getShops();
 
     const start = new Date(2020, 0, 1); // January 1, 2020
@@ -23,10 +23,10 @@ export function generateTransactions(count) {
         const date = getRandomDate(start, end).toISOString().slice(0, 16);
         const amount = randomBetween(1000, 50000);
         const categoryId = randomBetween(1, 12);
-        const type = categoryMap.get(String(categoryId));
-        const shopId = type === 'Expense' ? (randomBetween(0, shops.length) || null) : null;
+        const category = categoryMap.get(String(categoryId));
+        const shopId = category.type === 'Expense' && !(category.name === 'Loan' || category.name === 'Repayment') ? (randomBetween(0, shops.length) || null) : null;
         const remarks = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed mollis suscipit congue. Phasellus sit amet nulla vitae lorem semper lobortis. Cras non massa et libero mollis tempus.';
-        const owner = type === 'DebtLoan' ? ownerName[randomBetween(0, 4)] : null;
+        const owner = (category.name === 'Debt' || category.name === 'Loan') ? ownerName[randomBetween(0, 4)] : null;
 
         transactions.push({ date, amount, categoryId, shopId, type, owner, remarks });
     }
