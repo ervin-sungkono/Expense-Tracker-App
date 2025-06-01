@@ -10,6 +10,35 @@ export default function InfoTransactionDialog({ transaction, show, hideFn }) {
     const [showEdit, setShowEdit] = useState(false);
     const [showDelete, setShowDelete] = useState(false);
 
+    const contents = [
+        {
+            label: "Date",
+            value: formatDateString(transaction.date)
+        },
+        {
+            label: "Amount",
+            value: formatCurrency(transaction.amount)
+        },
+        {
+            label: "Category",
+            value: transaction.category
+        },
+        {
+            label: "Shop",
+            value: transaction.shop,
+            isHidden: transaction.shop == null
+        },
+        {
+            label: "Owner",
+            value: transaction.owner,
+            isHidden: transaction.owenr == null
+        },
+        {
+            label: "Notes",
+            value: transaction.remarks ?? "No notes yet."
+        },
+    ]
+
     return (
         <>
             <Dialog 
@@ -19,28 +48,12 @@ export default function InfoTransactionDialog({ transaction, show, hideFn }) {
                 <div className="flex flex-col gap-4">
                     <div className="text-xl font-bold">Transaction Detail</div>
                     <div className="flex flex-col mb-4">
-                        <div className="flex flex-col gap-1 pb-2 border-b border-dark/20 dark:border-white/20">
-                            <p className="uppercase text-xs md:text-sm font-semibold text-dark/80 dark:text-white/80">Date</p>
-                            <p className="text-sm md:text-base text-dark dark:text-white">{formatDateString(transaction.date)}</p>
-                        </div>
-                        <div className="flex flex-col gap-1 py-2 border-b border-dark/20 dark:border-white/20">
-                            <p className="uppercase text-xs md:text-sm font-semibold text-dark/80 dark:text-white/80">Amount</p>
-                            <p className="text-sm md:text-base text-dark dark:text-white">{formatCurrency(transaction.amount)}</p>
-                        </div>
-                        <div className="flex flex-col gap-1 py-2 not-last:border-b border-dark/20 dark:border-white/20">
-                            <p className="uppercase text-xs md:text-sm font-semibold text-dark/80 dark:text-white/80">Category</p>
-                            <p className="text-sm md:text-base text-dark dark:text-white">{transaction.category}</p>
-                        </div>
-                        {transaction.shop &&
-                        <div className="flex flex-col gap-1 py-2 not-last:border-b border-dark/20 dark:border-white/20">
-                            <p className="uppercase text-xs md:text-sm font-semibold text-dark/80 dark:text-white/80">Shop</p>
-                            <p className="text-sm md:text-base text-dark dark:text-white">{transaction.shop}</p>
-                        </div>}
-                        {transaction.remarks && 
-                        <div className="flex flex-col gap-1 py-2">
-                            <p className="uppercase text-xs md:text-sm font-semibold text-dark/80 dark:text-white/80">Notes</p>
-                            <p className="text-sm md:text-base text-dark dark:text-white">{transaction.remarks}</p>
-                        </div>}
+                        {contents.map(content => (
+                            !content.isHidden && <div key={content.label} className="flex flex-col gap-1 pb-2 border-b border-dark/20 dark:border-white/20">
+                                <p className="uppercase text-xs md:text-sm font-semibold text-dark/80 dark:text-white/80">{content.label}</p>
+                                <p className="text-sm md:text-base text-dark dark:text-white">{content.value}</p>
+                            </div>
+                        ))}
                     </div>
                     <div className="flex justify-end gap-2.5">
                         <Button label={"Edit"} contained onClick={() => setShowEdit(true)}/>
