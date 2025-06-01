@@ -1,6 +1,6 @@
 'use client'
 import { memo } from 'react';
-import { FixedSizeList } from 'react-window';
+import { VariableSizeList } from 'react-window';
 import AutoSizer from 'react-virtualized-auto-sizer';
 import CategoryCard from './CategoryCard';
 import LoadingSpinner from '../common/LoadingSpinner';
@@ -18,12 +18,17 @@ const Row = ({ index, style, data }) => {
 
 const MemoizedRow = memo(Row);
 
-const VirtualizedCategoryList = ({ items }) => {
+const getItemSize = (item) => {
+  const extraLength = item.data?.length ?? 0;
+  return 56 + extraLength * 56;
+}
+
+const VirtualizedCategoryList = ({ ref, items }) => {
   if(!items) {
     return (
       <div className='w-full h-full flex flex-col justify-center items-center gap-4 bg-neutral-200 dark:bg-neutral-700 rounded-lg px-4 py-2.5'>
         <LoadingSpinner/>
-        <p className='text-dark/80 dark:text-white/80 text-sm md:text-base text-center'>Loading transaction data..</p>
+        <p className='text-dark/80 dark:text-white/80 text-sm md:text-base text-center'>Loading category data..</p>
       </div>
     )
   }
@@ -40,16 +45,17 @@ const VirtualizedCategoryList = ({ items }) => {
   return (
     <AutoSizer>
       {({ height, width }) => (
-          <FixedSizeList
+          <VariableSizeList
+            ref={ref}
             height={height}
             width={width}
             itemCount={items.length}
-            itemSize={64}
+            itemSize={(index) => getItemSize(items[index])}
             itemData={items}
             style={{willChange: 'initial'}}
           >
             {MemoizedRow}
-          </FixedSizeList>
+          </VariableSizeList>
       )}
     </AutoSizer>
   );

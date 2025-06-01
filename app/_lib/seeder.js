@@ -1,3 +1,5 @@
+import { getDebtLoanType } from "./utils";
+
 function getRandomDate(start, end) {
     const startDate = start.getTime();
     const endDate = end.getTime();
@@ -24,11 +26,12 @@ export function generateTransactions(count) {
         const amount = randomBetween(1000, 50000);
         const categoryId = randomBetween(1, 12);
         const category = categoryMap.get(String(categoryId));
+        const expenseType = category.type === 'DebtLoan' ? getDebtLoanType(category.name) : category.type;
         const shopId = category.type === 'Expense' ? (randomBetween(0, shops.length) || null) : null;
         const remarks = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed mollis suscipit congue. Phasellus sit amet nulla vitae lorem semper lobortis. Cras non massa et libero mollis tempus.';
         const owner = category.type === 'DebtLoan' ? ownerName[randomBetween(0, 4)] : null;
 
-        transactions.push({ date, amount, categoryId, shopId, type, owner, remarks });
+        transactions.push({ date, amount, categoryId, shopId, type: expenseType, owner, remarks });
     }
 
     return transactions;

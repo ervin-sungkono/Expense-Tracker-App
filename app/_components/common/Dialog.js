@@ -7,7 +7,7 @@ export default function Dialog({ children, show = false, hideFn = null, hideCanc
 
     useEffect(() => {
         let hide = null;
-        if(!show && !hidden) hide = setTimeout(() => setHidden(true), 500);
+        if(!show && !hidden) hide = setTimeout(() => setHidden(true), 350);
         else if(show && hidden) {
             setHidden(false)
         }
@@ -17,8 +17,8 @@ export default function Dialog({ children, show = false, hideFn = null, hideCanc
 
     if(!hidden)
     return(
-        <div className="fixed w-full h-full px-4 py-8 top-0 left-0 flex justify-center items-center z-[10000]">
-            <div className={`relative w-full overflow-y-auto max-h-full max-w-2xl bg-white dark:bg-neutral-700 rounded-lg px-6 pt-9 pb-8 z-50 ${show ? 'animate-[show_.5s_forwards_ease-in-out]' : 'animate-[hide_.5s_forwards_ease-in-out]'}`}>
+        <div className="fixed w-full h-full px-4 py-8 top-0 left-0 flex justify-center items-center z-[10000] overflow-hidden">
+            <div className={`relative w-full overflow-y-auto max-h-full max-w-2xl bg-white dark:bg-neutral-700 rounded-lg px-6 pt-9 pb-8 z-50 ${show ? 'animate-[show_.35s_forwards_ease-in-out]' : 'animate-[hide_.35s_forwards_ease-in-out]'}`}>
                 {children}
                 {!hideCancelButton && 
                 <button className="absolute cursor-pointer text-white p-2 bg-basic-gradient rounded-bl-lg right-0 top-0" onClick={hideFn}>
