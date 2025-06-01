@@ -66,16 +66,26 @@ class ExpenseDB extends Dexie {
             .toArray();
     }
 
+    getTransactionCountByCategory(categoryId) {
+        return this.transactions
+            .where({ categoryId })
+            .count();
+    }
+
     getAllCategories() {
         return this.categories.orderBy('name').toArray();
     }
 
-    getParentCategories() {
-        return this.categories.where({ parentId: null }).toArray();
+    getParentCategories(type) {
+        return this.categories.filter(category => category.parentId === null && category.type === type).toArray();
     }
 
     getChildCategories(categoryId) {
         return this.categories.where({ parentId: categoryId }).toArray();
+    }
+
+    getChildCategoriesCount(categoryId) {
+        return this.categories.where({ parentId: categoryId }).count();
     }
 
     getAllShops() {
