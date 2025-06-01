@@ -17,3 +17,11 @@
 @utility bg-danger-gradient--hover {
     @apply bg-linear-to-r from-red-600 to-red-600/80;
 }
+
+@utility bg-success-gradient {
+    @apply bg-linear-to-r from-green-600 to-green-400;
+}
+
+@utility bg-success-gradient--hover {
+    @apply bg-linear-to-r from-green-600 to-green-600/80;
+}

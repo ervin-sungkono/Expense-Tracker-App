@@ -33,11 +33,11 @@ export default function CategoriesCarousel() {
             const filteredTransactions = filterTransactionByMonth();
             const categoriesMap = {};
             for(let i = 0; i < categories.length; i++) {
-                categoriesMap[categories[i].id] = {...categories[i]};
+                categoriesMap[categories[i].id] = {...categories[i], total: 0};
             }
 
             for(let i = 0; i < filteredTransactions.length; i++) {
-                if(filteredTransactions[i].categoryId) categoriesMap[filteredTransactions[i].categoryId].budget -= Number(filteredTransactions[i].amount);
+                if(filteredTransactions[i].categoryId) categoriesMap[filteredTransactions[i].categoryId].total += Number(filteredTransactions[i].amount);
             }
 
             setCategoryData([...Object.values(categoriesMap)]);
@@ -54,14 +54,14 @@ export default function CategoriesCarousel() {
     } else {
         return(
             <div className="mb-4">
-                <SubHeader title="Categories" description={"based on this month's remaining budget"} onClick={() => setShowDialog(true)}/>
+                <SubHeader title="Categories" description={"based on this month's transaction"} onClick={() => setShowDialog(true)}/>
                 {categoryData.length > 0 ?
                 <SwiperContainer 
                     spaceBetween={12}
                     slidesPerView={1.8}
                     items={categoryData?.sort((a,b) => a.budget - b.budget).map(category => ({
                         id: category.id,
-                        component: <CategoryCard {...category} slug={`/transactions?category=${encodeURIComponent(category.name)}`}/>
+                        component: <CategoryCard {...category} slug={`/transactions?category=${encodeURIComponent(category.name)}&type=${encodeURIComponent(category.type)}`}/>
                     }))}
                 /> :
                 <div className="h-40 flex flex-col justify-center items-center gap-4 w-full bg-neutral-200 dark:bg-neutral-700 rounded-lg py-6 px-4">

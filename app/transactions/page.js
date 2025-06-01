@@ -71,7 +71,7 @@ export default function Transactions() {
                         </div>
                     </div>
                 </div>
-                <div className="flex grow">
+                <div className="flex grow mb-2">
                     <VirtualizedTransactionList
                         items={transactions}
                         loadMore={fetchMoreData}
