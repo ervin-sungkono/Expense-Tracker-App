@@ -8,7 +8,7 @@ import Image from "next/image";
 const AddCategoryDialog = dynamic(() => import("../categories/AddCategoryDialog"));
 const DeleteCategoryDialog = dynamic(() => import("../categories/DeleteCategoryDialog"));
 
-function CategoryCard({ category, style, depth = 0 }) {
+function CategoryCard({ category, onClick, style, depth = 0 }) {
     const { id, name, icon, mutable } = category;
     const [showMenu, setShowMenu] = useState(false);
     const [showInfo, setShowInfo] = useState(false);
@@ -36,10 +36,14 @@ function CategoryCard({ category, style, depth = 0 }) {
         ...getMutableItems()
     ]
 
+    const handleCategoryClick = () => {
+        onClick && onClick(category);
+    }
+
     return(
         <div style={{...style, marginLeft: `${24 * depth}px`}}>
             <div className="relative border-b border-dark/20 dark:border-white/20">
-                <div className="py-2 flex">
+                <div onClick={handleCategoryClick} className={`py-2 flex ${onClick ? 'cursor-pointer' : ''}`}>
                     <div className="w-full flex gap-2.5 items-center">
                         <div className="flex items-center gap-2 grow">
                             <div className="relative w-8 h-8 md:w-10 md:h-10 rounded-full bg-neutral-200 dark:bg-neutral-600">
@@ -66,14 +70,15 @@ function CategoryCard({ category, style, depth = 0 }) {
                     hideFn={() => setShowEdit(false)}
                 />
                 <DeleteCategoryDialog 
-                    categoryId={id} 
+                    categoryId={id}
+                    categoryName={name}
                     show={showDelete} 
                     hideFn={() => setShowDelete(false)}
                 />
             </div>
             {category.data &&
             category.data.map(subcategory => (
-                <CategoryCard key={subcategory.id} category={subcategory} style={{}} depth={depth + 1}/>
+                <CategoryCard key={subcategory.id} category={subcategory} onClick={onClick} style={{}} depth={depth + 1}/>
             ))}
         </div>
     )
