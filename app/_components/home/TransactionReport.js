@@ -16,9 +16,20 @@ export default function TransactionReport() {
 
     const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth());
     const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
+    const [yearOptions, setYearOptions] = useState(null);
 
     const [monthMap, setMonthMap] = useState({});
     const [yearMap, setYearMap] = useState({});
+
+    useEffect(() => {
+        const years = Object.keys(yearMap);
+        if(years.length > 0) {
+            setYearOptions(years.map(year => ({
+                id: Number(year),
+                label: year
+            })))
+        }
+    }, [yearMap])
 
     useEffect(() => {
         if(transactions && categories && shops) {
@@ -91,16 +102,14 @@ export default function TransactionReport() {
                         }))} 
                         onChange={(val) => setSelectedMonth(val)}
                     />
-                    <SelectField 
+                    {yearOptions ? <SelectField 
                         name={"year"}
                         placeholder={"Year"}
                         _selected={selectedYear}
-                        _options={generateRangeOptions(1980, 2100).map(year => ({
-                            id: year,
-                            label: year
-                        }))}
+                        _options={yearOptions}
                         onChange={(val) => setSelectedYear(val)}
-                    />
+                    /> :
+                    <div className="w-full h-full rounded-md bg-neutral-200 dark:bg-neutral-600 animate-pulse"></div>}
                 </div>
             ),
             component: <TransactionGraph type="MONTHLY" labels={getMonthlyLabels(selectedYear, selectedMonth)} transactionData={monthMap[`${selectedYear}-${selectedMonth}`]}/>
@@ -110,15 +119,12 @@ export default function TransactionReport() {
             label: 'Annual',
             header: () => (
                 <div className="px-3 pt-2">
-                    <SelectField 
+                    {yearOptions && <SelectField 
                         name={"year"}
                         _selected={selectedYear}
-                        _options={generateRangeOptions(1980, 2100).map(year => ({
-                            id: year,
-                            label: year
-                        }))}
+                        _options={yearOptions}
                         onChange={(val) => setSelectedYear(val)}
-                    />
+                    />}
                 </div>
             ),
             component: <TransactionGraph type="ANNUAL" labels={MONTHS} transactionData={yearMap[selectedYear]}/>

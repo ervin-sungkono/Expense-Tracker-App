@@ -21,6 +21,24 @@ export default function TransactionData() {
     const [monthMap, setMonthMap] = useState({});
     const [yearMap, setYearMap] = useState({});
 
+    const [yearOptions, setYearOptions] = useState(null);
+
+    useEffect(() => {
+        const years = Object.keys(yearMap);
+        if(years.length > 0) {
+            setYearOptions(years.map(year => ({
+                id: Number(year),
+                label: year
+            })))
+        } else {
+            const year = new Date().getFullYear();
+            setYearOptions([{
+                id: Number(year),
+                label: year
+            }])
+        }
+    }, [yearMap])
+
     useEffect(() => {
         if(transactions) {
             const newDateMap = {};
@@ -73,15 +91,13 @@ export default function TransactionData() {
                         }))} 
                         onChange={(val) => setSelectedMonth(val)}
                     />
+                    {yearOptions && 
                     <SelectField 
                         name={"year"}
                         _selected={selectedYear}
-                        _options={generateRangeOptions(1980, 2100).map(year => ({
-                            id: year,
-                            label: year
-                        }))}
+                        _options={yearOptions}
                         onChange={(val) => setSelectedYear(val)}
-                    />
+                    />}
                 </div>
             ),
             component: <TransactionChart transactionData={monthMap[`${selectedYear}-${selectedMonth}`]}/>
@@ -91,15 +107,13 @@ export default function TransactionData() {
             label: 'Annual',
             header: () => (
                 <div className="px-3 pt-2">
+                    {yearOptions &&
                     <SelectField 
                         name={"year"}
                         _selected={selectedYear}
-                        _options={generateRangeOptions(1980, 2100).map(year => ({
-                            id: year,
-                            label: year
-                        }))}
+                        _options={yearOptions}
                         onChange={(val) => setSelectedYear(val)}
-                    />
+                    />}
                 </div>
             ),
             component: <TransactionChart transactionData={yearMap[selectedYear]}/>

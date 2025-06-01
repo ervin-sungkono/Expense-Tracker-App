@@ -1,7 +1,7 @@
 'use client'
 import { useEffect, useState } from "react"
 
-export default function Tab({ header, selected = null, contents = [] }) {
+export default function Tab({ selected = null, contents = [] }) {
     const [selectedTab, setSelectedTab] = useState(selected);
 
     useEffect(() => {
