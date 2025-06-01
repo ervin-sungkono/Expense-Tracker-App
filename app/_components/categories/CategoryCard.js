@@ -5,8 +5,9 @@ import ContextMenu from "../common/ContextMenu";
 import { IoMdMore as MoreIcon } from "react-icons/io";
 import Image from "next/image";
 
-const AddCategoryDialog = dynamic(() => import("../categories/AddCategoryDialog"));
-const DeleteCategoryDialog = dynamic(() => import("../categories/DeleteCategoryDialog"));
+const InfoCategoryDialog = dynamic(() => import("./InfoCategoryDialog"))
+const AddCategoryDialog = dynamic(() => import("./AddCategoryDialog"));
+const DeleteCategoryDialog = dynamic(() => import("./DeleteCategoryDialog"));
 
 function CategoryCard({ category, onClick, style, depth = 0 }) {
     const { id, name, icon, mutable } = category;
@@ -64,6 +65,11 @@ function CategoryCard({ category, onClick, style, depth = 0 }) {
                     show={showMenu} 
                     hideFn={() => setShowMenu(false)}
                     hideOnItemClick
+                />
+                <InfoCategoryDialog
+                    category={category}
+                    show={showInfo}
+                    hideFn={() => setShowInfo(false)}
                 />
                 <AddCategoryDialog 
                     category={category}

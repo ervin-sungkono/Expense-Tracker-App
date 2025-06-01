@@ -40,6 +40,10 @@ class ExpenseDB extends Dexie {
         return this.transactions.toArray();
     }
 
+    getTransactionsByCategory(categoryId) {
+        return this.transactions.where({ categoryId }).toArray();
+    }
+
     getPaginatedTransactions(limit, searchText, type, { categoryId, shopId, amountRange, dateRange }) {
         return this.transactions
             .orderBy('date')
@@ -74,6 +78,11 @@ class ExpenseDB extends Dexie {
 
     getAllCategories() {
         return this.categories.orderBy('name').toArray();
+    }
+
+    getCategoryById(categoryId) {
+        if(!categoryId) return null;
+        return this.categories.where({ id: categoryId }).first();
     }
 
     getParentCategories(type) {
