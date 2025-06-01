@@ -3,13 +3,19 @@ import { useState } from "react";
 import Page from "../common/Page";
 import SearchBar from "../common/Searchbar";
 import VirtualizedCategoryList from "./VirtualizedCategoryList";
+import Button from "../common/Button";
 
-export default function SelectCategoryPage({ show, hideFn, categories, onCategorySelected }) {
+export default function SelectCategoryPage({ show, hideFn, categories, onCategorySelected, onCancelSelection }) {
     const [searchText, setSearchText] = useState('');
 
     const handleCategoryClicked = (value) => {
         hideFn && hideFn();
         onCategorySelected && onCategorySelected(value);
+    }
+
+    const handleCancelSelection = () => {
+        hideFn && hideFn();
+        onCancelSelection && onCancelSelection();
     }
 
     return(
@@ -28,6 +34,9 @@ export default function SelectCategoryPage({ show, hideFn, categories, onCategor
                         items={categories?.filter(category => category.name.toLowerCase().includes(searchText))}
                         onCategoryClicked={handleCategoryClicked}
                     />
+                </div>
+                <div className="flex justify-center mt-2">
+                    <Button style="danger" label={"Cancel Selection"} onClick={handleCancelSelection}/>
                 </div>
             </div>
         </Page>

@@ -14,6 +14,7 @@ export default function AddTransactionDialog({ transaction = {}, show, hideFn })
     const shops = useLiveQuery(() => db.getAllShops());
     const [errorMessage, setErrorMessage] = useState({});
     const [selectedCategory, setSelectedCategory] = useState(null); 
+    const [selectCategory, setSelectCategory] = useState(false);
 
     const validateDate = (date) => {
         return new DateValidator("Date", date)
@@ -115,14 +116,9 @@ export default function AddTransactionDialog({ transaction = {}, show, hideFn })
                             required
                             label={"Category"}
                             name="categoryId"
-                            _selected={transaction.categoryId}
-                            _options={categories.map(category => ({
-                                id: category.id,
-                                label: category.name
-                            }))}
                             placeholder={"--Select Category--"}
                             errorMessage={errorMessage?.categoryId}
-                            onChange={(categoryId) => setSelectedCategory(categories.find(category => category.id === categoryId))}
+                            overrideOnClick={() => setSelectCategory(true)}
                         />}
                         {shops && selectedCategory?.type === 'Expense' && 
                         <SelectField

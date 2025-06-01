@@ -94,7 +94,7 @@ export default function AddCategoryDialog({ category = {}, show, hideFn }) {
     const resetForm = (form) => {
         form.reset();
         setSelectedType(null);
-        setSelectParent(null);
+        setSelectedParent(null);
         setSelectedIcon('sky--weather_star.svg');
     }
 
@@ -190,6 +190,7 @@ export default function AddCategoryDialog({ category = {}, show, hideFn }) {
                 hideFn={() => setSelectParent(false)}
                 categories={parentCategories?.filter(c => c.id !== category.id)}
                 onCategorySelected={(parentId) => setSelectedParent(parentId)}
+                onCancelSelection={() => setSelectedParent(null)}
             />
         </>
     )
