@@ -13,7 +13,7 @@ export default function SelectField({ customSelected, label, name, required = fa
 
     useEffect(() => {
         if(dropdownRef?.current && showOption && selected?.id) {
-            dropdownRef.current.querySelector(`#${name}-${selected.id}`).scrollIntoView({ block: 'center' });
+            dropdownRef.current.querySelector(`#${name}-${selected.id}`).scrollIntoView({ block: 'nearest' });
         }
     }, [showOption, dropdownRef, selected])
     
