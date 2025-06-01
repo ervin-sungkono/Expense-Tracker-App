@@ -1,5 +1,5 @@
 'use client'
-import { formatCurrency } from "@/app/_lib/utils";
+import { formatCurrency, getDebtLoanType } from "@/app/_lib/utils";
 import Dialog from "../common/Dialog";
 import { db } from "@/app/_lib/db";
 import { useLiveQuery } from "dexie-react-hooks";
@@ -29,7 +29,7 @@ export default function InfoCategoryDialog({ category = {}, show, hideFn }) {
         },
         {
             label: "Type",
-            value: category.type
+            value: category.type === 'DebtLoan' ? getDebtLoanType(category.name) : category.type
         },
         {
             label: "Transaction Count",
@@ -58,7 +58,7 @@ export default function InfoCategoryDialog({ category = {}, show, hideFn }) {
                     </div>
                     <div className="flex flex-col gap-4">
                         {contents.map(content => (
-                            <div key={content.label} className="flex flex-col gap-1 pb-2 border-b border-dark/20 dark:border-white/20">
+                            <div key={content.label} className="flex flex-col gap-1 pb-2 not-last:border-b border-dark/20 dark:border-white/20">
                                 <p className="uppercase text-xs md:text-sm font-semibold text-dark/80 dark:text-white/80">{content.label}</p>
                                 <p className="text-sm md:text-base text-dark dark:text-white">{content.value}</p>
                             </div>

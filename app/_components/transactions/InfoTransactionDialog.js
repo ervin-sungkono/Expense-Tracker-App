@@ -49,7 +49,7 @@ export default function InfoTransactionDialog({ transaction, show, hideFn }) {
                     <div className="text-xl font-bold">Transaction Detail</div>
                     <div className="flex flex-col mb-4">
                         {contents.map(content => (
-                            !content.isHidden && <div key={content.label} className="flex flex-col gap-1 pb-2 border-b border-dark/20 dark:border-white/20">
+                            !content.isHidden && <div key={content.label} className="flex flex-col gap-1 pb-2 not-last:border-b border-dark/20 dark:border-white/20">
                                 <p className="uppercase text-xs md:text-sm font-semibold text-dark/80 dark:text-white/80">{content.label}</p>
                                 <p className="text-sm md:text-base text-dark dark:text-white">{content.value}</p>
                             </div>
