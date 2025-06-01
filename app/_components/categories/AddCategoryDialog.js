@@ -3,26 +3,37 @@ import Dialog from "../common/Dialog";
 import InputField from "../common/InputField";
 import SelectField from "../common/SelectField";
 import { db } from "@/app/_lib/db";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Button from "../common/Button";
 import { StringValidator } from "@/app/_lib/validator";
 import { useLiveQuery } from "dexie-react-hooks";
 import SelectIconPage from "./SelectIconPage";
 import Image from "next/image";
+import SelectCategoryPage from "./SelectCategoryPage";
 
 export default function AddCategoryDialog({ category = {}, show, hideFn }) {
     const [errorMessage, setErrorMessage] = useState({});
     const [selectIcon, setSelectIcon] = useState(false);
     const [selectParent, setSelectParent] = useState(false);
     const [selectedIcon, setSelectedIcon] = useState(category.icon ?? 'sky--weather_star.svg');
-    const [selectedParent, setSelectedParent] = useState(category.parentId);
+    const [selectedParent, setSelectedParent] = useState(null);
 
     const parentCategories = useLiveQuery(() => db.getParentCategories(category.type));
+
+    useEffect(() => {
+        if(category.parentId && parentCategories) setSelectedParent(parentCategories.find(pc => pc.id === category.parentId));
+    }, [category.parentId, parentCategories])
 
     const typeOptions = [
         { id: 'Expense', label: 'Expense' },
         { id: 'Income', label: 'Income' },
     ]
+
+    const validateIcon = (icon) => {
+        return new StringValidator("Icon", icon)
+            .required()
+            .validate();
+    }
 
     const validateType = (type) => {
         return new StringValidator("Type", type)
@@ -38,10 +49,6 @@ export default function AddCategoryDialog({ category = {}, show, hideFn }) {
             .validate();
     }
 
-    const handleIconSelect = (icon) => {
-        setSelectedIcon(icon);
-    }
-
     const handleSubmit = (e) => {
         e.preventDefault();
 
@@ -55,14 +62,15 @@ export default function AddCategoryDialog({ category = {}, show, hideFn }) {
         }
 
         payload.icon = selectedIcon;
-        payload.parentId = selectedParent;
+        payload.parentId = selectedParent.id;
 
         try{
             let error = {};
-            const { name, type } = payload;
+            const { name, type, icon } = payload;
 
             error.name = validateName(name);
             error.type = validateType(type);
+            error.icon = validateIcon(icon);
 
             setErrorMessage(error);
             if(Object.values(error).filter(Boolean).length > 0) {
@@ -97,6 +105,22 @@ export default function AddCategoryDialog({ category = {}, show, hideFn }) {
         )
     }
 
+    const renderParentSelected = () => {
+        if(!selectedParent) return (
+            <div className="flex items-center gap-2">
+                <p className="text-dark dark:text-white text-sm">Select Parent Category</p>
+            </div>
+        )
+        return (
+            <div className="flex items-center gap-2">
+                <div className="relative w-8 h-8 md:w-10 md:h-10 flex justify-center items-center bg-neutral-200 dark:bg-neutral-600 rounded-full">
+                    {selectedParent.icon && <Image className="object-contain p-1.5 md:p-2" src={`./category_icons/${selectedParent.icon}`} alt="" fill/>}
+                </div>
+                <p className="text-dark dark:text-white text-sm">{selectedParent.name}</p>
+            </div>
+        )
+    }
+
     return (
         <>
             <Dialog 
@@ -108,6 +132,7 @@ export default function AddCategoryDialog({ category = {}, show, hideFn }) {
                     <form onSubmit={handleSubmit}>
                         <div className="flex flex-col gap-4 mb-6">
                             <SelectField
+                                required
                                 label={"Icon"}
                                 name={"icon"}
                                 placeholder={selectedIcon ? "Change Icon" : "Select Icon"}
@@ -135,14 +160,11 @@ export default function AddCategoryDialog({ category = {}, show, hideFn }) {
                                 disabled={category.id != null}
                             />
                             <SelectField
-                                required
                                 label={"Parent Category"}
                                 name={"parentId"}
-                                _selected={category.parentId}
-                                placeholder={"Select Parent Category"}
-                                _options={parentCategories?.map(category => ({ id: category.id, label: category.name }))}
                                 errorMessage={errorMessage?.parentId}
-                                overrideOnClick={() => console.log('OPENING SELECT CATEGORY')}
+                                overrideOnClick={() => setSelectParent(true)}
+                                customSelected={renderParentSelected()}
                             />
                         </div>
                         <Button type="submit" label={getDialogAction()}/>
@@ -152,7 +174,13 @@ export default function AddCategoryDialog({ category = {}, show, hideFn }) {
             <SelectIconPage
                 show={selectIcon}
                 hideFn={() => setSelectIcon(false)}
-                onIconSelected={handleIconSelect}
+                onIconSelected={(icon) => setSelectedIcon(icon)}
+            />
+            <SelectCategoryPage
+                show={selectParent}
+                hideFn={() => setSelectParent(false)}
+                categories={parentCategories?.filter(c => c.id !== category.id)}
+                onCategorySelected={(parentId) => setSelectedParent(parentId)}
             />
         </>
     )

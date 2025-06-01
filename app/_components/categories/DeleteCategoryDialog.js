@@ -3,7 +3,7 @@ import Dialog from "../common/Dialog";
 import Button from "../common/Button";
 import { useLiveQuery } from "dexie-react-hooks";
 
-export default function DeleteCategoryDialog({ categoryId, show, hideFn, onDelete }) {
+export default function DeleteCategoryDialog({ categoryId, categoryName, show, hideFn, onDelete }) {
     const transactionCount = useLiveQuery(() => db.getTransactionCountByCategory(categoryId));
     const childCategoryCount = useLiveQuery(() => db.getChildCategoriesCount(categoryId));
 
@@ -18,7 +18,7 @@ export default function DeleteCategoryDialog({ categoryId, show, hideFn, onDelet
     }
 
     const getDeleteMessage = () => {
-        return `There are ${transactionCount} transactions in this category and ${childCategoryCount} sub categories`;
+        return `There are ${transactionCount} transactions and ${childCategoryCount} sub categories in this category `;
     }
 
     return(
@@ -28,7 +28,7 @@ export default function DeleteCategoryDialog({ categoryId, show, hideFn, onDelet
         >
             <div className="flex flex-col gap-4">
                 <div className="flex flex-col gap-2">
-                    <div className="text-xl font-bold">Delete Category</div>
+                    <div className="text-xl font-bold">Delete {categoryName} Category</div>
                     <p className="text-dark/80 dark:text-white/80 text-sm md:text-base">{getDeleteMessage()}</p>
                     <p className="text-dark/80 dark:text-white/80 text-sm md:text-base">1. <b>Merge:</b> Move all transactions, budgets and sub categories to another category before deleting</p>
                     <p className="text-dark/80 dark:text-white/80 text-sm md:text-base">2. <b>Delete:</b> Delete all transactions, budgets and sub categories along with this category</p>

@@ -6,13 +6,13 @@ import CategoryCard from './CategoryCard';
 import LoadingSpinner from '../common/LoadingSpinner';
 import Image from 'next/image';
 
-const Row = ({ index, style, data }) => {
-  const item = data[index];
+const Row = ({ index, style, data: { items, onCategoryClicked } }) => {
+  const item = items[index];
 
   if(!item) return <div style={style} className='flex justify-center items-center animate-pulse'><p>Loading more data..</p></div>
   
   return (
-      <CategoryCard category={item} style={style}/>
+      <CategoryCard category={item} onClick={onCategoryClicked} style={style}/>
   );
 };
 
@@ -23,7 +23,7 @@ const getItemSize = (item) => {
   return 56 + extraLength * 56;
 }
 
-const VirtualizedCategoryList = ({ ref, items }) => {
+const VirtualizedCategoryList = ({ ref, items, onCategoryClicked }) => {
   if(!items) {
     return (
       <div className='w-full h-full flex flex-col justify-center items-center gap-4 bg-neutral-200 dark:bg-neutral-700 rounded-lg px-4 py-2.5'>
@@ -51,7 +51,7 @@ const VirtualizedCategoryList = ({ ref, items }) => {
             width={width}
             itemCount={items.length}
             itemSize={(index) => getItemSize(items[index])}
-            itemData={items}
+            itemData={{ items, onCategoryClicked }}
             style={{willChange: 'initial'}}
           >
             {MemoizedRow}
