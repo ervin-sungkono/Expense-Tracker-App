@@ -1,4 +1,5 @@
 import { getDebtLoanType } from "./utils";
+import iconArray from '../../public/icons.json';
 
 function getRandomDate(start, end) {
     const startDate = start.getTime();
@@ -58,7 +59,7 @@ export function generateBudgets(count) {
 }
 
 export function getCategories() {
-    return [
+    const categories = [
         { id: 1, name: "Food", type: "Expense", parentId: null, mutable: true },
         { id: 2, name: "Transportation", type: "Expense", parentId: null, mutable: true },
         { id: 3, name: "Entertainment", type: "Expense", parentId: null, mutable: true },
@@ -72,6 +73,11 @@ export function getCategories() {
         { id: 11, name: "Bus", type: "Expense", parentId: 2, mutable: true },
         { id: 12, name: "Motorcycle", type: "Expense", parentId: 2, mutable: true }
     ]
+
+    return categories.map(category => ({
+        ...category,
+        icon: iconArray[randomBetween(0, iconArray.length - 1)]
+    }))
 }
 
 export function getShops() {

@@ -17,8 +17,9 @@ export default function AddCategoryDialog({ category = {}, show, hideFn }) {
     const [selectParent, setSelectParent] = useState(false);
     const [selectedIcon, setSelectedIcon] = useState(category.icon ?? 'sky--weather_star.svg');
     const [selectedParent, setSelectedParent] = useState(null);
+    const [selectedType, setSelectedType] = useState(category.type ?? 'Expense');
 
-    const parentCategories = useLiveQuery(() => db.getParentCategories(category.type));
+    const parentCategories = useLiveQuery(() => db.getParentCategories(selectedType), [selectedType]);
 
     useEffect(() => {
         if(category.parentId && parentCategories) setSelectedParent(parentCategories.find(pc => pc.id === category.parentId));
@@ -62,7 +63,7 @@ export default function AddCategoryDialog({ category = {}, show, hideFn }) {
         }
 
         payload.icon = selectedIcon;
-        payload.parentId = selectedParent.id;
+        payload.parentId = selectedParent?.id ?? null; // set to null if left unfilled
 
         try{
             let error = {};
@@ -83,11 +84,18 @@ export default function AddCategoryDialog({ category = {}, show, hideFn }) {
                 db.addCategory(payload);
             }
             
-            form.reset();
+            resetForm(form);
             hideFn && hideFn();
         } catch(e) {
             console.log(e);
         }
+    }
+     
+    const resetForm = (form) => {
+        form.reset();
+        setSelectedType(null);
+        setSelectParent(null);
+        setSelectedIcon('sky--weather_star.svg');
     }
 
     const getDialogAction = () => {
@@ -97,7 +105,7 @@ export default function AddCategoryDialog({ category = {}, show, hideFn }) {
     const renderIconSelected = () => {
         return (
             <div className="flex items-center gap-2">
-                <div className="relative w-8 h-8 md:w-10 md:h-10 flex justify-center items-center bg-neutral-200 dark:bg-neutral-600 rounded-full">
+                <div className="relative w-8 h-8 md:w-10 md:h-10 flex justify-center items-center bg-ocean-blue rounded-full">
                     <Image className="object-contain p-1.5 md:p-2" src={`./category_icons/${selectedIcon}`} alt="" fill/>
                 </div>
                 <p className="text-dark dark:text-white text-sm">Change Icon</p>
@@ -113,7 +121,7 @@ export default function AddCategoryDialog({ category = {}, show, hideFn }) {
         )
         return (
             <div className="flex items-center gap-2">
-                <div className="relative w-8 h-8 md:w-10 md:h-10 flex justify-center items-center bg-neutral-200 dark:bg-neutral-600 rounded-full">
+                <div className="relative w-8 h-8 md:w-10 md:h-10 flex justify-center items-center bg-ocean-blue rounded-full">
                     {selectedParent.icon && <Image className="object-contain p-1.5 md:p-2" src={`./category_icons/${selectedParent.icon}`} alt="" fill/>}
                 </div>
                 <p className="text-dark dark:text-white text-sm">{selectedParent.name}</p>
@@ -153,11 +161,12 @@ export default function AddCategoryDialog({ category = {}, show, hideFn }) {
                                 required
                                 label={"Type"}
                                 name={"type"}
-                                _selected={category.type}
+                                _selected={selectedType}
                                 placeholder={"Select Type"}
                                 _options={typeOptions}
                                 errorMessage={errorMessage?.type}
                                 disabled={category.id != null}
+                                onChange={(type) => setSelectedType(type)}
                             />
                             <SelectField
                                 label={"Parent Category"}
