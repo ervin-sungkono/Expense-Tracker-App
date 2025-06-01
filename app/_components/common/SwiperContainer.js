@@ -21,8 +21,8 @@ export default function SwiperContainer({ spaceBetween = 0, slidesPerView = 1, i
             style={{ overflow: 'visible' }}
             virtual={{
                 enabled: true,
-                addSlidesBefore: 2,
-                addSlidesAfter: 2
+                addSlidesBefore: 5,
+                addSlidesAfter: 5
             }}
         >
             {items.map(item => (

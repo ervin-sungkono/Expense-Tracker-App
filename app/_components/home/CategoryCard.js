@@ -1,8 +1,9 @@
 import { formatCurrency, getDebtLoanType } from "@/app/_lib/utils";
 import { IoChevronForward as RightIcon } from "react-icons/io5";
 import Link from "next/link";
+import { memo } from "react";
 
-export default function CategoryCard({ name, type, total = 0, slug = '' }) {
+function CategoryCard({ name, type, total = 0, slug = '' }) {
     const getCategoryType = () => {
         const categoryType = type === 'DebtLoan' ? getDebtLoanType(name) : type;
         return categoryType === 'Income';
@@ -23,3 +24,5 @@ export default function CategoryCard({ name, type, total = 0, slug = '' }) {
         </Link>
     )
 }
+
+export default memo(CategoryCard);
