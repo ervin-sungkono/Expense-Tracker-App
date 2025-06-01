@@ -10,10 +10,12 @@ import ImportDataDialog from "./ImportDataDialog";
 import ThemeSwitch from "../common/ThemeSwitch";
 import DeleteAccountDialog from "./DeleteAccountDialog";
 import AboutAppPage from "./AboutAppPage";
+// import ChangeCurrencyDialog from "./ChangeCurrencyDialog";
 
 export default function SettingsList() {
     const [showCategory, setShowCategory] = useState(false);
     const [showUsername, setShowUsername] = useState(false);
+    // const [showCurrency, setShowCurrency] = useState(false);
     const [showImport, setShowImport] = useState(false);
     const [showAbout, setShowAbout] = useState(false);
     const [deleteAccount, setDeleteAccount] = useState(false);
@@ -85,6 +87,12 @@ export default function SettingsList() {
             description: 'Set a new username',
             onClick: () => setShowUsername(true)
         },
+        // {
+        //     id: 'change-currency',
+        //     title: 'Change currency',
+        //     description: 'Use a different currency',
+        //     onClick: () => setShowCurrency(true)
+        // },
         {
             id: 'category',
             title: 'Category',
@@ -132,11 +140,15 @@ export default function SettingsList() {
                 show={showCategory}
                 hideFn={() => setShowCategory(false)}
             />
-            <Button style="danger" label={"Delete Account"} onClick={() => setDeleteAccount(true)} className="mt-8"/>
+            <Button style="danger" label={"Delete Account"} onClick={() => setDeleteAccount(true)} className="mt-8 pb-4"/>
             <ChangeUsernameDialog
                 show={showUsername}
                 hideFn={() => setShowUsername(false)}
             />
+            {/* <ChangeCurrencyDialog
+                show={showCurrency}
+                hideFn={() => setShowCurrency(false)}
+            /> */}
             <ImportDataDialog
                 show={showImport}
                 hideFn={() => setShowImport(false)}
