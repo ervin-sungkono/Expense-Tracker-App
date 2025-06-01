@@ -50,7 +50,7 @@ function CategoryCard({ category, onClick, style, depth = 0 }) {
                             <div className="relative w-8 h-8 md:w-10 md:h-10 rounded-full bg-ocean-blue">
                                 {icon && <Image className="object-contain p-1.5 md:p-2" src={`./category_icons/${icon}`} alt="" fill/>}
                             </div>
-                            <p className="text-base font-semibold grow">{name}</p>
+                            <p className="text-sm md:text-base font-semibold grow">{name}</p>
                         </div>
                         {!onClick && 
                         <div onClick={() => setShowMenu(true)} className="cursor-pointer p-2 rounded-full active:bg-neutral-300/30 active:dark:bg-neutral-800/30 transition-colors duration-150 ease-in-out">
