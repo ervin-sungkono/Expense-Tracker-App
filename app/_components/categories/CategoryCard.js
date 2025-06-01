@@ -43,17 +43,18 @@ function CategoryCard({ category, onClick, style, depth = 0 }) {
     return(
         <div style={{...style, marginLeft: `${24 * depth}px`}}>
             <div className="relative border-b border-dark/20 dark:border-white/20">
-                <div onClick={handleCategoryClick} className={`py-2 flex ${onClick ? 'cursor-pointer' : ''}`}>
+                <div onClick={handleCategoryClick} className={`py-2 flex ${onClick ? 'cursor-pointer active:bg-neutral-300/30 active:dark:bg-neutral-800/30' : ''}`}>
                     <div className="w-full flex gap-2.5 items-center">
                         <div className="flex items-center gap-2 grow">
-                            <div className="relative w-8 h-8 md:w-10 md:h-10 rounded-full bg-neutral-200 dark:bg-neutral-600">
+                            <div className="relative w-8 h-8 md:w-10 md:h-10 rounded-full bg-ocean-blue">
                                 {icon && <Image className="object-contain p-1.5 md:p-2" src={`./category_icons/${icon}`} alt="" fill/>}
                             </div>
                             <p className="text-base font-semibold grow">{name}</p>
                         </div>
+                        {!onClick && 
                         <div onClick={() => setShowMenu(true)} className="cursor-pointer p-2 rounded-full active:bg-neutral-300/30 active:dark:bg-neutral-800/30 transition-colors duration-150 ease-in-out">
                             <MoreIcon size={24}/>
-                        </div>
+                        </div>}
                     </div>
                 </div>
                 {(depth === 0 && category.data?.length > 0) && <span className="absolute left-3 top-14 w-0.5 bg-neutral-200 dark:bg-neutral-600" style={{height: category.data.length * 56 - 26}}></span>}
