@@ -1,4 +1,4 @@
-[
+export const icons = [
   "animal-amphibian_frog.svg",
   "animal-bird_baby_chick.svg",
   "animal-bird_bird.svg",

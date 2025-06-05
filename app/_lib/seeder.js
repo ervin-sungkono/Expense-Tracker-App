@@ -1,5 +1,5 @@
 import { getDebtLoanType } from "./utils";
-import iconArray from '../../public/icons.json';
+import { icons } from "./const/icons";
 
 function getRandomDate(start, end) {
     const startDate = start.getTime();
@@ -76,7 +76,7 @@ export function getCategories() {
 
     return categories.map(category => ({
         ...category,
-        icon: iconArray[randomBetween(0, iconArray.length - 1)]
+        icon: icons[randomBetween(0, icons.length - 1)]
     }))
 }
 
