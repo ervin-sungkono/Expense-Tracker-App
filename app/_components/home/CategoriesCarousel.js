@@ -1,4 +1,5 @@
 'use client'
+import dynamic from "next/dynamic"
 import { useLiveQuery } from "dexie-react-hooks"
 import SwiperContainer from "../common/SwiperContainer"
 import SubHeader from "./SubHeader"
@@ -7,7 +8,9 @@ import { useEffect, useState } from "react"
 import CategoryCard from "./CategoryCard"
 import CategoryList from "../common/CategoryList"
 import Button from "../common/Button"
-import AddCategoryDialog from "../categories/AddCategoryDialog"
+import Dialog from "../common/Dialog"
+
+const AddCategoryForm = dynamic(() => import("../categories/AddCategoryForm"))
 
 export default function CategoriesCarousel() {
     const [categoryData, setCategoryData] = useState(null);
@@ -72,10 +75,12 @@ export default function CategoriesCarousel() {
                     show={showDialog}
                     hideFn={() => setShowDialog(false)}
                 />
-                <AddCategoryDialog
+                <Dialog
                     show={showAdd}
                     hideFn={() => setShowAdd(false)}
-                />
+                >
+                    <AddCategoryForm/>
+                </Dialog>
             </div>
         )
     }
