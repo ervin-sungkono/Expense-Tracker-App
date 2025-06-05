@@ -15,15 +15,20 @@ export default function AddCategoryDialog({ category = {}, show, hideFn }) {
     const [errorMessage, setErrorMessage] = useState({});
     const [selectIcon, setSelectIcon] = useState(false);
     const [selectParent, setSelectParent] = useState(false);
-    const [selectedIcon, setSelectedIcon] = useState(category.icon ?? 'sky--weather_star.svg');
+    const [selectedIcon, setSelectedIcon] = useState('sky--weather_star.svg');
     const [selectedParent, setSelectedParent] = useState(null);
-    const [selectedType, setSelectedType] = useState(category.type ?? 'Expense');
+    const [selectedType, setSelectedType] = useState('Expense');
 
     const parentCategories = useLiveQuery(() => db.getParentCategories(selectedType), [selectedType]);
 
     useEffect(() => {
+        if(category.icon) setSelectedIcon(category.icon);
+        if(category.type) setSelectedType(category.type);
+    }, [category])
+
+    useEffect(() => {
         if(category.parentId && parentCategories) setSelectedParent(parentCategories.find(pc => pc.id === category.parentId));
-    }, [category.parentId, parentCategories])
+    }, [category, parentCategories])
 
     const typeOptions = [
         { id: 'Expense', label: 'Expense' },
@@ -191,6 +196,7 @@ export default function AddCategoryDialog({ category = {}, show, hideFn }) {
                 categories={parentCategories?.filter(c => c.id !== category.id)}
                 onCategorySelected={(parentId) => setSelectedParent(parentId)}
                 onCancelSelection={() => setSelectedParent(null)}
+                defaultType={selectedType}
             />
         </>
     )
