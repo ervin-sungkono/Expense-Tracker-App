@@ -1,12 +1,11 @@
 'use client'
-import Dialog from "../common/Dialog";
 import InputField from "../common/InputField";
 import { useState } from "react";
 import Button from "../common/Button";
 import { StringValidator } from "@/app/_lib/validator";
 import { useLocalStorage } from "@/app/_lib/hooks";
 
-export default function ChangeUsernameDialog({ show, hideFn }) {
+export default function ChangeUsernameForm({ onSubmit }) {
     const [errorMessage, setErrorMessage] = useState({});
     const [username, setUsername] = useLocalStorage('username');
 
@@ -44,35 +43,30 @@ export default function ChangeUsernameDialog({ show, hideFn }) {
 
             setUsername(name)
             form.reset();
-            hideFn && hideFn();
+            onSubmit && onSubmit();
         } catch(e) {
             console.log(e);
         }
     }
 
     return (
-        <Dialog 
-            show={show} 
-            hideFn={hideFn}
-        >
-            <div className="flex flex-col gap-4">
-                <div className="text-xl font-bold">{'Change Username'}</div>
-                <form onSubmit={handleSubmit}>
-                    <div className="flex flex-col gap-4 mb-6">
-                        <InputField 
-                            required
-                            name={"name"} 
-                            label={"New Username"} 
-                            placeholder={"Enter new username (max 25 characters)"}
-                            type={"text"}
-                            maxLength={25}
-                            defaultValue={username}
-                            errorMessage={errorMessage?.name}
-                        />
-                    </div>
-                    <Button type="submit" label={'Update'}/>
-                </form>
-            </div>
-        </Dialog>
+        <div className="flex flex-col gap-4">
+            <div className="text-xl font-bold">{'Change Username'}</div>
+            <form onSubmit={handleSubmit}>
+                <div className="flex flex-col gap-4 mb-6">
+                    <InputField 
+                        required
+                        name={"name"} 
+                        label={"New Username"} 
+                        placeholder={"Enter new username (max 25 characters)"}
+                        type={"text"}
+                        maxLength={25}
+                        defaultValue={username}
+                        errorMessage={errorMessage?.name}
+                    />
+                </div>
+                <Button type="submit" label={'Update'}/>
+            </form>
+        </div>
     )
 }

@@ -3,13 +3,15 @@ import List from "../common/List"
 import CategoryList from "../common/CategoryList";
 import { useEffect, useState } from "react";
 import Button from "../common/Button";
-import ChangeUsernameDialog from "./ChangeUsernameDialog";
 import { db } from "@/app/_lib/db";
 import { saveAs } from "file-saver";
-import ImportDataDialog from "./ImportDataDialog";
 import ThemeSwitch from "../common/ThemeSwitch";
-import DeleteAccountDialog from "./DeleteAccountDialog";
-import AboutAppPage from "./AboutAppPage";
+import Dialog from "../common/Dialog";
+import ImportDataForm from "./ImportDataForm";
+import DeleteAccountForm from "./DeleteAccountForm";
+import Page from "../common/Page";
+import AboutApp from "./AboutApp";
+import ChangeUsernameForm from "./ChangeUsernameForm";
 // import ChangeCurrencyDialog from "./ChangeCurrencyDialog";
 
 export default function SettingsList() {
@@ -141,26 +143,34 @@ export default function SettingsList() {
                 hideFn={() => setShowCategory(false)}
             />
             <Button style="danger" label={"Delete Account"} onClick={() => setDeleteAccount(true)} className="mt-8 pb-4"/>
-            <ChangeUsernameDialog
+            <Dialog
                 show={showUsername}
                 hideFn={() => setShowUsername(false)}
-            />
+            >
+                <ChangeUsernameForm onSubmit={() => setShowUsername(false)}/>
+            </Dialog>
             {/* <ChangeCurrencyDialog
                 show={showCurrency}
                 hideFn={() => setShowCurrency(false)}
             /> */}
-            <ImportDataDialog
+            <Dialog
                 show={showImport}
                 hideFn={() => setShowImport(false)}
-            />
-            <DeleteAccountDialog
+            >
+                <ImportDataForm onFinishImport={() => setShowImport(false)}/>
+            </Dialog>
+            <Dialog
                 show={deleteAccount}
                 hideFn={() => setDeleteAccount(false)}
-            />
-            <AboutAppPage
+            >
+                <DeleteAccountForm onCancel={() => setDeleteAccount(false)}/>
+            </Dialog>
+            <Page
                 show={showAbout}
                 hideFn={() => setShowAbout(false)}
-            />
+            >
+                <AboutApp/>
+            </Page>
         </>
     )
 }
