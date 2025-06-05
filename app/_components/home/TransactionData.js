@@ -8,7 +8,6 @@ import SubHeader from "./SubHeader";
 import SelectField from "../common/SelectField";
 import InputField from "../common/InputField";
 import { MONTHS } from "@/app/_lib/const";
-import { generateRangeOptions } from "@/app/_lib/utils";
 
 export default function TransactionData() {
     const transactions = useLiveQuery(() => db.getAllTransactions());

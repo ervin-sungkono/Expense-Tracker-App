@@ -7,7 +7,7 @@ import { useEffect, useState } from "react";
 import SubHeader from "./SubHeader";
 import SelectField from "../common/SelectField";
 import { MONTHS } from "@/app/_lib/const";
-import { generateRangeOptions, getMonthlyLabels } from "@/app/_lib/utils";
+import { getMonthlyLabels } from "@/app/_lib/utils";
 
 export default function TransactionReport() {
     const transactions = useLiveQuery(() => db.getAllTransactions());
