@@ -1,28 +1,17 @@
 'use client'
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Page from "../common/Page";
 import SearchBar from "../common/Searchbar";
 import VirtualizedIconList from "./VirtualizedIconList";
+import { icons } from "@/app/_lib/const/icons";
 
 export default function SelectIconPage({ show, hideFn, onIconSelected }) {
-    const [icons, setIcons] = useState(null);
     const [searchText, setSearchText] = useState('');
 
     const handleIconClicked = (value) => {
         hideFn && hideFn();
         onIconSelected && onIconSelected(value);
     }
-    
-    const loadIconData = () => {
-        fetch("./icons.json")
-            .then(res => res.json())
-            .then(data => setIcons(data))
-            .catch(error => console.log(error))
-    }
-
-    useEffect(() => {
-        loadIconData()
-    }, [])
 
     return(
         <Page
