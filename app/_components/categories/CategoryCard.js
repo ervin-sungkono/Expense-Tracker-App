@@ -4,10 +4,11 @@ import { memo, useState } from "react";
 import ContextMenu from "../common/ContextMenu";
 import { IoMdMore as MoreIcon } from "react-icons/io";
 import Image from "next/image";
+import Dialog from "../common/Dialog";
 
-const InfoCategoryDialog = dynamic(() => import("./InfoCategoryDialog"))
-const AddCategoryDialog = dynamic(() => import("./AddCategoryDialog"));
-const DeleteCategoryDialog = dynamic(() => import("./DeleteCategoryDialog"));
+const InfoCategoryContent = dynamic(() => import("./InfoCategoryContent"))
+const AddCategoryForm = dynamic(() => import("./AddCategoryForm"));
+const DeleteCategoryForm= dynamic(() => import("./DeleteCategoryForm"));
 
 function CategoryCard({ category, onClick, style, depth = 0 }) {
     const { id, name, icon, mutable } = category;
@@ -66,22 +67,29 @@ function CategoryCard({ category, onClick, style, depth = 0 }) {
                     hideFn={() => setShowMenu(false)}
                     hideOnItemClick
                 />
-                <InfoCategoryDialog
-                    category={category}
-                    show={showInfo}
+                <Dialog
+                    show={showInfo} 
                     hideFn={() => setShowInfo(false)}
-                />
-                <AddCategoryDialog 
-                    category={category}
+                >
+                    <InfoCategoryContent category={category}/>
+                </Dialog>
+                <Dialog
                     show={showEdit} 
                     hideFn={() => setShowEdit(false)}
-                />
-                <DeleteCategoryDialog 
-                    categoryId={id}
-                    categoryName={name}
+                >
+                    <AddCategoryForm category={category}/>
+                </Dialog>
+                <Dialog
                     show={showDelete} 
                     hideFn={() => setShowDelete(false)}
-                />
+                >
+                    <DeleteCategoryForm 
+                        categoryId={id}
+                        categoryName={name}
+                        onDelete={() => setShowDelete(false)}
+                    />
+                </Dialog>
+                
             </div>
             {category.data &&
             category.data.map(subcategory => (

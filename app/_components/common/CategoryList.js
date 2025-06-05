@@ -4,9 +4,12 @@ import VirtualizedCategoryList from "../categories/VirtualizedCategoryList";
 import Button from "./Button";
 import Page from "./Page";
 import CategoryTab from "../categories/CategoryTab";
-import AddCategoryDialog from "../categories/AddCategoryDialog";
 import { useLiveQuery } from "dexie-react-hooks";
 import { db } from "@/app/_lib/db";
+import dynamic from "next/dynamic";
+import Dialog from "./Dialog";
+
+const AddCategoryForm = dynamic(() => import("../categories/AddCategoryForm"))
 
 export default function CategoryList({ show, hideFn }) {
     const [showDialog, setShowDialog] = useState(false);
@@ -73,10 +76,13 @@ export default function CategoryList({ show, hideFn }) {
                 <div className="flex justify-center mt-2">
                     <Button label={"Add New Category"} onClick={() => setShowDialog(true)}/>
                 </div>
-                <AddCategoryDialog
+                <Dialog
                     show={showDialog}
                     hideFn={() => setShowDialog(false)}
-                />
+                >
+                    <AddCategoryForm/>
+                </Dialog>
+                
             </div>
         </Page>
     )

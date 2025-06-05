@@ -1,5 +1,6 @@
 'use client'
-import Dialog from "../common/Dialog";
+import dynamic from "next/dynamic";
+import Image from "next/image";
 import InputField from "../common/InputField";
 import SelectField from "../common/SelectField";
 import { db } from "@/app/_lib/db";
@@ -7,11 +8,12 @@ import { useEffect, useState } from "react";
 import Button from "../common/Button";
 import { StringValidator } from "@/app/_lib/validator";
 import { useLiveQuery } from "dexie-react-hooks";
-import SelectIconPage from "./SelectIconPage";
-import Image from "next/image";
-import SelectCategoryPage from "./SelectCategoryPage";
+import Page from "../common/Page";
 
-export default function AddCategoryDialog({ category = {}, show, hideFn }) {
+const SelectIcon = dynamic(() => import("./SelectIcon"));
+const SelectCategory = dynamic(() => import("./SelectCategory"));
+
+export default function AddCategoryForm({ category = {} }) {
     const [errorMessage, setErrorMessage] = useState({});
     const [selectIcon, setSelectIcon] = useState(false);
     const [selectParent, setSelectParent] = useState(false);
@@ -89,18 +91,21 @@ export default function AddCategoryDialog({ category = {}, show, hideFn }) {
                 db.addCategory(payload);
             }
             
-            resetForm(form);
+            form.reset();
             hideFn && hideFn();
         } catch(e) {
             console.log(e);
         }
     }
-     
-    const resetForm = (form) => {
-        form.reset();
-        setSelectedType(null);
+
+    const handleCategorySelect = (parentId) => {
+        setSelectedParent(parentId);
+        setSelectParent(false);
+    }
+
+    const handleCancelSelection = () => {
         setSelectedParent(null);
-        setSelectedIcon('sky--weather_star.svg');
+        setSelectParent(false);
     }
 
     const getDialogAction = () => {
@@ -136,68 +141,69 @@ export default function AddCategoryDialog({ category = {}, show, hideFn }) {
 
     return (
         <>
-            <Dialog 
-                show={show} 
-                hideFn={hideFn}
-            >
-                <div className="flex flex-col gap-4">
-                    <div className="text-xl font-bold">{getDialogAction()}</div>
-                    <form onSubmit={handleSubmit}>
-                        <div className="flex flex-col gap-4 mb-6">
-                            <SelectField
-                                required
-                                label={"Icon"}
-                                name={"icon"}
-                                placeholder={selectedIcon ? "Change Icon" : "Select Icon"}
-                                errorMessage={errorMessage?.icon}
-                                overrideOnClick={() => setSelectIcon(true)}
-                                customSelected={renderIconSelected()}
-                            />
-                            <InputField 
-                                required
-                                name={"name"} 
-                                label={"Name"} 
-                                placeholder={"Enter name"}
-                                type={"text"}
-                                defaultValue={category.name}
-                                errorMessage={errorMessage?.name}
-                            />
-                            <SelectField
-                                required
-                                label={"Type"}
-                                name={"type"}
-                                _selected={selectedType}
-                                placeholder={"Select Type"}
-                                _options={typeOptions}
-                                errorMessage={errorMessage?.type}
-                                disabled={category.id != null}
-                                onChange={(type) => setSelectedType(type)}
-                            />
-                            <SelectField
-                                label={"Parent Category"}
-                                name={"parentId"}
-                                errorMessage={errorMessage?.parentId}
-                                overrideOnClick={() => setSelectParent(true)}
-                                customSelected={renderParentSelected()}
-                            />
-                        </div>
-                        <Button type="submit" label={getDialogAction()}/>
-                    </form>
-                </div>
-            </Dialog>
-            <SelectIconPage
+            <div className="flex flex-col gap-4">
+                <div className="text-xl font-bold">{getDialogAction()}</div>
+                <form onSubmit={handleSubmit}>
+                    <div className="flex flex-col gap-4 mb-6">
+                        <SelectField
+                            required
+                            label={"Icon"}
+                            name={"icon"}
+                            placeholder={selectedIcon ? "Change Icon" : "Select Icon"}
+                            errorMessage={errorMessage?.icon}
+                            overrideOnClick={() => setSelectIcon(true)}
+                            customSelected={renderIconSelected()}
+                        />
+                        <InputField 
+                            required
+                            name={"name"} 
+                            label={"Name"} 
+                            placeholder={"Enter name"}
+                            type={"text"}
+                            defaultValue={category.name}
+                            errorMessage={errorMessage?.name}
+                        />
+                        <SelectField
+                            required
+                            label={"Type"}
+                            name={"type"}
+                            _selected={selectedType}
+                            placeholder={"Select Type"}
+                            _options={typeOptions}
+                            errorMessage={errorMessage?.type}
+                            disabled={category.id != null}
+                            onChange={(type) => setSelectedType(type)}
+                        />
+                        <SelectField
+                            label={"Parent Category"}
+                            name={"parentId"}
+                            errorMessage={errorMessage?.parentId}
+                            overrideOnClick={() => setSelectParent(true)}
+                            customSelected={renderParentSelected()}
+                        />
+                    </div>
+                    <Button type="submit" label={getDialogAction()}/>
+                </form>
+            </div>
+            <Page
+                title={"Icon List"}
                 show={selectIcon}
                 hideFn={() => setSelectIcon(false)}
-                onIconSelected={(icon) => setSelectedIcon(icon)}
-            />
-            <SelectCategoryPage
+            >
+                <SelectIcon onIconSelected={(icon) => setSelectedIcon(icon)}/>
+            </Page>
+           <Page
                 show={selectParent}
                 hideFn={() => setSelectParent(false)}
-                categories={parentCategories?.filter(c => c.id !== category.id)}
-                onCategorySelected={(parentId) => setSelectedParent(parentId)}
-                onCancelSelection={() => setSelectedParent(null)}
-                defaultType={selectedType}
-            />
+           >
+                <SelectCategory
+                    categories={parentCategories?.filter(c => c.id !== category.id)}
+                    onCategorySelected={handleCategorySelect}
+                    onCancelSelection={handleCancelSelection}
+                    defaultType={selectedType}
+                />
+           </Page>
+            
         </>
     )
 }
