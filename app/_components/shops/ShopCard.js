@@ -1,7 +1,8 @@
 import Image from "next/image";
 import { IoLocationSharp as LocationIcon } from "react-icons/io5";
 import { useState } from "react";
-import InfoShopDialog from "./InfoShopDialog";
+import Dialog from "../common/Dialog";
+import InfoShopForm from "./InfoShopForm";
 
 export default function ShopCard({ shop, isOdd, style }) {
     const { image, name, location } = shop;
@@ -23,11 +24,12 @@ export default function ShopCard({ shop, isOdd, style }) {
                     </div>
                 </div>
             </div>
-            <InfoShopDialog
-                shop={shop}
+            <Dialog
                 show={showDialog}
                 hideFn={() => setShowDialog(false)}
-            />
+            >
+                <InfoShopForm shop={shop} hideFn={() => setShowDialog(false)}/>
+            </Dialog>
         </div>
     )
 }

@@ -8,7 +8,8 @@ import Header from "../_components/common/Header";
 import IconButton from "../_components/common/IconButton";
 import { IoMdAdd as PlusIcon } from "react-icons/io";
 import { useLiveQuery } from "dexie-react-hooks";
-import InfoShopDialog from "../_components/shops/InfoShopDialog";
+import Dialog from "../_components/common/Dialog";
+import InfoShopForm from "../_components/shops/InfoShopForm";
 
 export default function Shops() {
     const PAGE_SIZE = 10;
@@ -52,10 +53,12 @@ export default function Shops() {
                         hasNextPage={shops && shops.length > 0 && shops.length % PAGE_SIZE === 0}
                     />
                 </div>
-                <InfoShopDialog
+                <Dialog
                     show={showAdd}
                     hideFn={() => setShowAdd(false)}
-                />
+                >
+                    <InfoShopForm hideFn={() => setShowAdd(false)}/>
+                </Dialog>
             </div>
         </Layout>
     )
