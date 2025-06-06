@@ -120,3 +120,7 @@ export function getDebtLoanType(name) {
     if(isDebtLoanIncome(name)) return 'Income';
     return null;
 }
+
+export function getWeeks(month, year){
+    return Array(new Date(year, month, 0).getDate()).fill(0).map((_,i) => new Date(year, month-1, i+1)).map((d,i,a) => !i && d.getDay() ? [Array(d.getDay()).fill(null), d.getDate()] : d.getDate() === a.length && d.getDay() < 6 ? [d.getDate(), Array(6-d.getDay()).fill(null)] : d.getDate()).flat(2).map((d,i,a) => a.length ? a.splice(0,7) : null).filter(w => w);
+}
