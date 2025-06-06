@@ -192,6 +192,7 @@ export default function AddCategoryForm({ category = {}, onSubmit }) {
                 <SelectIcon onIconSelected={(icon) => setSelectedIcon(icon)}/>
             </Page>
            <Page
+                title={"Select Category"}
                 show={selectParent}
                 hideFn={() => setSelectParent(false)}
            >
@@ -201,8 +202,7 @@ export default function AddCategoryForm({ category = {}, onSubmit }) {
                     onCancelSelection={handleCancelSelection}
                     defaultType={selectedType}
                 />
-           </Page>
-            
+           </Page>      
         </>
     )
 }

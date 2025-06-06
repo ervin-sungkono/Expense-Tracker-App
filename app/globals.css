@@ -112,41 +112,41 @@ input:-webkit-autofill:active {
 
 @keyframes show {
   from {
-    transform: translateY(100%);
+    top: 100%;
     opacity: 0;
   }
   to {
-    transform: translateY(0%);
+    top: 0;
     opacity: 1;
   }
 }
 
 @keyframes hide {
   from {
-    transform: translateY(0%);
+    top: 0;
     opacity: 1;
   }
   to {
-    transform: translateY(100%);
+    top: 100%;
     opacity: 0;
   }
 }
 
 @keyframes slide-in {
   from {
-    transform: translateY(100%);
+    top: 100%;
   }
   to {
-    transform: translateY(0%);
+    top: 0;
   }
 }
 
 @keyframes slide-out {
   from {
-    transform: translateY(0%);
+    top: 0;
   }
   to {
-    transform: translateY(100%);
+    top: 100%;
   }
 }
 
