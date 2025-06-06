@@ -2,14 +2,18 @@
 import { useEffect, useRef, useState } from "react"
 
 export default function SelectField({ customSelected, label, name, required = false, _selected, placeholder, _options = [], errorMessage, onChange, overrideOnClick, disabled }){
-    const [options, _] = useState(_options);
+    const [options, setOptions] = useState([]);
     const [selected, setSelected] = useState(null);
     const [showOption, setShowOption] = useState(false);
     const dropdownRef = useRef();
 
     useEffect(() => {
-        if(_selected && options) setSelected(options.find(option => option.id == _selected))
+        if(_selected != null && options) setSelected(options.find(option => option.id == _selected))
     }, [_selected, options])
+
+    useEffect(() => {
+        setOptions(_options);
+    }, [_options])
 
     useEffect(() => {
         if(dropdownRef?.current && showOption && selected?.id) {
