@@ -27,12 +27,20 @@ class ExpenseDB extends Dexie {
     constructor() {
         super(DB_NAME);
 
+        this.version(1).stores({
+            expenses: '++id, date, amount, categoryId, shopId, remarks',
+            categories: '++id, name, budget',
+            shops: '++id, name, image, location'
+        })
+
         this.version(DB_VERSION).stores({
             transactions: '++id, date, amount, categoryId, shopId, owner, type, remarks',
             expenses: null,
             categories: '++id, icon, name, type, parentId, mutable',
             budgets: '++id, amount, categoryId, start_date, end_date, repeat',
             shops: '++id, name, image, location'
+        }).upgrade(async() => {
+            await this.delete();
         });
     }
 
