@@ -64,7 +64,6 @@ export default function InfoShopForm({ shop, hideFn }) {
                 db.addShop(payload);
             }
             
-            form.reset();
             hideFn && hideFn();
         } catch(e) {
             console.log(e);

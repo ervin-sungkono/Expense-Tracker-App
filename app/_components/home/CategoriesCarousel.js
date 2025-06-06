@@ -79,7 +79,7 @@ export default function CategoriesCarousel() {
                     show={showAdd}
                     hideFn={() => setShowAdd(false)}
                 >
-                    <AddCategoryForm/>
+                    <AddCategoryForm onSubmit={() => setShowAdd(false)}/>
                 </Dialog>
             </div>
         )

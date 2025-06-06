@@ -77,7 +77,7 @@ function CategoryCard({ category, onClick, style, depth = 0 }) {
                     show={showEdit} 
                     hideFn={() => setShowEdit(false)}
                 >
-                    <AddCategoryForm category={category}/>
+                    <AddCategoryForm category={category} onSubmit={() => setShowEdit(false)}/>
                 </Dialog>
                 <Dialog
                     show={showDelete} 

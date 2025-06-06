@@ -42,7 +42,6 @@ export default function ChangeUsernameForm({ onSubmit }) {
             }
 
             setUsername(name)
-            form.reset();
             onSubmit && onSubmit();
         } catch(e) {
             console.log(e);
