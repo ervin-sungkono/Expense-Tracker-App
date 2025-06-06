@@ -7,15 +7,18 @@ import { useEffect, useState } from "react";
 import SubHeader from "./SubHeader";
 import SelectField from "../common/SelectField";
 import { MONTHS } from "@/app/_lib/const";
-import { getMonthlyLabels } from "@/app/_lib/utils";
+import { getMonthlyLabels, getWeeks } from "@/app/_lib/utils";
 
 export default function TransactionReport() {
     const transactions = useLiveQuery(() => db.getAllTransactions());
     const categories = useLiveQuery(() => db.getAllCategories());
     const shops = useLiveQuery(() => db.getAllShops());
 
+    const [weeks, setWeeks] = useState(null);
+    const [selectedWeek, setSelectedWeek] = useState(0);
     const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth());
     const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
+    const [weekOptions, setWeekOptions] = useState(null);
     const [yearOptions, setYearOptions] = useState(null);
 
     const [monthMap, setMonthMap] = useState({});
@@ -30,6 +33,15 @@ export default function TransactionReport() {
             })))
         }
     }, [yearMap])
+
+    useEffect(() => {
+        if(selectedMonth && selectedYear) {
+            const _weeks = getWeeks(selectedMonth, selectedYear);
+
+            setWeeks(_weeks);
+            setWeekOptions(_weeks?.map((_, index) => ({ id: index, label: `Week ${index + 1}` })));
+        }
+    }, [selectedMonth, selectedYear])
 
     useEffect(() => {
         if(transactions && categories && shops) {
@@ -58,35 +70,47 @@ export default function TransactionReport() {
 
     const contents = [
         // TODO: make weekly report graph
-        // {
-        //     id: 'monthly',
-        //     label: 'Monthly',
-        //     header: () => (
-        //         <div className="px-3 pt-2 grid grid-cols-2 gap-2">
-        //             <SelectField
-        //                 name={"month"}
-        //                 placeholder={"Month"}
-        //                 _selected={selectedMonth}
-        //                 _options={MONTHS.map((month, index) => ({
-        //                     id: index,
-        //                     label: month
-        //                 }))} 
-        //                 onChange={(val) => setSelectedMonth(val)}
-        //             />
-        //             <SelectField 
-        //                 name={"year"}
-        //                 placeholder={"Year"}
-        //                 _selected={selectedYear}
-        //                 _options={generateRangeOptions(1980, 2100).map(year => ({
-        //                     id: year,
-        //                     label: year
-        //                 }))}
-        //                 onChange={(val) => setSelectedYear(val)}
-        //             />
-        //         </div>
-        //     ),
-        //     component: <TransactionGraph type="WEEKLY" labels={getMonthlyLabels(selectedYear, selectedMonth)} transactionData={monthMap[`${selectedYear}-${selectedMonth}`]}/>
-        // },
+        {
+            id: 'weekly',
+            label: 'Weekly',
+            header: () => (
+                <div className="px-3 pt-2 grid grid-cols-3 gap-2">
+                    {weekOptions ? 
+                    <SelectField
+                        name={"week"}
+                        placeholder={"Week"}
+                        _selected={selectedWeek}
+                        _options={weekOptions}
+                        onChange={(val) => setSelectedWeek(val)}
+                    /> :
+                    <div className="w-full h-full rounded-md bg-neutral-200 dark:bg-neutral-600 animate-pulse"></div>}
+                    <SelectField
+                        name={"month"}
+                        placeholder={"Month"}
+                        _selected={selectedMonth}
+                        _options={MONTHS.map((month, index) => ({
+                            id: index,
+                            label: month
+                        }))} 
+                        onChange={(val) => setSelectedMonth(val)}
+                    />
+                    {yearOptions ? <SelectField 
+                        name={"year"}
+                        placeholder={"Year"}
+                        _selected={selectedYear}
+                        _options={yearOptions}
+                        onChange={(val) => setSelectedYear(val)}
+                    /> :
+                    <div className="w-full h-full rounded-md bg-neutral-200 dark:bg-neutral-600 animate-pulse"></div>}
+                </div>
+            ),
+            component: <TransactionGraph 
+                type="WEEKLY" 
+                labels={getMonthlyLabels(selectedYear, selectedMonth)} 
+                transactionData={monthMap[`${selectedYear}-${selectedMonth}`]}
+                title={`Week_${selectedWeek + 1}_${MONTHS[selectedMonth]}_${selectedYear}`}
+            />
+        },
         {
             id: 'monthly',
             label: 'Monthly',
@@ -112,7 +136,12 @@ export default function TransactionReport() {
                     <div className="w-full h-full rounded-md bg-neutral-200 dark:bg-neutral-600 animate-pulse"></div>}
                 </div>
             ),
-            component: <TransactionGraph type="MONTHLY" labels={getMonthlyLabels(selectedYear, selectedMonth)} transactionData={monthMap[`${selectedYear}-${selectedMonth}`]}/>
+            component: <TransactionGraph 
+                type="MONTHLY" 
+                labels={getMonthlyLabels(selectedYear, selectedMonth)} 
+                transactionData={monthMap[`${selectedYear}-${selectedMonth}`]} 
+                title={`${MONTHS[selectedMonth]}_${selectedYear}`}
+            />
         },
         {
             id: 'annual',
@@ -127,19 +156,19 @@ export default function TransactionReport() {
                     />}
                 </div>
             ),
-            component: <TransactionGraph type="ANNUAL" labels={MONTHS} transactionData={yearMap[selectedYear]}/>
-        },
-        {
-            id: 'all-time',
-            label: 'All Time',
-            component: <TransactionGraph type="ALLTIME" labels={Object.keys(yearMap)} transactionData={Object.values(yearMap).flat(1)}/>
+            component: <TransactionGraph 
+                type="ANNUAL" 
+                labels={MONTHS} 
+                transactionData={yearMap[selectedYear]} 
+                title={`${selectedYear}`}
+            />
         }
     ]
 
     return(
         <div className="mb-4">
             <SubHeader loading={!transactions} title="Transaction Report"/>
-            <Tab selected={'monthly'} contents={contents}/>
+            <Tab selected={'weekly'} contents={contents}/>
         </div>
     )
 }

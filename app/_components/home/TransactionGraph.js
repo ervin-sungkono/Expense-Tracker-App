@@ -32,7 +32,7 @@ ChartJS.register(
     Filler
 );
 
-export default function TransactionGraph({ transactionData = [], labels, type = 'MONTHLY' }) {
+export default function TransactionGraph({ transactionData = [], labels, type = 'MONTHLY', title = '' }) {
     const [data, setData] = useState(null);
     const [chartData, setChartData] = useState(null);
     const [chartOptions, setChartOptions] = useState(null);
@@ -61,16 +61,16 @@ export default function TransactionGraph({ transactionData = [], labels, type = 
         ]
 
         const settings = {
-            fileName: `transaction_report-${new Date().getTime()}`,
+            fileName: `transaction_report-${title}`,
             extraLength: 3,
             writeMode: 'writeFile'
         }
 
-        const callback = () => {
-            console.log('Download complete');
-        }
+        // const callback = () => {
+        //     console.log('Download complete');
+        // }
 
-        xlsx(data, settings, callback);
+        xlsx(data, settings);
     }
 
     useEffect(() => {
