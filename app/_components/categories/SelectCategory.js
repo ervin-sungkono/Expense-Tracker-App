@@ -1,14 +1,17 @@
 'use client'
-import { useState, useEffect } from "react";
-import SearchBar from "../common/Searchbar";
+import dynamic from "next/dynamic";
+import { useState, useEffect, useRef } from "react";
 import VirtualizedCategoryList from "./VirtualizedCategoryList";
 import Button from "../common/Button";
-import CategoryTab from "./CategoryTab";
 
-export default function SelectCategory({ categories, onCategorySelected, onCancelSelection, defaultType = 'Expense', showTab = false }) {
+const CategoryTab = dynamic(() => import('./CategoryTab'));
+const SearchBar = dynamic(() => import('../common/Searchbar'));
+
+export default function SelectCategory({ categories, onCategorySelected, onCancelSelection, defaultType = 'Expense', showTab = false, showSearch = false, hideCancelButton = false }) {
     const [searchText, setSearchText] = useState('');
     const [selectedType, setSelectedType] = useState(defaultType);
     const [categoryData, setCategoryData] = useState(null);
+    const categoryRef = useRef(null);
 
     useEffect(() => {
         if(categories) {
@@ -44,6 +47,13 @@ export default function SelectCategory({ categories, onCategorySelected, onCance
         }
     }, [categories])
 
+    useEffect(() => {
+        if(categoryData && categoryData[selectedType]) {
+            console.log('TRIGGER ITEM SIZE RECOMPUTE');
+            categoryRef.current?.resetAfterIndex(0);
+        }
+    }, [categoryData, selectedType])
+
     const handleCategoryClicked = (value) => {
         setSelectedType(defaultType);
         onCategorySelected && onCategorySelected(value);
@@ -55,21 +65,23 @@ export default function SelectCategory({ categories, onCategorySelected, onCance
     }
 
     return(
-        <div className="grow flex flex-col gap-4">
+        <div className="grow flex flex-col gap-2">
             {showTab && <CategoryTab selected={selectedType} onChange={(type) => setSelectedType(type)}/>}
-            <SearchBar
+            {showSearch && <SearchBar
                 placeholder={"Search category"}
                 onSearch={(val) => setSearchText(val.toLowerCase())}
-            />
+            />}
             <div className="grow">
                 <VirtualizedCategoryList
+                    ref={categoryRef}
                     items={categoryData?.[selectedType]?.filter(category => category.name.toLowerCase().includes(searchText))}
                     onCategoryClicked={handleCategoryClicked}
                 />
             </div>
+            {!hideCancelButton && 
             <div className="flex justify-center mt-2">
                 <Button style="danger" label={"Cancel Selection"} onClick={handleCancelSelection}/>
-            </div>
+            </div>}
         </div>
     )
 }

@@ -197,6 +197,7 @@ export default function AddCategoryForm({ category = {}, onSubmit }) {
                 hideFn={() => setSelectParent(false)}
            >
                 <SelectCategory
+                    showSearch
                     categories={parentCategories?.filter(c => c.id !== category.id)}
                     onCategorySelected={handleCategorySelect}
                     onCancelSelection={handleCancelSelection}

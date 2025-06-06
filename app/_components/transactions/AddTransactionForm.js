@@ -8,6 +8,8 @@ import { useState } from "react";
 import Button from "../common/Button";
 import { DateValidator, NumberValidator, StringValidator } from "@/app/_lib/validator";
 import Page from "../common/Page";
+import SelectCategory from "../categories/SelectCategory";
+import Image from "next/image";
 
 export default function AddTransactionForm({ transaction = {}, onSubmit }) {
     const categories = useLiveQuery(() => db.getAllCategories());
@@ -42,6 +44,16 @@ export default function AddTransactionForm({ transaction = {}, onSubmit }) {
             .validate();
     }
 
+    const handleCategorySelect = (categoryId) => {
+        setSelectedCategory(categoryId);
+        setSelectCategory(false);
+    }
+
+    const handleCancelSelection = () => {
+        setSelectedCategory(null);
+        setSelectCategory(false);
+    }
+
     const handleSubmit = (e) => {
         e.preventDefault();
 
@@ -53,6 +65,8 @@ export default function AddTransactionForm({ transaction = {}, onSubmit }) {
         for(const [key, value] of formData.entries()) {
             payload[key] = value;
         }
+        payload.categoryId = selectedCategory?.id ?? null; // set to null if left unfilled
+        payload.type = selectedCategory?.type;
 
         try{
             let error = {};
@@ -80,6 +94,22 @@ export default function AddTransactionForm({ transaction = {}, onSubmit }) {
         } catch(e) {
             console.log(e);
         }
+    }
+
+    const renderCategorySelected = () => {
+        if(!selectedCategory) return (
+            <div className="flex items-center gap-2">
+                <p className="text-dark dark:text-white text-sm">Select Category</p>
+            </div>
+        )
+        return (
+            <div className="flex items-center gap-2">
+                <div className="relative w-8 h-8 md:w-10 md:h-10 flex justify-center items-center bg-ocean-blue rounded-full">
+                    {selectedCategory.icon && <Image className="object-contain p-1.5 md:p-2" src={`./category_icons/${selectedCategory.icon}`} alt="" fill/>}
+                </div>
+                <p className="text-dark dark:text-white text-sm">{selectedCategory.name}</p>
+            </div>
+        )
     }
 
     const getDialogAction = () => {
@@ -112,9 +142,9 @@ export default function AddTransactionForm({ transaction = {}, onSubmit }) {
                         required
                         label={"Category"}
                         name="categoryId"
-                        placeholder={"--Select Category--"}
                         errorMessage={errorMessage?.categoryId}
                         overrideOnClick={() => setSelectCategory(true)}
+                        customSelected={renderCategorySelected()}
                     />}
                     {shops && selectedCategory?.type === 'Expense' && 
                     <SelectField
@@ -152,7 +182,14 @@ export default function AddTransactionForm({ transaction = {}, onSubmit }) {
                 show={selectCategory}
                 hideFn={() => setSelectCategory(false)}
             >
-                
+                <SelectCategory
+                    showTab
+                    hideCancelButton
+                    categories={categories}
+                    onCategorySelected={handleCategorySelect}
+                    onCancelSelection={handleCancelSelection}
+                    defaultType="Expense"
+                />
             </Page>
         </div>
     )
