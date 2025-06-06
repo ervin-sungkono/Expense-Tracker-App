@@ -48,7 +48,7 @@ export default function InfoCategoryContent({ category = {} }) {
         <div className="flex flex-col gap-4">
             <div className="text-xl text-center font-bold">Category Detail</div>
             <div className="relative w-14 h-14 md:w-16 md:h-16 mx-auto rounded-full bg-ocean-blue mb-2">
-                {category.icon && <Image className="object-contain p-1.5 md:p-2" src={`./category_icons/${category.icon}`} alt="" fill/>}
+                {category.icon && <Image className="object-contain p-2" src={`./category_icons/${category.icon}`} alt="" fill/>}
             </div>
             <div className="flex flex-col gap-4">
                 {contents.map(content => (
