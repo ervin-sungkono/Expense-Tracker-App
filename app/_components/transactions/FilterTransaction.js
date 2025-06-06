@@ -1,37 +1,14 @@
 import SelectField from "../common/SelectField";
 import Button from "../common/Button";
 import { useLiveQuery } from "dexie-react-hooks";
-import { useSearchParams } from "next/navigation";
 import { db } from "@/app/_lib/db";
 import InputField from "../common/InputField";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 
 export default function FilterTransaction({ onSubmit, filterOptions = {}, setFilterOptions }) {
     const categories = useLiveQuery(() => db.getAllCategories());
     const shops = useLiveQuery(() => db.getAllShops());
     const [errorMessage, setErrorMessage] = useState({});
-
-    const searchParams = useSearchParams();
-    const category = searchParams.get('category');
-    const shop = searchParams.get('shop');
-
-    useEffect(() => {
-            if(category && categories) {
-                setFilterOptions((prevOptions) => ({
-                    ...prevOptions,
-                    categoryId: categories.find(c => c.name.toLowerCase() === category.toLowerCase())?.id
-                }))
-            }
-    }, [category, categories])
-
-    useEffect(() => {
-        if(shop && shops) {
-            setFilterOptions((prevOptions) => ({
-                ...prevOptions,
-                shopId: shops.find(s => s.name.toLowerCase() === shop.toLowerCase())?.id
-            }))
-        }
-    }, [shop, shops])
 
     const validateAmount = (minAmount, maxAmount = Infinity) => {
         if(minAmount <= 0 || maxAmount <= 0) {

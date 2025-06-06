@@ -10,12 +10,14 @@ import IconButton from "../_components/common/IconButton";
 import { IoFilter as FilterIcon } from "react-icons/io5";
 import Dialog from "../_components/common/Dialog";
 import FilterTransaction from "../_components/transactions/FilterTransaction";
+import { useSearchParams } from "next/navigation";
 
 export default function Transactions() {
     const PAGE_SIZE = 20;
 
     const [limit, setLimit] = useState(PAGE_SIZE);
     const [searchText, setSearchText] = useState("");
+    const [type, setType] = useState('Expense');
     const [filterOptions, setFilterOptions] = useState({
         categoryId: null,
         shopId: null,
@@ -24,7 +26,7 @@ export default function Transactions() {
     })
 
     const transactionQuery = useLiveQuery(
-        () => db.getPaginatedTransactions(limit, searchText, "Expense", filterOptions), 
+        () => db.getPaginatedTransactions(limit, searchText, type, filterOptions), 
         [limit, searchText, filterOptions]
     )
     
@@ -32,11 +34,22 @@ export default function Transactions() {
     const categories = useLiveQuery(() => db.getAllCategories());
     const shops = useLiveQuery(() => db.getAllShops());
 
+    const searchParams = useSearchParams();
+    const category = searchParams.get('category');
+    const shop = searchParams.get('shop');
+    const defaultType = searchParams.get('type');
+
     const [filterMode, setFilterMode] = useState(false);
 
     useEffect(() => {        
         setLimit(PAGE_SIZE); // Refresh page limit
     }, [searchText, filterOptions])
+
+    useEffect(() => {
+        if(defaultType) {
+            setType(defaultType);
+        }
+    }, [defaultType])
 
     useEffect(() => {
         if(transactionQuery && categories && shops) {
@@ -52,6 +65,24 @@ export default function Transactions() {
             )
         }
     }, [transactionQuery, categories, shops])
+
+    useEffect(() => {
+        if(category && categories) {
+            setFilterOptions((prevOptions) => ({
+                ...prevOptions,
+                categoryId: categories.find(c => c.name.toLowerCase() === category.toLowerCase())?.id
+            }))
+        }
+    }, [category, categories])
+
+    useEffect(() => {
+        if(shop && shops) {
+            setFilterOptions((prevOptions) => ({
+                ...prevOptions,
+                shopId: shops.find(s => s.name.toLowerCase() === shop.toLowerCase())?.id
+            }))
+        }
+    }, [shop, shops])
 
     const fetchMoreData = async() => {
         setLimit(currentLimit => currentLimit + PAGE_SIZE);
