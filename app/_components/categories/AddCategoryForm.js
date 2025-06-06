@@ -13,7 +13,7 @@ import Page from "../common/Page";
 const SelectIcon = dynamic(() => import("./SelectIcon"));
 const SelectCategory = dynamic(() => import("./SelectCategory"));
 
-export default function AddCategoryForm({ category = {} }) {
+export default function AddCategoryForm({ category = {}, onSubmit }) {
     const [errorMessage, setErrorMessage] = useState({});
     const [selectIcon, setSelectIcon] = useState(false);
     const [selectParent, setSelectParent] = useState(false);
@@ -91,8 +91,7 @@ export default function AddCategoryForm({ category = {} }) {
                 db.addCategory(payload);
             }
             
-            form.reset();
-            hideFn && hideFn();
+            onSubmit && onSubmit();
         } catch(e) {
             console.log(e);
         }

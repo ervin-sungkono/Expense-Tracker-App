@@ -80,7 +80,7 @@ export default function CategoryList({ show, hideFn }) {
                     show={showDialog}
                     hideFn={() => setShowDialog(false)}
                 >
-                    <AddCategoryForm/>
+                    <AddCategoryForm onSubmit={() => setShowDialog(false)}/>
                 </Dialog>
                 
             </div>
