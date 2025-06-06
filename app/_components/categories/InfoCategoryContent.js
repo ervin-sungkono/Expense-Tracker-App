@@ -52,7 +52,7 @@ export default function InfoCategoryContent({ category = {} }) {
             </div>
             <div className="flex flex-col gap-4">
                 {contents.map(content => (
-                    <div key={content.label} className="flex flex-col gap-1 pb-2 not-last:border-b border-dark/20 dark:border-white/20">
+                    <div key={content.label} className="flex flex-col gap-1 pb-2 not-last:mb-2 not-last:border-b border-dark/20 dark:border-white/20">
                         <p className="uppercase text-xs md:text-sm font-semibold text-dark/80 dark:text-white/80">{content.label}</p>
                         <p className="text-sm md:text-base text-dark dark:text-white">{content.value}</p>
                     </div>
