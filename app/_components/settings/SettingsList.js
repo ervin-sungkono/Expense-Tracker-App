@@ -162,6 +162,7 @@ export default function SettingsList() {
             <Dialog
                 show={deleteAccount}
                 hideFn={() => setDeleteAccount(false)}
+                hideCancelButton
             >
                 <DeleteAccountForm onCancel={() => setDeleteAccount(false)}/>
             </Dialog>
