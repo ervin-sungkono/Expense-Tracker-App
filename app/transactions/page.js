@@ -12,11 +12,27 @@ import Dialog from "../_components/common/Dialog";
 import FilterTransaction from "../_components/transactions/FilterTransaction";
 import { useSearchParams } from "next/navigation";
 
+const UpdateFilter = ({ onSearchParamResult }) => {
+    const searchParams = useSearchParams();
+    
+    useEffect(() => {
+        const category = searchParams.get('category');
+        const shop = searchParams.get('shop');
+        const defaultType = searchParams.get('type');
+
+        onSearchParamResult && onSearchParamResult({ category, shop, defaultType });
+    }, [searchParams])
+
+    return null;
+}
+
 export default function Transactions() {
     const PAGE_SIZE = 20;
 
     const [limit, setLimit] = useState(PAGE_SIZE);
     const [searchText, setSearchText] = useState("");
+    const [defaultCategory, setCategory] = useState(null);
+    const [defaultShop, setShop] = useState(null);
     const [type, setType] = useState('Expense');
     const [filterOptions, setFilterOptions] = useState({
         categoryId: null,
@@ -34,11 +50,6 @@ export default function Transactions() {
     const categories = useLiveQuery(() => db.getAllCategories());
     const shops = useLiveQuery(() => db.getAllShops());
 
-    const searchParams = useSearchParams();
-    const category = searchParams.get('category');
-    const shop = searchParams.get('shop');
-    const defaultType = searchParams.get('type');
-
     const [filterMode, setFilterMode] = useState(false);
 
     useEffect(() => {        
@@ -46,10 +57,22 @@ export default function Transactions() {
     }, [searchText, filterOptions])
 
     useEffect(() => {
-        if(defaultType) {
-            setType(defaultType);
+        if(defaultCategory && categories) {
+            setFilterOptions((prevOptions) => ({
+                ...prevOptions,
+                categoryId: categories.find(c => c.name.toLowerCase() === defaultCategory.toLowerCase())?.id
+            }))
         }
-    }, [defaultType])
+    }, [defaultCategory, categories])
+
+    useEffect(() => {
+        if(defaultShop && shops) {
+            setFilterOptions((prevOptions) => ({
+                ...prevOptions,
+                shopId: shops.find(s => s.name.toLowerCase() === defaultShop.toLowerCase())?.id
+            }))
+        }
+    }, [defaultShop, shops])
 
     useEffect(() => {
         if(transactionQuery && categories && shops) {
@@ -57,7 +80,7 @@ export default function Transactions() {
             const shopsMap = new Map(shops.map(shop => [String(shop.id), shop.name]));
             setTransactions(
                 transactionQuery
-                .map(transaction => ({ 
+                .map(transaction => ({
                     ...transaction, 
                     category: categoriesMap.get(String(transaction.categoryId)),
                     shop: shopsMap.get(String(transaction.shopId))
@@ -66,23 +89,11 @@ export default function Transactions() {
         }
     }, [transactionQuery, categories, shops])
 
-    useEffect(() => {
-        if(category && categories) {
-            setFilterOptions((prevOptions) => ({
-                ...prevOptions,
-                categoryId: categories.find(c => c.name.toLowerCase() === category.toLowerCase())?.id
-            }))
-        }
-    }, [category, categories])
-
-    useEffect(() => {
-        if(shop && shops) {
-            setFilterOptions((prevOptions) => ({
-                ...prevOptions,
-                shopId: shops.find(s => s.name.toLowerCase() === shop.toLowerCase())?.id
-            }))
-        }
-    }, [shop, shops])
+    const handleFilter = ({ category, shop, defaultType }) => {
+        if(category) setCategory(category);
+        if(shop) setShop(shop);
+        if(defaultType) setType(defaultType);
+    }
 
     const fetchMoreData = async() => {
         setLimit(currentLimit => currentLimit + PAGE_SIZE);
@@ -90,6 +101,9 @@ export default function Transactions() {
 
     return(
         <Layout pathname={"/transactions"}>
+            <Suspense>
+                <UpdateFilter onSearchParamResult={handleFilter}/>
+            </Suspense>
             <div className="h-full flex flex-col">
                 <div className="mb-4">
                     <Header title={"Transaction List"} textAlign="center"/>
@@ -111,18 +125,16 @@ export default function Transactions() {
                     />
                 </div>
             </div>
-            <Suspense>
-                <Dialog
-                    show={filterMode}
-                    hideFn={() => setFilterMode(false)}
-                >
-                    <FilterTransaction
-                        onSubmit={() => setFilterMode(false)}
-                        filterOptions={filterOptions}
-                        setFilterOptions={setFilterOptions}
-                    />
-                </Dialog>
-            </Suspense>
+            <Dialog
+                show={filterMode}
+                hideFn={() => setFilterMode(false)}
+            >
+                <FilterTransaction
+                    onSubmit={() => setFilterMode(false)}
+                    filterOptions={filterOptions}
+                    setFilterOptions={setFilterOptions}
+                />
+            </Dialog>
         </Layout>
     )
 }
