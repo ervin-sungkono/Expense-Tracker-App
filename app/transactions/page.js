@@ -7,8 +7,9 @@ import { useLiveQuery } from "dexie-react-hooks";
 import SearchBar from "../_components/common/Searchbar";
 import Header from "../_components/common/Header";
 import IconButton from "../_components/common/IconButton";
-import FilterTransactionDialog from "../_components/transactions/FilterTransactionDialog";
 import { IoFilter as FilterIcon } from "react-icons/io5";
+import Dialog from "../_components/common/Dialog";
+import FilterTransaction from "../_components/transactions/FilterTransaction";
 
 export default function Transactions() {
     const PAGE_SIZE = 20;
@@ -80,12 +81,16 @@ export default function Transactions() {
                 </div>
             </div>
             <Suspense>
-                <FilterTransactionDialog
+                <Dialog
                     show={filterMode}
                     hideFn={() => setFilterMode(false)}
-                    filterOptions={filterOptions}
-                    setFilterOptions={setFilterOptions}
-                />
+                >
+                    <FilterTransaction
+                        onSubmit={() => setFilterMode(false)}
+                        filterOptions={filterOptions}
+                        setFilterOptions={setFilterOptions}
+                    />
+                </Dialog>
             </Suspense>
         </Layout>
     )

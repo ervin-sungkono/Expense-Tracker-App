@@ -5,10 +5,11 @@ import { memo, useState } from "react";
 import { useLongPress } from "use-long-press";
 import ContextMenu from "../common/ContextMenu";
 import { isMobile } from "react-device-detect";
+import Dialog from "../common/Dialog";
 
-const AddTransactionDialog = dynamic(() => import("./AddTransactionDialog"));
-const DeleteTransactionDialog = dynamic(() => import("./DeleteTransactionDialog"));
-const InfoTransactionDialog = dynamic(() => import("./InfoTransactionDialog"));
+const AddTransactionForm = dynamic(() => import("./AddTransactionForm"));
+const DeleteTransactionForm = dynamic(() => import("./DeleteTransactionForm"));
+const InfoTransactionForm = dynamic(() => import("./InfoTransactionForm"));
 
 function TransactionCard({ transaction, style }) {
     const { id, date, category, amount } = transaction;
@@ -56,21 +57,35 @@ function TransactionCard({ transaction, style }) {
                 hideFn={() => setShowMenu(false)}
                 hideOnItemClick
             />
-            <InfoTransactionDialog 
-                transaction={transaction} 
+            <Dialog
                 show={showInfo} 
                 hideFn={() => setShowInfo(false)}
-            />
-            <AddTransactionDialog 
-                transaction={transaction} 
+            >
+                <InfoTransactionForm 
+                    transaction={transaction} 
+                    hideFn={() => setShowInfo(false)}
+                />
+            </Dialog>
+            <Dialog
                 show={showEdit} 
                 hideFn={() => setShowEdit(false)}
-            />
-            <DeleteTransactionDialog 
-                transactionId={id} 
+            >
+                <AddTransactionForm 
+                    transaction={transaction} 
+                    onSubmit={() => setShowEdit(false)}
+                />
+            </Dialog>
+            <Dialog
                 show={showDelete} 
                 hideFn={() => setShowDelete(false)}
-            />
+                hideCancelButton
+            >
+                <DeleteTransactionForm
+                    transactionId={id}
+                    onDelete={() => setShowDelete(false)}
+                    onCancel={() => setShowDelete(false)}
+                />
+            </Dialog>
         </div>
     )
 }
