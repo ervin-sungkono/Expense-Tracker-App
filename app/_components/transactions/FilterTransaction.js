@@ -132,7 +132,7 @@ export default function FilterTransaction({ onSubmit, filterOptions = {}, setFil
                         placeholder={"--Select Shop--"}
                     />}
                     <div className="w-full flex flex-col gap-2">
-                        <div className="w-full flex gap-2">
+                        <div className="grid grid-cols-2 gap-2">
                             <InputField 
                                 name={"min_amount"} 
                                 label={"Min Amount"} 
@@ -151,7 +151,7 @@ export default function FilterTransaction({ onSubmit, filterOptions = {}, setFil
                         {errorMessage.amount && <p className="text-[10.8px] md:text-xs text-red-600 dark:text-red-400">{errorMessage.amount}</p>}
                     </div>
                     <div className="w-full flex flex-col gap-2">
-                        <div className="w-full flex gap-2">
+                        <div className="grid grid-cols-2 gap-2">
                             <InputField 
                                 name={"start_date"} 
                                 label={"Start Date"} 
