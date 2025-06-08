@@ -38,7 +38,7 @@ export default function CategoriesCarousel() {
         return (
             <div className="mb-4">
                 <SubHeader loading title="Categories" description={"based on this month's remaining budget"} link="/categories"/>
-                <div className="h-28 w-screen bg-neutral-200 dark:bg-neutral-700 animate-pulse rounded-lg"></div>
+                <div className="h-28 w-screen bg-neutral-200 dark:bg-neutral-800 animate-pulse rounded-lg"></div>
             </div>
         )
     } else {
@@ -54,7 +54,7 @@ export default function CategoriesCarousel() {
                         component: <CategoryCard {...category} slug={`/transactions?category=${encodeURIComponent(category.name)}`}/>
                     }))}
                 /> :
-                <div className="h-40 flex flex-col justify-center items-center gap-4 w-full bg-neutral-200 dark:bg-neutral-700 rounded-lg py-6 px-4">
+                <div className="h-40 flex flex-col justify-center items-center gap-4 w-full bg-neutral-200 dark:bg-neutral-800 rounded-lg py-6 px-4">
                     <p className="text-sm md:text-base text-center font-medium text-dark/80 dark:text-white/80">No category found, please create a new category</p>
                     <Button onClick={() => setShowAdd(true)} label="Add New Category" contained/>
                 </div>}

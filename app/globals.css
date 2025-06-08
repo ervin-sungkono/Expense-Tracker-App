@@ -11,12 +11,12 @@
 }
 
 :root {
-  --background: #f5f5f5;
+  --background: #ebebeb;
   --foreground: #2b2b2b;
 }
 
 [data-theme='dark'] {
-  --background: #2b2b2b;
+  --background: #161616;
   --foreground: #ededed;
 }
 
@@ -40,7 +40,7 @@ body {
 
     /* Handle */
     ::-webkit-scrollbar-thumb {
-      @apply bg-neutral-300 dark:bg-neutral-700 rounded-full
+      @apply bg-neutral-300 dark:bg-neutral-800 rounded-full
     }
 
     /* Handle on hover */

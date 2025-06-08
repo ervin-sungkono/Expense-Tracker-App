@@ -82,14 +82,13 @@ class ExpenseDB extends Dexie {
         return this.transactions.where({ categoryId }).toArray();
     }
 
-    getPaginatedTransactions(limit, searchText, type, { categoryId, shopId, amountRange, dateRange }) {
+    getPaginatedTransactions(limit, searchText, { categoryId, shopId, amountRange, dateRange }) {
         return this.transactions
             .orderBy('date')
             .filter(transaction => {
                 if(!transaction.remarks.toLowerCase().includes(searchText)) return false;
                 if(categoryId && transaction.categoryId != categoryId) return false;
                 if(shopId && transaction.shopId != shopId) return false;
-                if(type && transaction.type != type) return false;
                 if(!isInAmountRange(transaction.amount, amountRange)) return false;
                 if(!isInDateRange(transaction.date, dateRange)) return false;
 
