@@ -51,7 +51,7 @@ export default function CategoriesCarousel() {
                     slidesPerView={1.8}
                     items={categoryData?.sort((a,b) => a.budget - b.budget).map(category => ({
                         id: category.id,
-                        component: <CategoryCard {...category} slug={`/transactions?category=${encodeURIComponent(category.name)}&type=${encodeURIComponent(category.type)}`}/>
+                        component: <CategoryCard {...category} slug={`/transactions?category=${encodeURIComponent(category.name)}`}/>
                     }))}
                 /> :
                 <div className="h-40 flex flex-col justify-center items-center gap-4 w-full bg-neutral-200 dark:bg-neutral-700 rounded-lg py-6 px-4">
