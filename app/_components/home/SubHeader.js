@@ -6,14 +6,14 @@ export default function SubHeader({ title, description, linkLabel = 'Manage', li
         return (
             <div className="w-full flex flex-col gap-0.5 mb-3 animate-pulse">
                 <div className="flex items-center gap-2.5">
-                    <p className="text-lg font-semibold text-transparent bg-neutral-200 dark:bg-neutral-700 rounded-full">{title}</p>
+                    <p className="text-lg font-semibold text-transparent bg-neutral-200 dark:bg-neutral-800 rounded-full">{title}</p>
                     {(link || onClick) && 
-                    <div className="ml-auto flex items-center gap-1 text-transparent bg-neutral-200 dark:bg-neutral-700 rounded-full">
+                    <div className="ml-auto flex items-center gap-1 text-transparent bg-neutral-200 dark:bg-neutral-800 rounded-full">
                         <p className="text-sm">{linkLabel}</p>
                         <RightIcon size={20}/>
                     </div>}
                 </div>
-                { description && <p className="block text-xs md:text-sm text-transparent bg-neutral-200 dark:bg-neutral-700 rounded-full">{description}</p>}
+                { description && <p className="block text-xs md:text-sm text-transparent bg-neutral-200 dark:bg-neutral-800 rounded-full">{description}</p>}
             </div>
         )
     } else {

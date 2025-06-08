@@ -12,27 +12,16 @@ import { IoFilter as FilterIcon } from "react-icons/io5";
 import Dialog from "../_components/common/Dialog";
 import FilterTransaction from "../_components/transactions/FilterTransaction";
 import { useSearchParams } from "next/navigation";
-import { getDebtLoanType } from "../_lib/utils";
 
 const UpdateFilter = ({ onSearchParamResult }) => {
     const searchParams = useSearchParams();
-    const categories = useLiveQuery(() => db.getAllCategories());
     
     useEffect(() => {
-        if(!categories) return;
-
         const category = searchParams.get('category');
         const shop = searchParams.get('shop');
 
-        const foundCategory = categories.find(c => c.name === category);
-        let defaultType = foundCategory?.type;
-
-        if(defaultType === 'DebtLoan') {
-            defaultType = getDebtLoanType(foundCategory.name);
-        }
-
-        onSearchParamResult && onSearchParamResult({ category, shop, defaultType });
-    }, [searchParams, categories])
+        onSearchParamResult && onSearchParamResult({ category, shop });
+    }, [searchParams])
 
     return null;
 }
@@ -43,8 +32,7 @@ export default function Transactions() {
     const [limit, setLimit] = useState(PAGE_SIZE);
     const [searchText, setSearchText] = useState("");
     const [defaultCategory, setCategory] = useState(null);
-    const [defaultShop, setShop] = useState(null);
-    const [type, setType] = useState('Expense');
+    const [defaultShop, setShop] = useState(null);;
     const [filterOptions, setFilterOptions] = useState({
         categoryId: null,
         shopId: null,
@@ -53,8 +41,8 @@ export default function Transactions() {
     })
 
     const transactionQuery = useLiveQuery(
-        () => db.getPaginatedTransactions(limit, searchText, type, filterOptions), 
-        [limit, searchText, type, filterOptions]
+        () => db.getPaginatedTransactions(limit, searchText, filterOptions), 
+        [limit, searchText, filterOptions]
     )
     
     const [transactions, setTransactions] = useState(null);
@@ -108,7 +96,12 @@ export default function Transactions() {
                         data: [transaction]
                     }
                 } else {
-                    transactionMap[dateKey].totalAmount += transaction.amount;
+                    let modifier = 1;
+                    if(transaction.type === 'Expense') {
+                        modifier = -1;
+                    }
+                    
+                    transactionMap[dateKey].totalAmount += transaction.amount * modifier;
                     transactionMap[dateKey].data.unshift(transaction);
                 }
             })
@@ -117,10 +110,9 @@ export default function Transactions() {
         }
     }, [transactionQuery, categories, shops])
 
-    const handleFilter = ({ category, shop, defaultType }) => {
+    const handleFilter = ({ category, shop }) => {
         if(category) setCategory(category);
         if(shop) setShop(shop);
-        if(defaultType) setType(defaultType);
     }
 
     const fetchMoreData = async() => {
@@ -145,11 +137,6 @@ export default function Transactions() {
                         </div>
                     </div>
                 </div>
-                <CategoryTab 
-                    selected={type} 
-                    onChange={(val) => setType(val)} 
-                    excluded={['DebtLoan']}
-                />
                 <div className="flex grow mb-2">
                     <VirtualizedTransactionList
                         items={transactions}

@@ -121,7 +121,7 @@ export default function TransactionChart({ transactionData = [] }) {
                     options={chartOptions}
                 /> :
                 <div className="w-full h-full px-3 py-4">
-                    <div className="w-full h-full rounded-lg bg-neutral-200 dark:bg-neutral-700 animate-pulse"></div>
+                    <div className="w-full h-full rounded-lg bg-neutral-200 dark:bg-neutral-800 animate-pulse"></div>
                 </div>
             }
         </div>

@@ -18,7 +18,7 @@ export default function ContextMenu({ items = [], show = false, hideFn = null, h
     return(
         <>
             <div className={`absolute z-50 min-w-[120px] shadow-lg translate-y-full origin-top-right ${show ? 'animate-[scale-in_.25s_forwards_ease-in-out]' : 'animate-[scale-out_.25s_forwards_ease-in-out]'}`} style={{ bottom: 0, right: 0 }}>
-                <div className="w-full relative z-50 py-1.5 bg-neutral-100 dark:bg-neutral-600 rounded-md">
+                <div className="w-full relative z-50 py-1.5 bg-neutral-100 dark:bg-neutral-800/60 backdrop-blur-2xl rounded-md">
                     {items.map((item, index) => (
                         <div 
                             key={`${item.label}-${index}`} 
@@ -26,7 +26,7 @@ export default function ContextMenu({ items = [], show = false, hideFn = null, h
                                 item.onClick && item.onClick();
                                 hideOnItemClick && hideFn();
                             }}
-                            className="cursor-pointer px-4 py-2 hover:bg-neutral-300/30 active:bg-neutral-300/30 dark:hover:bg-neutral-800/30 dark:active:bg-neutral-800/30"
+                            className="cursor-pointer px-4 py-2 active:bg-neutral-300/30 dark:active:bg-white/10"
                         >
                             {item.label}
                         </div>

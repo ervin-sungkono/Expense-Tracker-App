@@ -16,9 +16,9 @@ const renderItem = (item) => {
     <div className='flex flex-col gap-1.5 py-2'>
       <div className='flex justify-between items-center'>
         <p className='font-semibold text-sm md:text-base'>{formatDateString(item.date)}</p>
-        <p className='font-semibold text-sm md:text-base text-ocean-blue'>{formatCurrency(item.totalAmount)}</p>
+        <p className={`font-semibold text-sm md:text-base ${item.totalAmount < 0 ? 'text-red-500 dark:text-red-400' : 'text-ocean-blue'}`}>{formatCurrency(item.totalAmount)}</p>
       </div>
-      <div className='bg-neutral-200 dark:bg-neutral-700 rounded-md'>
+      <div className='bg-white dark:bg-neutral-800 rounded-md'>
         {item.data?.map(transaction => (
           <TransactionCard key={transaction.id} transaction={transaction}/>
         ))}
