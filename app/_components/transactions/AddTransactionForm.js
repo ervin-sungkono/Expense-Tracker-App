@@ -15,7 +15,7 @@ export default function AddTransactionForm({ transaction = {}, onSubmit }) {
     const categories = useLiveQuery(() => db.getAllCategories());
     const shops = useLiveQuery(() => db.getAllShops());
     const [errorMessage, setErrorMessage] = useState({});
-    const [selectedCategory, setSelectedCategory] = useState(null); 
+    const [selectedCategory, setSelectedCategory] = useState(transaction.category); 
     const [selectCategory, setSelectCategory] = useState(false);
 
     const validateDate = (date) => {

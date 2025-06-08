@@ -1,4 +1,5 @@
 import useLocalStorage from "./useLocalStorage";
 import useNavigatorOnLine from "./useNavigatorOnline";
+import useDynamicItemSize from "./useDynamicItemSize";
 
-export { useLocalStorage, useNavigatorOnLine };
+export { useLocalStorage, useNavigatorOnLine, useDynamicItemSize };

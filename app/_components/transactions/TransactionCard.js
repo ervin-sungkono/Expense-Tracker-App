@@ -6,13 +6,14 @@ import { useLongPress } from "use-long-press";
 import ContextMenu from "../common/ContextMenu";
 import { isMobile } from "react-device-detect";
 import Dialog from "../common/Dialog";
+import Image from "next/image";
 
 const AddTransactionForm = dynamic(() => import("./AddTransactionForm"));
 const DeleteTransactionForm = dynamic(() => import("./DeleteTransactionForm"));
 const InfoTransactionForm = dynamic(() => import("./InfoTransactionForm"));
 
-function TransactionCard({ transaction, style }) {
-    const { id, date, category, amount } = transaction;
+function TransactionCard({ transaction }) {
+    const { id, category, amount, remarks } = transaction;
     const [showMenu, setShowMenu] = useState(false);
     const [showInfo, setShowInfo] = useState(false);
     const [showEdit, setShowEdit] = useState(false);
@@ -41,14 +42,19 @@ function TransactionCard({ transaction, style }) {
     ]
 
     return(
-        <div style={style} className="relative not-last:border-b border-dark/20 dark:border-white/20">
-            <div {...handlers()} onClick={!isMobile ? () => setShowMenu(true) : null} className="cursor-pointer px-4 py-2 flex active:bg-neutral-300/30 active:dark:bg-neutral-800/30 transition-colors duration-150 ease-in-out">
-                <div className="w-full flex flex-col gap-1">
+        <div className="relative not-last:border-b border-dark/20 dark:border-white/20 flex items-center">
+            <div {...handlers()} onClick={!isMobile ? () => setShowMenu(true) : null} className="w-full h-full cursor-pointer px-2.5 md:px-4 py-2 flex active:bg-neutral-300/30 active:dark:bg-neutral-800/30 transition-colors duration-150 ease-in-out">
+                <div className="w-full flex items-center gap-2.5">
+                    <div className="relative shrink-0 w-8 h-8 md:w-10 md:h-10 flex justify-center items-center bg-ocean-blue rounded-full">
+                        {category.icon && <Image className="object-contain p-1.5 md:p-2" src={`./category_icons/${category.icon}`} alt="" fill/>}
+                    </div>
                     <div className="w-full flex items-center gap-1.5">
-                        <p className="text-base font-medium grow">{category}</p>
+                        <div className="grow flex flex-col gap-1">
+                            <p className="text-sm md:text-base font-medium grow">{category.name}</p>
+                            <p className="text-xs md:text-sm line-clamp-1 text-dark/80 dark:text-white/80">{remarks}</p>
+                        </div>
                         <p className="text-sm md:text-base font-medium">{formatCurrency(amount)}</p>
                     </div>
-                    <p className="text-xs text-dark/80 dark:text-white/80">{formatDateString(date)}</p>
                 </div>
             </div>
             <ContextMenu 
