@@ -14,7 +14,7 @@ export default function RecentTransactions() {
         if(recentTransactions && categories) {
             const categoriesMap = {};
             for(let i = 0; i < categories.length; i++) {
-                categoriesMap[categories[i].id] = categories[i].name;
+                categoriesMap[categories[i].id] = categories[i];
             }
 
             setTransactionData(recentTransactions.map(transaction => ({ ...transaction, category: categoriesMap[transaction.categoryId]})));
