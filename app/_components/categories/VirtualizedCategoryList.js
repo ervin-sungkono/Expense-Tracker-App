@@ -18,12 +18,14 @@ const Row = ({ index, style, data: { items, onCategoryClicked } }) => {
 
 const MemoizedRow = memo(Row);
 
-const getItemSize = (item) => {
-  const extraLength = item.data?.length ?? 0;
-  return 56 + extraLength * 56;
-}
-
 const VirtualizedCategoryList = ({ ref, items, onCategoryClicked }) => {
+  const getItemSize = (index) => {
+    const item = items[index];
+    const extraLength = item.data?.length ?? 0;
+    
+    return 56 + extraLength * 56;
+  }
+
   if(!items) {
     return (
       <div className='w-full h-full flex flex-col justify-center items-center gap-4 bg-neutral-200 dark:bg-neutral-700 rounded-lg px-4 py-2.5'>
@@ -50,7 +52,7 @@ const VirtualizedCategoryList = ({ ref, items, onCategoryClicked }) => {
             height={height}
             width={width}
             itemCount={items.length}
-            itemSize={(index) => getItemSize(items[index])}
+            itemSize={getItemSize}
             itemData={{ items, onCategoryClicked }}
             style={{willChange: 'initial'}}
           >
