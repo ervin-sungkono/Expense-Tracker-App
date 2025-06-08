@@ -5,7 +5,7 @@ import InfiniteLoader from 'react-window-infinite-loader';
 import TransactionCard from './TransactionCard';
 import LoadingSpinner from '../common/LoadingSpinner';
 import Image from 'next/image';
-import { formatDateString } from '@/app/_lib/utils';
+import { formatCurrency, formatDateString } from '@/app/_lib/utils';
 import { useDynamicItemSize } from '@/app/_lib/hooks';
 import DynamicRow from '../common/DynamicRow';
 
@@ -14,7 +14,10 @@ const renderItem = (item) => {
   
   return (
     <div className='flex flex-col gap-1.5 py-2'>
-      <p className='font-semibold text-sm md:text-base'>{formatDateString(item.date)}</p>
+      <div className='flex justify-between items-center'>
+        <p className='font-semibold text-sm md:text-base'>{formatDateString(item.date)}</p>
+        <p className='font-semibold text-sm md:text-base text-ocean-blue'>{formatCurrency(item.totalAmount)}</p>
+      </div>
       <div className='bg-neutral-200 dark:bg-neutral-700 rounded-md'>
         {item.data?.map(transaction => (
           <TransactionCard key={transaction.id} transaction={transaction}/>
