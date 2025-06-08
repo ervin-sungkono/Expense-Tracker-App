@@ -9,24 +9,11 @@ import LinkButton from "../common/LinkButton"
 
 export default function ShopsCarousel() {
     const [shopData, setShopData] = useState(null);
-    const transactions = useLiveQuery(() => db.getAllTransactions());
+    const transactions = useLiveQuery(() => db.getMonthTransactions());
     const shops = useLiveQuery(() => db.getAllShops());
-
-    const filterTransactionByMonth = (month) => {
-        if(!month) {
-            month = new Date().getMonth(); // current month
-        }
-
-        const isSameMonth = (targetDate) => {
-            return new Date(targetDate).getMonth() === month && new Date(targetDate).getFullYear() === new Date().getFullYear();
-        }
-
-        return transactions.filter(transaction => isSameMonth(transaction.date));
-    }
 
     useEffect(() => {
         if(transactions && shops) {
-            const filteredTransactions = filterTransactionByMonth();
             const shopsMap = {};
             for(let i = 0; i < shops.length; i++) {
                 shopsMap[shops[i].id] = {
@@ -36,10 +23,10 @@ export default function ShopsCarousel() {
                 };
             }
 
-            for(let i = 0; i < filteredTransactions.length; i++) {
-                if(filteredTransactions[i].shopId) { 
-                    shopsMap[filteredTransactions[i].shopId].count++;
-                    shopsMap[filteredTransactions[i].shopId].amount += Number(filteredTransactions[i].amount);
+            for(let i = 0; i < transactions.length; i++) {
+                if(transactions[i].shopId) { 
+                    shopsMap[transactions[i].shopId].count++;
+                    shopsMap[transactions[i].shopId].amount += Number(transactions[i].amount);
                 }
             }
 

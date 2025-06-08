@@ -4,6 +4,14 @@ import { generateBudgets, generateTransactions, getCategories, getShops } from "
 const DB_NAME = "ExpenseDB";
 const DB_VERSION = 2;
 
+function isSameMonth(targetDate){
+    const date = new Date();
+    const year = date.getFullYear();
+    const month =  date.getMonth();
+
+    return new Date(targetDate).getMonth() === month && new Date(targetDate).getFullYear() === year;
+}
+
 function isInAmountRange(amount, range) {
     const [min, max] = range;
 
@@ -42,10 +50,30 @@ class ExpenseDB extends Dexie {
         }).upgrade(async() => {
             await this.delete();
         });
+
+        this.on('populate', () => this.populate());
+    }
+
+    async populate() {
+        await this.transactions.bulkAdd(generateTransactions(10000));
+
+        await this.categories.bulkAdd(getCategories());
+
+        await this.shops.bulkAdd(getShops());
+
+        await this.budgets.bulkAdd(generateBudgets(500));
     }
 
     getAllTransactions() {
         return this.transactions.toArray();
+    }
+
+    getMonthTransactions() {
+        return this.transactions
+            .filter(transaction => {
+                return isSameMonth(transaction.date)
+            })
+            .toArray();
     }
 
     getTransactionsByCategory(categoryId) {
@@ -228,16 +256,4 @@ class ExpenseDB extends Dexie {
     }
 }
 
-async function populate() {
-    await db.transactions.bulkAdd(generateTransactions(100000));
-
-    await db.categories.bulkAdd(getCategories());
-
-    await db.shops.bulkAdd(getShops());
-
-    await db.budgets.bulkAdd(generateBudgets(500));
-}
-
 export const db = new ExpenseDB();
-
-db.on('populate', populate);
