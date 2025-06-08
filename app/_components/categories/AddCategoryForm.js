@@ -107,6 +107,11 @@ export default function AddCategoryForm({ category = {}, onSubmit }) {
         setSelectParent(false);
     }
 
+    const handleSelectIcon = (icon) => {
+        setSelectedIcon(icon);
+        setSelectIcon(false);
+    }
+
     const getDialogAction = () => {
         return category.id ? 'Edit Category' : 'Add Category';
     }
@@ -189,7 +194,7 @@ export default function AddCategoryForm({ category = {}, onSubmit }) {
                 show={selectIcon}
                 hideFn={() => setSelectIcon(false)}
             >
-                <SelectIcon onIconSelected={(icon) => setSelectedIcon(icon)}/>
+                <SelectIcon onIconSelected={handleSelectIcon}/>
             </Page>
            <Page
                 title={"Select Category"}
