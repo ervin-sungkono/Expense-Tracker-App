@@ -22,7 +22,7 @@ export default function SubHeader({ title, description, linkLabel = 'Manage', li
                 <div className="flex items-center gap-2.5">
                     <p className="grow text-lg font-semibold text-dark dark:text-white">{title}</p>
                     {link && 
-                    <Link href={link} className="flex items-center gap-1 text-deep-blue dark:text-ocean-blue">
+                    <Link scroll={false} href={link} className="flex items-center gap-1 text-deep-blue dark:text-ocean-blue">
                         <p className="text-sm">{linkLabel}</p>
                         <RightIcon size={20}/>
                     </Link>}

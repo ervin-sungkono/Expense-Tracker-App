@@ -4,7 +4,7 @@ import Link from "next/link";
 
 export default function LinkButton({ href = '', disabled, ...params }) {
     return(
-        <Link href={ disabled ? '#' : href}>
+        <Link scroll={false} href={ disabled ? '#' : href}>
             <Button {...params}/>
         </Link>
     )

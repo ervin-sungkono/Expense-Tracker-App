@@ -10,7 +10,7 @@ function CategoryCard({ name, type, total = 0, slug = '' }) {
     }
 
     return(
-        <Link href={slug} className={`h-28 flex flex-col items-end px-4 py-3 text-white ${getCategoryType() ? 'bg-success-gradient hover:bg-success-gradient--hover' : 'bg-danger-gradient hover:bg-danger-gradient--hover'} transition-colors duration-300 ease-in-out rounded-lg`}>
+        <Link scroll={false} href={slug} className={`h-28 flex flex-col items-end px-4 py-3 text-white ${getCategoryType() ? 'bg-success-gradient hover:bg-success-gradient--hover' : 'bg-danger-gradient hover:bg-danger-gradient--hover'} transition-colors duration-300 ease-in-out rounded-lg`}>
             <div className="w-full flex flex-col gap-0.5">
                 <p className="text-base md:text-lg font-semibold">{name}</p>
                 <p className="text-sm">{getCategoryType() ? '+' : '-'}{formatCurrency(total)}</p>
