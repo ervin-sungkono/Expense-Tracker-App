@@ -7,7 +7,7 @@ export default function NavbarItem({ item, active = false }) {
             className={`nav-link`}
             aria-label={item.label}
         >
-            <Link href={item.url} className={`text-dark${active ? ' nav-active' : ''}`}>
+            <Link scroll={false} href={item.url} className={`text-dark${active ? ' nav-active' : ''}`}>
                 {item.icon}
             </Link>
         </div>
