@@ -3,7 +3,7 @@
 }
 
 .navbar-content {
-    @apply max-w-2xl mx-auto px-4 py-5 rounded-2xl bg-white dark:bg-neutral-700 grid grid-cols-5 shadow-md shadow-dark/10;
+    @apply max-w-2xl mx-auto px-4 h-16 rounded-2xl bg-white dark:bg-neutral-700 grid grid-cols-5 items-center shadow-md shadow-dark/10;
 }
 
 .nav-link {
@@ -11,11 +11,19 @@
 }
 
 .nav-link > a {
-    @apply relative text-dark/60 dark:text-white/60 hover:text-ocean-blue transition-opacity duration-300 ease-in-out after:absolute;
+    @apply flex flex-col items-center gap-1 relative text-dark/60 dark:text-white/60 hover:text-ocean-blue transition-opacity duration-300 ease-in-out after:absolute;
+}
+
+.nav-link .nav-label {
+    @apply text-[10.8px] md:text-xs
 }
 
 .nav-link > .nav-active {
     @apply text-ocean-blue;
+}
+
+.nav-link > .nav-active .nav-label {
+    @apply font-semibold
 }
 
 .nav-link > a::after {
