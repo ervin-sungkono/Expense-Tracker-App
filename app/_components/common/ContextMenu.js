@@ -6,7 +6,7 @@ export default function ContextMenu({ items = [], show = false, hideFn = null, h
 
     useEffect(() => {
         let hide = null;
-        if(!show && !hidden) hide = setTimeout(() => setHidden(true), 500);
+        if(!show && !hidden) hide = setTimeout(() => setHidden(true), 350);
         else if(show && hidden) {
             setHidden(false)
         }
