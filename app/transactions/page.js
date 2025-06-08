@@ -133,7 +133,7 @@ export default function Transactions() {
                 <UpdateFilter onSearchParamResult={handleFilter}/>
             </Suspense>
             <div className="h-full flex flex-col">
-                <div className="mb-4">
+                <div className="mb-2">
                     <Header title={"Transaction List"} textAlign="center"/>
                     <div className="flex items-center gap-2">
                         <SearchBar
