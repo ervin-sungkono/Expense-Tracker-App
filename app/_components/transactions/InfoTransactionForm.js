@@ -26,7 +26,7 @@ export default function InfoTransactionForm({ transaction, hideFn }) {
         },
         {
             label: "Category",
-            value: transaction.category
+            value: transaction.category.name
         },
         {
             label: "Shop",
@@ -36,7 +36,7 @@ export default function InfoTransactionForm({ transaction, hideFn }) {
         {
             label: "Owner",
             value: transaction.owner,
-            isHidden: transaction.owenr == null
+            isHidden: transaction.owner == null
         },
         {
             label: "Notes",

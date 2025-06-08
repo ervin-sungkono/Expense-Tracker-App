@@ -1,14 +1,9 @@
 'use client'
 import { useEffect, useState } from "react"
 
-export default function CategoryTab({ selected = null, onChange }) {
+export default function CategoryTab({ selected = null, onChange, excluded = [] }) {
     const [selectedTab, setSelectedTab] = useState(selected);
     const [selectedIndex, setSelectedIndex] = useState(0);
-
-    useEffect(() => {
-        setSelectedIndex(tabs.findIndex(tab => tab.id === selectedTab));
-        onChange && onChange(selectedTab);
-    }, [selectedTab])
 
     const handleSelectTab = (id) => {
         setSelectedTab(id);
@@ -18,10 +13,16 @@ export default function CategoryTab({ selected = null, onChange }) {
         {id: 'Expense', label: 'Expense'},
         {id: 'Income', label: 'Income'},
         {id: 'DebtLoan', label: 'Debt/Loan'},
-    ]
+    ].filter(tab => !excluded.includes(tab.id))
 
     useEffect(() => {
-        if(!selectedTab) setSelectedTab(tabs[0].id)
+        if(!selectedTab) {
+            setSelectedTab(tabs[0].id);
+            return;
+        }
+
+        setSelectedIndex(tabs.findIndex(tab => tab.id === selectedTab));
+        onChange && onChange(selectedTab);
     }, [selectedTab])
 
     return(
