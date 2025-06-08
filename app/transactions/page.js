@@ -104,9 +104,11 @@ export default function Transactions() {
                 if(!transactionMap[dateKey]) {
                     transactionMap[dateKey] = {
                         date: new Date(dateKey),
+                        totalAmount: transaction.amount,
                         data: [transaction]
                     }
                 } else {
+                    transactionMap[dateKey].totalAmount += transaction.amount;
                     transactionMap[dateKey].data.unshift(transaction);
                 }
             })
