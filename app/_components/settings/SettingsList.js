@@ -1,7 +1,7 @@
 'use client';
 import List from "../common/List"
 import CategoryList from "../common/CategoryList";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import Button from "../common/Button";
 import { db } from "@/app/_lib/db";
 import { saveAs } from "file-saver";
@@ -26,6 +26,8 @@ export default function SettingsList() {
     const [exportDescription, setExportDescription] = useState(null);
     const [installPrompt, setInstallPrompt] = useState(null);
     const [installDisable, setInstallDisable] = useState(false);
+
+    const switchRef = useRef(null);
 
     const exportCallback = ({ totalRows, completedRows, done }) => {
         setExportDescription(`${completedRows} out of ${totalRows} rows downloaded.`)
@@ -105,7 +107,10 @@ export default function SettingsList() {
             id: 'theme',
             title: 'Theme',
             description: 'Set theme preferences',
-            control: <ThemeSwitch/>
+            onClick: () => {
+                switchRef.current?.toggle();
+            },
+            control: <ThemeSwitch ref={switchRef}/>
         },
         {
             id: 'import-data',
