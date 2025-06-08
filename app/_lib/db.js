@@ -34,6 +34,7 @@ function isInDateRange(date, range) {
 class ExpenseDB extends Dexie {
     constructor() {
         super(DB_NAME);
+        console.log('CONSTRUCTING DATABASE CLASS');
 
         this.version(1).stores({
             expenses: '++id, date, amount, categoryId, shopId, remarks',
@@ -48,13 +49,14 @@ class ExpenseDB extends Dexie {
             budgets: '++id, amount, categoryId, start_date, end_date, repeat',
             shops: '++id, name, image, location'
         }).upgrade(async() => {
-            await this.delete();
+            await this.resetDB();
         });
 
         this.on('populate', () => this.populate());
     }
 
     async populate() {
+        console.log('POPULATING DATA');
         await this.transactions.bulkAdd(generateTransactions(10000));
 
         await this.categories.bulkAdd(getCategories());
