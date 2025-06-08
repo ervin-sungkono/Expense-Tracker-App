@@ -16,31 +16,18 @@ export default function CategoriesCarousel() {
     const [categoryData, setCategoryData] = useState(null);
     const [showDialog, setShowDialog] = useState(false);
     const [showAdd, setShowAdd] = useState(false);
-    const transactions = useLiveQuery(() => db.getAllTransactions());
+    const transactions = useLiveQuery(() => db.getMonthTransactions());
     const categories = useLiveQuery(() => db.getAllCategories());
-
-    const filterTransactionByMonth = (month) => {
-        if(!month) {
-            month = new Date().getMonth(); // current month
-        }
-
-        const isSameMonth = (targetDate) => {
-            return new Date(targetDate).getMonth() === month && new Date(targetDate).getFullYear() === new Date().getFullYear();
-        }
-
-        return transactions.filter(transaction => isSameMonth(transaction.date));
-    }
 
     useEffect(() => {
         if(transactions && categories) {
-            const filteredTransactions = filterTransactionByMonth();
             const categoriesMap = {};
             for(let i = 0; i < categories.length; i++) {
                 categoriesMap[categories[i].id] = {...categories[i], total: 0};
             }
 
-            for(let i = 0; i < filteredTransactions.length; i++) {
-                if(filteredTransactions[i].categoryId) categoriesMap[filteredTransactions[i].categoryId].total += Number(filteredTransactions[i].amount);
+            for(let i = 0; i < transactions.length; i++) {
+                if(transactions[i].categoryId) categoriesMap[transactions[i].categoryId].total += Number(transactions[i].amount);
             }
 
             setCategoryData([...Object.values(categoriesMap)]);
