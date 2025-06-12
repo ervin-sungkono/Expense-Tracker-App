@@ -176,7 +176,7 @@ export default function TransactionGraph({ transactionData = [], labels, type = 
                     options={chartOptions}
                 /> :
                 <div className="w-full h-full px-3 py-4">
-                    <div className="w-full h-full rounded-lg bg-neutral-200 dark:bg-neutral-800 animate-pulse"></div>
+                    <div className="w-full h-full rounded-lg bg-neutral-300 dark:bg-neutral-800 animate-pulse"></div>
                 </div>
             }
             <div className="w-full px-4 mt-2 pb-4">

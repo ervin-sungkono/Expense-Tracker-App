@@ -38,7 +38,7 @@ export default function CategoriesCarousel() {
         return (
             <div className="mb-4">
                 <SubHeader loading title="Categories" description={"based on this month's remaining budget"} link="/categories"/>
-                <div className="h-28 w-screen bg-neutral-200 dark:bg-neutral-800 animate-pulse rounded-lg"></div>
+                <div className="h-28 w-screen bg-neutral-300 dark:bg-neutral-800 animate-pulse rounded-lg"></div>
             </div>
         )
     } else {
