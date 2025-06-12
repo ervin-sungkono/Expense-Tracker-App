@@ -57,25 +57,30 @@ input::-webkit-inner-spin-button {
 }
 
 input[type=number],
-input[type="date"] {
+input[type="date"],
+input[type="datetime-local"] {
     -moz-appearance:textfield; /* Firefox */
     position: relative;
     z-index: 2;
     background: transparent;
 }
 
-input[type="date"] {
+input[type="date"],
+input[type="datetime-local"] {
   appearance: none;
   -webkit-appearance: none;
 }
 
 input[type="date"]::-webkit-inner-spin-button,
-input[type="date"]::-webkit-calendar-picker-indicator {
+input[type="date"]::-webkit-calendar-picker-indicator,
+input[type="datetime-local"]::-webkit-inner-spin-button,
+input[type="datetime-local"]::-webkit-calendar-picker-indicator {
   appearance: none;
   -webkit-appearance: none;
 }
 
-input[type="date"]::-webkit-calendar-picker-indicator {
+input[type="date"]::-webkit-calendar-picker-indicator,
+input[type="datetime-local"]::-webkit-calendar-picker-indicator {
   opacity: 0;
   position: absolute;
   left: 0; /* Ensures the calendar still shows up */
