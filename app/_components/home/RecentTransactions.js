@@ -25,7 +25,7 @@ export default function RecentTransactions() {
         return (
             <div className="mb-4">
                 <SubHeader title={"Recent Transactions"} linkLabel="See all" link={"/transactions"} loading/>
-                <div className="h-48 bg-white dark:bg-neutral-800 rounded-lg py-1.5 animate-pulse"></div>
+                <div className="h-48 bg-neutral-300 dark:bg-neutral-800 rounded-lg py-1.5 animate-pulse"></div>
             </div>
         )
     }

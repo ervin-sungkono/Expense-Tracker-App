@@ -83,7 +83,7 @@ export default function TransactionReport() {
                         _options={weekOptions}
                         onChange={(val) => setSelectedWeek(val)}
                     /> :
-                    <div className="w-full h-full rounded-md bg-neutral-200 dark:bg-neutral-600 animate-pulse"></div>}
+                    <div className="w-full h-full rounded-md bg-neutral-300 dark:bg-neutral-600 animate-pulse"></div>}
                     <SelectField
                         name={"month"}
                         placeholder={"Month"}
@@ -101,7 +101,7 @@ export default function TransactionReport() {
                         _options={yearOptions}
                         onChange={(val) => setSelectedYear(val)}
                     /> :
-                    <div className="w-full h-full rounded-md bg-neutral-200 dark:bg-neutral-600 animate-pulse"></div>}
+                    <div className="w-full h-full rounded-md bg-neutral-300 dark:bg-neutral-600 animate-pulse"></div>}
                 </div>
             ),
             component: <TransactionGraph 
@@ -133,7 +133,7 @@ export default function TransactionReport() {
                         _options={yearOptions}
                         onChange={(val) => setSelectedYear(val)}
                     /> :
-                    <div className="w-full h-full rounded-md bg-neutral-200 dark:bg-neutral-600 animate-pulse"></div>}
+                    <div className="w-full h-full rounded-md bg-neutral-300 dark:bg-neutral-600 animate-pulse"></div>}
                 </div>
             ),
             component: <TransactionGraph 

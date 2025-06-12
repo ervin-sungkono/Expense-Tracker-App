@@ -44,7 +44,7 @@ export default function ShopsCarousel() {
         return (
             <div className="mb-4">
                 <SubHeader title="Shops" description={"based on this month's visits"} link="/shops" loading/>
-                <div className="h-56 w-screen bg-neutral-200 dark:bg-neutral-800 animate-pulse rounded-lg"></div>
+                <div className="h-56 w-screen bg-neutral-300 dark:bg-neutral-800 animate-pulse rounded-lg"></div>
             </div>
         )
     }
