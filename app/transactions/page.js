@@ -87,7 +87,7 @@ export default function Transactions() {
 
             const transactionMap = {};
             transactionData.forEach(transaction => {
-                const dateKey = transaction.date.split('T')[0];
+                const dateKey = transaction.date.toISOString().split('T')[0];
 
                 if(!transactionMap[dateKey]) {
                     transactionMap[dateKey] = {
@@ -102,7 +102,7 @@ export default function Transactions() {
                     }
                     
                     transactionMap[dateKey].totalAmount += transaction.amount * modifier;
-                    transactionMap[dateKey].data.unshift(transaction);
+                    transactionMap[dateKey].data.push(transaction);
                 }
             })
 

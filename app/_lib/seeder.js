@@ -23,7 +23,7 @@ export function generateTransactions(count) {
     const transactions = [];
     
     for(let i = 0; i < count; i++) {
-        const date = getRandomDate(start, end).toISOString().slice(0, 16);
+        const date = getRandomDate(start, end);
         const amount = randomBetween(1000, 50000);
         const categoryId = randomBetween(1, 12);
         const category = categoryMap.get(String(categoryId));
