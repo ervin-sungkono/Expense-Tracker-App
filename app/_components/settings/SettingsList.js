@@ -1,18 +1,20 @@
 'use client';
+import dynamic from "next/dynamic";
 import List from "../common/List"
-import CategoryList from "../common/CategoryList";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Button from "../common/Button";
 import { db } from "@/app/_lib/db";
 import { saveAs } from "file-saver";
 import ThemeSwitch from "../common/ThemeSwitch";
 import Dialog from "../common/Dialog";
-import ImportDataForm from "./ImportDataForm";
-import DeleteAccountForm from "./DeleteAccountForm";
 import Page from "../common/Page";
-import AboutApp from "./AboutApp";
-import ChangeUsernameForm from "./ChangeUsernameForm";
 // import ChangeCurrencyDialog from "./ChangeCurrencyDialog";
+
+const CategoryList = dynamic(() => import("../common/CategoryList"));
+const AboutApp = dynamic(() => import("../settings/AboutApp"));
+const ImportDataForm = dynamic(() => import("./ImportDataForm"));
+const DeleteAccountForm = dynamic(() => import("./DeleteAccountForm"));
+const ChangeUsernameForm = dynamic(() => import("./ChangeUsernameForm"));
 
 export default function SettingsList() {
     const [showCategory, setShowCategory] = useState(false);
@@ -143,10 +145,13 @@ export default function SettingsList() {
     return(
         <>
             <List items={SETTING_ITEMS}/>
-            <CategoryList
+            <Page
+                title={"Category List"}
                 show={showCategory}
                 hideFn={() => setShowCategory(false)}
-            />
+            >
+                <CategoryList/>
+            </Page>
             <Button style="danger" label={"Delete Account"} onClick={() => setDeleteAccount(true)} className="mt-8 pb-4"/>
             <Dialog
                 show={showUsername}
@@ -172,6 +177,7 @@ export default function SettingsList() {
                 <DeleteAccountForm onCancel={() => setDeleteAccount(false)}/>
             </Dialog>
             <Page
+                title={"About Xpensed"}
                 show={showAbout}
                 hideFn={() => setShowAbout(false)}
             >
