@@ -146,6 +146,7 @@ export default function TransactionGraph({ transactionData = [], labels, type = 
                         }
                     },
                     y: {
+                        beginAtZero: true,
                         ticks: {
                             callback: (value) => {
                                 return nFormatter(value, 0);
