@@ -124,3 +124,38 @@ export function getDebtLoanType(name) {
 export function getWeeks(month, year){
     return Array(new Date(year, month, 0).getDate()).fill(0).map((_,i) => new Date(year, month-1, i+1)).map((d,i,a) => !i && d.getDay() ? [Array(d.getDay()).fill(null), d.getDate()] : d.getDate() === a.length && d.getDay() < 6 ? [d.getDate(), Array(6-d.getDay()).fill(null)] : d.getDate()).flat(2).map((d,i,a) => a.length ? a.splice(0,7) : null).filter(w => w);
 }
+
+
+export function isInAmountRange(amount, range) {
+    const [min, max] = range;
+
+    if(min && amount < min) return false;
+    if(max && amount > max) return false;
+
+    return true
+}
+
+/**
+ * 
+ * @param {Date} date 
+ * @param {Date[]} range 
+ * @returns 
+ */
+export function isInDateRange(date, range) {
+    const [min, max] = range;
+
+    const currTime = new Date(date).getTime();
+    if(min && currTime < new Date(min).getTime()) return false;
+    if(max && currTime > new Date(max).getTime()) return false;
+
+    return true
+}
+
+/**
+ * 
+ * @param {Date} date 
+ * @returns Value in datetime-local input format
+ */
+export function dateToLocalInput(date = new Date()) {
+    return date.toISOString().slice(0, 16);
+}

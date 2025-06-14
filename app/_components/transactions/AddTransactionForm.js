@@ -10,6 +10,7 @@ import { DateValidator, NumberValidator, StringValidator } from "@/app/_lib/vali
 import Page from "../common/Page";
 import SelectCategory from "../categories/SelectCategory";
 import Image from "next/image";
+import { dateToLocalInput } from "@/app/_lib/utils";
 
 export default function AddTransactionForm({ transaction = {}, onSubmit }) {
     const categories = useLiveQuery(() => db.getAllCategories());
@@ -83,6 +84,7 @@ export default function AddTransactionForm({ transaction = {}, onSubmit }) {
             }
 
             payload.amount = Number(payload.amount); // ensure that value stored is Number type
+            payload.date = new Date(payload.date);
             if(transaction.id) {
                 db.updateTransaction(transaction.id, payload);
             } else {
@@ -126,7 +128,7 @@ export default function AddTransactionForm({ transaction = {}, onSubmit }) {
                         name={"date"} 
                         label={"Date"} 
                         type={"datetime-local"}
-                        defaultValue={transaction.date ?? new Date().toISOString().slice(0,16)}
+                        defaultValue={transaction.date ? dateToLocalInput(transaction.date) : dateToLocalInput()}
                         errorMessage={errorMessage?.date}
                     />
                     <InputField 

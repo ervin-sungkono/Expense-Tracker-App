@@ -1,37 +1,16 @@
 import Dexie from "dexie";
 import { generateBudgets, generateTransactions, getCategories, getShops } from "./seeder";
+import { isInAmountRange, isInDateRange } from "./utils";
 
 const DB_NAME = "ExpenseDB";
 const DB_VERSION = 2;
 
-function isSameMonth(targetDate){
-    const date = new Date();
-    const year = date.getFullYear();
-    const month =  date.getMonth();
-
-    return new Date(targetDate).getMonth() === month && new Date(targetDate).getFullYear() === year;
-}
-
-function isInAmountRange(amount, range) {
-    const [min, max] = range;
-
-    if(min && amount < min) return false;
-    if(max && amount > max) return false;
-
-    return true
-}
-
-function isInDateRange(date, range) {
-    const [min, max] = range;
-
-    const currTime = new Date(date).getTime();
-    if(min && currTime < new Date(min).getTime()) return false;
-    if(max && currTime > new Date(max).getTime()) return false;
-
-    return true
-}
-
+/**
+ * @extends Dexie
+ */
 class ExpenseDB extends Dexie {
+    static instance;
+
     constructor() {
         super(DB_NAME);
         console.log('CONSTRUCTING DATABASE CLASS');
@@ -55,9 +34,21 @@ class ExpenseDB extends Dexie {
         this.on('populate', () => this.populate());
     }
 
+    /**
+     * 
+     * @returns {ExpenseDB} static database instance.
+     */
+    static getInstance() {
+        if(!this.instance) {
+            this.instance = new ExpenseDB();
+        }
+        
+        return this.instance;
+    }
+
     async populate() {
         console.log('POPULATING DATA');
-        await this.transactions.bulkAdd(generateTransactions(10000));
+        await this.transactions.bulkAdd(generateTransactions(100000));
 
         await this.categories.bulkAdd(getCategories());
 
@@ -71,11 +62,14 @@ class ExpenseDB extends Dexie {
     }
 
     getMonthTransactions() {
-        return this.transactions
-            .filter(transaction => {
-                return isSameMonth(transaction.date)
-            })
-            .toArray();
+        const date = new Date();
+        const month = date.getMonth();
+        const year = date.getFullYear();
+
+        const firstDay = new Date(year, month, 1, 0); // first day of the month
+        const lastDay = new Date(year, month + 1, 0, 23, 59, 59); // last day of the month
+
+        return this.transactions.where('date').between(firstDay, lastDay).toArray();
     }
 
     getTransactionsByCategory(categoryId) {
@@ -156,9 +150,8 @@ class ExpenseDB extends Dexie {
 
     getActiveBudget(dateRange) {
         return this.budgets
-            .filter(budget => {
-                return isInDateRange(budget.start_date, dateRange) && isInDateRange(budget.end_date, dateRange);
-            })
+            .where('start_date')
+            .between(dateRange[0], dateRange[1])
             .toArray();
     }
 
@@ -257,4 +250,4 @@ class ExpenseDB extends Dexie {
     }
 }
 
-export const db = new ExpenseDB();
+export const db = ExpenseDB.getInstance();

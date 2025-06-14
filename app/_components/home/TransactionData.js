@@ -48,7 +48,7 @@ export default function TransactionData() {
                 const date = new Date(transaction.date);
                 const month = date.getMonth();
                 const year = date.getFullYear();
-                const dateKey = transaction.date.split('T')[0];
+                const dateKey = transaction.date.toISOString().split('T')[0];
                 const monthKey = `${year}-${month}`
 
                 newDateMap[dateKey] = (newDateMap[dateKey] || []).concat(transaction);
