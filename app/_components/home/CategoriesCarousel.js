@@ -9,6 +9,7 @@ import CategoryCard from "./CategoryCard"
 import CategoryList from "../common/CategoryList"
 import Button from "../common/Button"
 import Dialog from "../common/Dialog"
+import Page from "../common/Page"
 
 const AddCategoryForm = dynamic(() => import("../categories/AddCategoryForm"))
 
@@ -58,10 +59,13 @@ export default function CategoriesCarousel() {
                     <p className="text-sm md:text-base text-center font-medium text-dark/80 dark:text-white/80">No category found, please create a new category</p>
                     <Button onClick={() => setShowAdd(true)} label="Add New Category" contained/>
                 </div>}
-                <CategoryList
+                <Page
+                    title={"Category List"}
                     show={showDialog}
                     hideFn={() => setShowDialog(false)}
-                />
+                >
+                    <CategoryList/>
+                </Page>
                 <Dialog
                     show={showAdd}
                     hideFn={() => setShowAdd(false)}

@@ -2,7 +2,6 @@
 import { useEffect, useRef, useState } from "react";
 import VirtualizedCategoryList from "../categories/VirtualizedCategoryList";
 import Button from "./Button";
-import Page from "./Page";
 import CategoryTab from "../categories/CategoryTab";
 import { useLiveQuery } from "dexie-react-hooks";
 import { db } from "@/app/_lib/db";
@@ -11,7 +10,7 @@ import Dialog from "./Dialog";
 
 const AddCategoryForm = dynamic(() => import("../categories/AddCategoryForm"))
 
-export default function CategoryList({ show, hideFn }) {
+export default function CategoryList() {
     const [showDialog, setShowDialog] = useState(false);
     const [categoryData, setCategoryData] = useState(null);
     const [selectedType, setSelectedType] = useState('Expense');
@@ -60,29 +59,23 @@ export default function CategoryList({ show, hideFn }) {
     }, [categoryData, selectedType])
 
     return(
-        <Page
-            title={"Category List"}
-            show={show}
-            hideFn={hideFn}
-        >
-            <div className="grow flex flex-col">
-                <CategoryTab selected={selectedType} onChange={(type) => setSelectedType(type)}/>
-                <div className="grow">
-                    <VirtualizedCategoryList
-                        ref={categoryRef}
-                        items={categoryData?.[selectedType]}
-                    />
-                </div>
-                <div className="flex justify-center mt-2">
-                    <Button label={"Add New Category"} onClick={() => setShowDialog(true)}/>
-                </div>
-                <Dialog
-                    show={showDialog}
-                    hideFn={() => setShowDialog(false)}
-                >
-                    <AddCategoryForm onSubmit={() => setShowDialog(false)}/>
-                </Dialog>
+        <div className="grow flex flex-col">
+            <CategoryTab selected={selectedType} onChange={(type) => setSelectedType(type)}/>
+            <div className="grow">
+                <VirtualizedCategoryList
+                    ref={categoryRef}
+                    items={categoryData?.[selectedType]}
+                />
             </div>
-        </Page>
+            <div className="flex justify-center mt-2">
+                <Button label={"Add New Category"} onClick={() => setShowDialog(true)}/>
+            </div>
+            <Dialog
+                show={showDialog}
+                hideFn={() => setShowDialog(false)}
+            >
+                <AddCategoryForm onSubmit={() => setShowDialog(false)}/>
+            </Dialog>
+        </div>
     )
 }
