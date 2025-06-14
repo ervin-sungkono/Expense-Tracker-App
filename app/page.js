@@ -26,7 +26,7 @@ export default function Onboarding() {
       return <Loading/>
     }
     return (
-        <Layout pathname="/" hideNavbar>
+        <Layout pathname="/" hideNavbar hideActionBar>
             <AppLogo position="center" className="mb-12"/>
             <SplashImage className="mb-10"/>
             <TextContent 

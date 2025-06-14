@@ -48,7 +48,7 @@ class ExpenseDB extends Dexie {
 
     async populate() {
         console.log('POPULATING DATA');
-        await this.transactions.bulkAdd(generateTransactions(100000));
+        await this.transactions.bulkAdd(generateTransactions(10000));
 
         await this.categories.bulkAdd(getCategories());
 

@@ -44,7 +44,7 @@ export default function Register() {
         return <Loading/>
     }
     return(
-        <Layout pathname={'/register'} hideNavbar>
+        <Layout pathname={'/register'} hideNavbar hideActionBar>
             <div className="h-full flex flex-col justify-center gap-4">
                 <TextContent
                     title={"Get Started"}

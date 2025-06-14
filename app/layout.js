@@ -18,7 +18,7 @@ export default function RootLayout({ children }) {
         <ThemeProvider enableColorScheme enableSystem>
           {children}
         </ThemeProvider>
-        <GoogleAnalytics gaId="G-FG6W314EEP"/>
+        { process.env.NODE_ENV === 'production' && <GoogleAnalytics gaId="G-FG6W314EEP"/>}
       </body>
     </html>
   );

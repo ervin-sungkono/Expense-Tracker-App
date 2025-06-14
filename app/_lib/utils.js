@@ -57,6 +57,15 @@ export function generateRangeOptions(start, end) {
     return range;
 }
 
+export function generateAsterisks(length) {
+    let res = '';
+
+    for(let i = 0; i < length; i++) {
+        res += '*';
+    }
+
+    return res;
+}
 
 export function formatCurrency(value, locale = 'id-ID', currency = 'IDR') {
     const formatter = new Intl.NumberFormat(locale, { style: 'currency', currency, minimumFractionDigits: 0 });
@@ -144,11 +153,15 @@ export function isInAmountRange(amount, range) {
 export function isInDateRange(date, range) {
     const [min, max] = range;
 
-    const currTime = new Date(date).getTime();
+    const currTime = date.getTime();
     if(min && currTime < new Date(min).getTime()) return false;
     if(max && currTime > new Date(max).getTime()) return false;
 
     return true
+}
+
+function zeroBased(value) {
+    return value < 10 ? `0${value}` : `${value}`;
 }
 
 /**
@@ -157,5 +170,12 @@ export function isInDateRange(date, range) {
  * @returns Value in datetime-local input format
  */
 export function dateToLocalInput(date = new Date()) {
-    return date.toISOString().slice(0, 16);
+    const year = date.getFullYear();
+    const month = zeroBased(date.getMonth() + 1);
+    const day = zeroBased(date.getDate());
+    const hour = zeroBased(date.getHours());
+    const minute = zeroBased(date.getMinutes());
+
+    const dateString = `${year}-${month}-${day}T${hour}:${minute}`;
+    return dateString;
 }
