@@ -28,25 +28,42 @@ body {
 }
 
 @media screen and (min-width: 720px) {
-    /* width */
-    ::-webkit-scrollbar {
-      width: 8px;
-    }
+  /* width */
+  ::-webkit-scrollbar {
+    @apply w-2;
+  }
 
+  /* Track */
+  ::-webkit-scrollbar-track {
+    @apply bg-neutral-100;
+  }
+
+  /* Handle */
+  ::-webkit-scrollbar-thumb {
+    @apply bg-neutral-300 rounded-full;
+  }
+
+  /* Handle on hover */
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-neutral-400;
+  } 
+
+  [data-theme='dark'] {
     /* Track */
     ::-webkit-scrollbar-track {
-      @apply bg-neutral-100 dark:bg-neutral-600
+      @apply bg-neutral-600;
     }
 
     /* Handle */
     ::-webkit-scrollbar-thumb {
-      @apply bg-neutral-300 dark:bg-neutral-800 rounded-full
+      @apply bg-neutral-800;
     }
 
     /* Handle on hover */
     ::-webkit-scrollbar-thumb:hover {
-      @apply bg-neutral-400 dark:bg-neutral-800
+      @apply bg-neutral-700;
     } 
+  }
 }
 
 input::-webkit-outer-spin-button,
