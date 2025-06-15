@@ -32,7 +32,7 @@ export default function RecentTransactions() {
     return(
         <div className="mb-4">
             <SubHeader title={"Recent Transactions"} linkLabel="See all" link={"/transactions"}/>
-            <div className="bg-white dark:bg-neutral-800 rounded-lg py-1.5">
+            <div className="bg-light dark:bg-neutral-800 rounded-lg py-1.5">
                 {transactionData.length > 0 ? 
                 transactionData.map(transaction => (
                     <TransactionCard key={transaction.id} transaction={transaction}/>

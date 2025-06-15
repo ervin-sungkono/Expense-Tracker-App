@@ -56,7 +56,7 @@ export default function ImageUploader({ label, name, initialValue, dropzoneOptio
         <div className="w-full flex flex-col gap-2">
             {label && <div className="block font-semibold text-xs md:text-sm text-dark-blue">{label} {dropzoneOptions.maxSize && <span>(max {(dropzoneOptions.maxSize / (1000 * 1000)).toFixed(0)}</span>} MB)</div>}
             <div {...getRootProps({className: 'relative dropzone cursor-pointer border focus:border-sky-blue border-deep-blue dark:border-ocean-blue/60 px-3 md:px-4 py-2 md:py-2.5 rounded-md'})}>
-                <div className="relative flex justify-center items-center w-full h-48 bg-neutral-100 dark:bg-neutral-600 rounded-sm mb-2">
+                <div className="relative flex justify-center items-center w-full h-48 bg-neutral-200 dark:bg-neutral-600 rounded-sm mb-2">
                     {previewImage ? 
                     <Image src={previewImage} alt="Preview Image" fill className="object-contain aspect-square"/> :
                     <p className="text-dark/80 dark:text-white/80 font-semibold">Preview Image</p>}
@@ -65,7 +65,7 @@ export default function ImageUploader({ label, name, initialValue, dropzoneOptio
                 <input {...getInputProps()} />
                 <p className="text-xs md:text-sm text-dark/80 dark:text-white/80 text-center">Drag and drop file here, or click to select from folder</p>
                 {errorMessage && <p className="text-center text-[10.8px] md:text-xs text-red-600 dark:text-red-400 mt-1">{errorMessage}</p>}
-                {previewImage && <button type="button" className="absolute cursor-pointer p-2 bg-basic-gradient rounded-bl-lg right-0 top-0" onClick={removePreview}>
+                {previewImage && <button type="button" className="absolute cursor-pointer p-2 bg-basic-gradient rounded-bl-lg right-0 top-0 text-white" onClick={removePreview}>
                     <CloseIcon size={20}/>
                 </button>}
             </div>

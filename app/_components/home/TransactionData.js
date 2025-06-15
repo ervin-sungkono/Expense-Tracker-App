@@ -122,7 +122,7 @@ export default function TransactionData() {
 
     return(
         <div className="mb-4">
-            <SubHeader loading={!transactions} title="My Transaction" link="/transactions"/>
+            <SubHeader loading={!transactions} title="My Transactions" linkLabel="See Reports" onClick={() => console.log('reports')}/>
             <Tab selected={'daily'} contents={contents}/>
         </div>
     )

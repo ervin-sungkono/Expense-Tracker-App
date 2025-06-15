@@ -18,7 +18,7 @@ const renderItem = (item) => {
         <p className='font-semibold text-sm md:text-base'>{formatDateString(item.date)}</p>
         <p className={`font-semibold text-sm md:text-base ${item.totalAmount < 0 ? 'text-red-500 dark:text-red-400' : 'text-ocean-blue'}`}>{formatCurrency(item.totalAmount)}</p>
       </div>
-      <div className='bg-white dark:bg-neutral-800 rounded-md'>
+      <div className='bg-light dark:bg-neutral-800 rounded-md'>
         {item.data?.map(transaction => (
           <TransactionCard key={transaction.id} transaction={transaction}/>
         ))}
