@@ -13,10 +13,10 @@ export default function ShopCard({ name, image, location, totalVisit, averageTra
 
     return(
         <Link scroll={false} href={`/transactions?shop=${encodeURIComponent(name)}`} className="w-full flex flex-col">
-            <div className="relative w-full aspect-video bg-white dark:bg-neutral-800 rounded-t-lg overflow-hidden">
+            <div className="relative w-full aspect-video bg-light dark:bg-neutral-800 rounded-t-lg overflow-hidden">
                 {image && <Image src={image} className="object-contain" fill alt={`${name} Image`}/>}
             </div>
-            <div className="pt-2.5 pb-4 px-4 rounded-b-lg bg-white dark:bg-neutral-800">
+            <div className="pt-2.5 pb-4 px-4 rounded-b-lg bg-light dark:bg-neutral-800">
                 <p className="text-base md:text-lg font-semibold mb-2">{name}</p>
                 <div className="flex flex-col gap-1">
                     <div className="text-sm text-dark/80 dark:text-white/80 flex items-center gap-1">

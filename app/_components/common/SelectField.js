@@ -17,6 +17,7 @@ export default function SelectField({ customSelected, label, name, required = fa
 
     useEffect(() => {
         if(dropdownRef?.current && showOption && selected?.id) {
+            dropdownRef.current.scrollIntoView({ block: 'nearest' });
             dropdownRef.current.querySelector(`#${name}-${selected.id}`).scrollIntoView({ block: 'nearest' });
         }
     }, [showOption, dropdownRef, selected])
@@ -46,7 +47,7 @@ export default function SelectField({ customSelected, label, name, required = fa
                 {!overrideOnClick &&
                 <div className={`${showOption ? 'block' : 'hidden'}`}>
                     <div className="fixed top-0 left-0 w-full h-full bg-transparent z-10" onClick={() => setShowOption(false)}></div>
-                    <div ref={dropdownRef} className="min-w-40 max-w-72 max-h-96 overflow-y-auto absolute left-0 -bottom-2 translate-y-full shadow-lg bg-white dark:bg-neutral-600 py-2 rounded-md z-50">
+                    <div ref={dropdownRef} className="min-w-40 max-w-72 max-h-96 overflow-y-auto absolute left-0 -bottom-2 translate-y-full shadow-lg bg-light dark:bg-neutral-600 py-2 rounded-md z-50">
                         {options.map(option => (
                             <div 
                                 id={`${name}-${option.id}`}
