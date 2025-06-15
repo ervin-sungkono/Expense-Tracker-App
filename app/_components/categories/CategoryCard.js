@@ -45,7 +45,7 @@ function CategoryCard({ category, onClick, style, depth = 0 }) {
     return(
         <div style={{...style, marginLeft: `${24 * depth}px`}}>
             <div className="h-14 relative border-b border-dark/20 dark:border-white/20">
-                <div onClick={handleCategoryClick} className={`py-2 flex ${onClick ? 'cursor-pointer active:bg-neutral-300/30 active:dark:bg-neutral-800/30' : ''}`}>
+                <div onClick={handleCategoryClick} className={`py-2 flex ${onClick ? 'cursor-pointer active:bg-neutral-300/30 dark:active:bg-light/10' : ''}`}>
                     <div className="w-full flex gap-2.5 items-center">
                         <div className="flex items-center gap-2 grow">
                             <div className="relative w-10 h-10 rounded-full bg-ocean-blue">
@@ -54,7 +54,7 @@ function CategoryCard({ category, onClick, style, depth = 0 }) {
                             <p className="text-sm md:text-base font-semibold grow">{name}</p>
                         </div>
                         {!onClick && 
-                        <div onClick={() => setShowMenu(true)} className="cursor-pointer p-2 rounded-full active:bg-neutral-300/30 active:dark:bg-neutral-800/30 transition-colors duration-150 ease-in-out">
+                        <div onClick={() => setShowMenu(true)} className="cursor-pointer p-2 rounded-full active:bg-neutral-300/30 dark:active:bg-light/10 transition-colors duration-150 ease-in-out">
                             <MoreIcon size={24}/>
                         </div>}
                     </div>
