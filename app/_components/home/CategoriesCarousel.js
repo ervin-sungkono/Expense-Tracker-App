@@ -6,16 +6,15 @@ import SubHeader from "./SubHeader"
 import { db } from "@/app/_lib/db"
 import { useEffect, useState } from "react"
 import CategoryCard from "./CategoryCard"
-import CategoryList from "../common/CategoryList"
 import Button from "../common/Button"
 import Dialog from "../common/Dialog"
-import Page from "../common/Page"
+import CategoryListPage from "../common/page/CategoryListPage"
 
 const AddCategoryForm = dynamic(() => import("../categories/AddCategoryForm"))
 
 export default function CategoriesCarousel() {
     const [categoryData, setCategoryData] = useState(null);
-    const [showDialog, setShowDialog] = useState(false);
+    const [showCategory, setShowCategory] = useState(false);
     const [showAdd, setShowAdd] = useState(false);
     const transactions = useLiveQuery(() => db.getMonthTransactions());
     const categories = useLiveQuery(() => db.getAllCategories());
@@ -45,7 +44,7 @@ export default function CategoriesCarousel() {
     } else {
         return(
             <div className="mb-4">
-                <SubHeader title="Categories" description={"based on this month's transaction"} onClick={() => setShowDialog(true)}/>
+                <SubHeader title="Categories" description={"based on this month's transaction"} onClick={() => setShowCategory(true)}/>
                 {categoryData.length > 0 ?
                 <SwiperContainer 
                     spaceBetween={12}
@@ -59,13 +58,10 @@ export default function CategoriesCarousel() {
                     <p className="text-sm md:text-base text-center font-medium text-dark/80 dark:text-white/80">No category found, please create a new category</p>
                     <Button onClick={() => setShowAdd(true)} label="Add New Category" contained/>
                 </div>}
-                <Page
-                    title={"Category List"}
-                    show={showDialog}
-                    hideFn={() => setShowDialog(false)}
-                >
-                    <CategoryList/>
-                </Page>
+                <CategoryListPage
+                    show={showCategory}
+                    hideFn={() => setShowCategory(false)}
+                />
                 <Dialog
                     show={showAdd}
                     hideFn={() => setShowAdd(false)}

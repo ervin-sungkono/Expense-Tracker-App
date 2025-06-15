@@ -7,10 +7,9 @@ import { useLiveQuery } from "dexie-react-hooks";
 import { useState } from "react";
 import Button from "../common/Button";
 import { DateValidator, NumberValidator, StringValidator } from "@/app/_lib/validator";
-import Page from "../common/Page";
-import SelectCategory from "../categories/SelectCategory";
 import Image from "next/image";
 import { dateToLocalInput } from "@/app/_lib/utils";
+import SelectCategoryPage from "../common/page/SelectCategoryPage";
 
 export default function AddTransactionForm({ transaction = {}, onSubmit }) {
     const categories = useLiveQuery(() => db.getAllCategories());
@@ -179,20 +178,16 @@ export default function AddTransactionForm({ transaction = {}, onSubmit }) {
                 </div>
                 <Button type="submit" label={getDialogAction()}/>
             </form>
-            <Page
-                title={"Select Category"}
+            <SelectCategoryPage
                 show={selectCategory}
                 hideFn={() => setSelectCategory(false)}
-            >
-                <SelectCategory
-                    showTab
-                    hideCancelButton
-                    categories={categories}
-                    onCategorySelected={handleCategorySelect}
-                    onCancelSelection={handleCancelSelection}
-                    defaultType="Expense"
-                />
-            </Page>
+                showTab
+                hideCancelButton
+                categories={categories}
+                onCategorySelected={handleCategorySelect}
+                onCancelSelection={handleCancelSelection}
+                defaultType="Expense"
+            />
         </div>
     )
 }

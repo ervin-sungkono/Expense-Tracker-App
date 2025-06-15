@@ -8,10 +8,8 @@ import { useEffect, useState } from "react";
 import Button from "../common/Button";
 import { StringValidator } from "@/app/_lib/validator";
 import { useLiveQuery } from "dexie-react-hooks";
-import Page from "../common/Page";
-
-const SelectIcon = dynamic(() => import("./SelectIcon"));
-const SelectCategory = dynamic(() => import("./SelectCategory"));
+import SelectIconPage from "../common/page/SelectIconPage";
+import SelectCategoryPage from "../common/page/SelectCategoryPage";
 
 export default function AddCategoryForm({ category = {}, onSubmit }) {
     const [errorMessage, setErrorMessage] = useState({});
@@ -189,26 +187,20 @@ export default function AddCategoryForm({ category = {}, onSubmit }) {
                     <Button type="submit" label={getDialogAction()}/>
                 </form>
             </div>
-            <Page
-                title={"Icon List"}
+            <SelectIconPage
                 show={selectIcon}
                 hideFn={() => setSelectIcon(false)}
-            >
-                <SelectIcon onIconSelected={handleSelectIcon}/>
-            </Page>
-           <Page
-                title={"Select Category"}
+                onIconSelected={handleSelectIcon}
+            />
+            <SelectCategoryPage
                 show={selectParent}
                 hideFn={() => setSelectParent(false)}
-           >
-                <SelectCategory
-                    showSearch
-                    categories={parentCategories?.filter(c => c.id !== category.id)}
-                    onCategorySelected={handleCategorySelect}
-                    onCancelSelection={handleCancelSelection}
-                    defaultType={selectedType}
-                />
-           </Page>      
+                showSearch
+                categories={parentCategories?.filter(c => c.id !== category.id)}
+                onCategorySelected={handleCategorySelect}
+                onCancelSelection={handleCancelSelection}
+                defaultType={selectedType}
+            />
         </>
     )
 }
