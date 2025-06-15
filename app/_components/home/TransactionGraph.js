@@ -32,8 +32,9 @@ ChartJS.register(
     Filler
 );
 
-export default function TransactionGraph({ transactionData = [], labels, type = 'MONTHLY', title = '' }) {
+export default function TransactionGraph({ transactionData = [], historyTransactionData = [], labels, historyLabels, type = 'MONTHLY', title = '' }) {
     const [data, setData] = useState(null);
+    const [historyData, setHistoryData] = useState(null);
     const [chartData, setChartData] = useState(null);
     const [chartOptions, setChartOptions] = useState(null);
     const [totalTransaction, setTotalTransaction] = useState(0);
@@ -73,6 +74,17 @@ export default function TransactionGraph({ transactionData = [], labels, type = 
         xlsx(data, settings);
     }
 
+    const getDatasetLabels = () => {
+        switch(type) {
+            case 'ANNUAL':
+                return ['This year', 'Last year']
+            case 'MONTHLY':
+                return ['This month', 'Last month']
+            case 'WEEKLY':
+                return ['This week', 'Last week']
+        }
+    }
+
     useEffect(() => {
         if(labels && transactionData && transactionData.length > 0) {
             const labelsMap = {}
@@ -80,7 +92,7 @@ export default function TransactionGraph({ transactionData = [], labels, type = 
             
             let totalTransaction = 0;
             transactionData.forEach(transaction => {
-                const date = new Date(transaction.date);
+                const date = transaction.date;
                 const month = date.getMonth();
                 const year = date.getFullYear();
 
@@ -98,17 +110,56 @@ export default function TransactionGraph({ transactionData = [], labels, type = 
             setData(Object.values(labelsMap));
             setTotalTransaction(totalTransaction);
         }
-    }, [labels, transactionData, type])
+
+        return () => {
+            setData(null);
+        }
+    }, [labels,  transactionData, type])
+
+    useEffect(() => {
+        if(historyLabels && historyTransactionData && historyTransactionData.length > 0) {
+            const historyLabelsMap = {};
+            historyLabels.forEach(label => historyLabelsMap[label] = 0);
+
+            historyTransactionData.forEach(transaction => {
+                const date = transaction.date;
+                const month = date.getMonth();
+                const year = date.getFullYear();
+
+                if(type === 'MONTHLY' || type === 'WEEKLY') {
+                    historyLabelsMap[formatDateString(date)] += transaction.amount;
+                } else if(type === 'ANNUAL') {
+                    historyLabelsMap[MONTHS[month]] += transaction.amount;
+                } else if(type === 'ALLTIME') {
+                    historyLabelsMap[year] += transaction.amount;
+                }
+            })
+
+            setHistoryData(Object.values(historyLabelsMap));
+        }
+
+        return () => {
+            setHistoryData(null);
+        }
+    }, [historyLabels, historyTransactionData, type])
 
     useEffect(() => {
         if(labels && data) {
             setChartData({
                 labels,
                 datasets: [{
-                    label: 'IDR Spent',
+                    label: getDatasetLabels()[0],
                     data,
                     borderColor: 'rgb(255, 99, 132)',
                     backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                    fill: 'start',
+                    tension: 0.1
+                },
+                {
+                    label: getDatasetLabels()[1],
+                    data: historyData ?? [],
+                    borderColor: 'rgb(128, 128, 128)',
+                    backgroundColor: 'rgba(128, 128, 128, 0.2)',
                     fill: 'start',
                     tension: 0.1
                 }]
@@ -160,7 +211,7 @@ export default function TransactionGraph({ transactionData = [], labels, type = 
                 }
             }); 
         }
-    }, [labels, data, type])
+    }, [labels, data, historyData, type])
 
     if(transactionData && transactionData.length === 0) return (
         <div className="flex justify-center items-center h-48 xs:h-64 px-3 py-4">
@@ -180,9 +231,9 @@ export default function TransactionGraph({ transactionData = [], labels, type = 
                     <div className="w-full h-full rounded-lg bg-neutral-300 dark:bg-neutral-800 animate-pulse"></div>
                 </div>
             }
-            <div className="w-full px-4 mt-2 pb-4">
+            {/* <div className="w-full px-4 mt-2 pb-4">
                 <Button label={"Download Report"} onClick={handleDownloadReport}/>
-            </div>
+            </div> */}
         </div>
     )
 }

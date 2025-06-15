@@ -4,7 +4,6 @@ import Tab from "../common/Tab";
 import TransactionGraph from "./TransactionGraph";
 import { db } from "@/app/_lib/db";
 import { useEffect, useState } from "react";
-import SubHeader from "./SubHeader";
 import SelectField from "../common/SelectField";
 import { MONTHS } from "@/app/_lib/const";
 import { getMonthlyLabels, getWeeklyLabels, getWeekNumber, getWeekRanges } from "@/app/_lib/utils";
@@ -13,7 +12,6 @@ export default function TransactionReport() {
     const transactions = useLiveQuery(() => db.getAllTransactions());
     const categories = useLiveQuery(() => db.getAllCategories());
     const shops = useLiveQuery(() => db.getAllShops());
-
     
     const [selectedWeek, setSelectedWeek] = useState(getWeekNumber(new Date));
     const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth());
@@ -27,6 +25,41 @@ export default function TransactionReport() {
     const [yearMap, setYearMap] = useState(null);
 
     const [selectedType, setSelectedType] = useState('Expense');
+
+    const getMonthKey = (year, month) => {
+        return `${year}-${month}`;
+    }
+
+    const getWeekKey = (year, week) => {
+        return `${year}W${week}`;
+    }
+
+    const getPreviousMonthKey = (year, month) => {
+        const date = new Date(year, month);
+        date.setMonth(date.getMonth() - 1);
+
+        return getMonthKey(date.getFullYear(), date.getMonth());
+    }
+
+    const getPreviousWeekKey = (year, week) => {
+        if(week > 1) {
+            return getWeekKey(year, week - 1);
+        }
+
+        // Since the week is not stored, this means there will be no data to return. Just return default 53 value
+        const lastYearWeekCount = weeks[year - 1]?.length ?? 53; 
+        return getWeekKey(year - 1, lastYearWeekCount);
+    }
+
+    const getPreviousWeek = (year, week) => {
+        if(week > 1) {
+            return weeks?.[year]?.[week - 2];
+        }
+
+        // Since the week is not stored, this means there will be no data to return. Just return default 53 value
+        const lastYearWeekCount = weeks[year - 1]?.length ?? 53; 
+        return weeks?.[year - 1]?.[lastYearWeekCount - 1];
+    }
 
     useEffect(() => {
         if(yearMap) {
@@ -138,8 +171,10 @@ export default function TransactionReport() {
             ),
             component: <TransactionGraph 
                 type="WEEKLY"
-                labels={(weeks && weeks[selectedYear]?.[selectedWeek - 1]?.labels)} 
-                transactionData={weekMap && weekMap[`${selectedYear}W${selectedWeek}`]?.[selectedType]}
+                labels={(weeks && weeks[selectedYear]?.[selectedWeek - 1]?.labels)}
+                historyLabels={(weeks && getPreviousWeek(selectedYear, selectedWeek)?.labels)} 
+                transactionData={weekMap && weekMap[getWeekKey(selectedYear, selectedWeek)]?.[selectedType]}
+                historyTransactionData={weekMap && weekMap[`${getPreviousWeekKey(selectedYear, selectedWeek)}`]?.[selectedType]}
                 title={`WEEK_${selectedWeek}_${selectedYear}`}
             />
         },
@@ -170,8 +205,10 @@ export default function TransactionReport() {
             ),
             component: <TransactionGraph 
                 type="MONTHLY" 
-                labels={getMonthlyLabels(selectedYear, selectedMonth)} 
-                transactionData={monthMap && monthMap[`${selectedYear}-${selectedMonth}`]?.[selectedType]} 
+                labels={getMonthlyLabels(selectedYear, selectedMonth)}
+                historyLabels={getMonthlyLabels(selectedYear, selectedMonth - 1)}
+                transactionData={monthMap && monthMap[getMonthKey(selectedYear, selectedMonth)]?.[selectedType]}
+                historyTransactionData={monthMap && monthMap[`${getPreviousMonthKey(selectedYear, selectedMonth)}`]?.[selectedType]}
                 title={`${MONTHS[selectedMonth]}_${selectedYear}`}
             />
         },
@@ -190,8 +227,10 @@ export default function TransactionReport() {
             ),
             component: <TransactionGraph 
                 type="ANNUAL" 
-                labels={MONTHS} 
-                transactionData={yearMap && yearMap[selectedYear]?.[selectedType]} 
+                labels={MONTHS}
+                historyLabels={MONTHS}
+                transactionData={yearMap && yearMap[selectedYear]?.[selectedType]}
+                historyTransactionData={yearMap && yearMap[selectedYear - 1]?.[selectedType]} 
                 title={`${selectedYear}`}
             />
         }
@@ -199,7 +238,6 @@ export default function TransactionReport() {
 
     return(
         <div className="mb-4">
-            <SubHeader loading={!transactions} title="Transaction Report"/>
             <Tab selected={'weekly'} contents={contents}/>
         </div>
     )
