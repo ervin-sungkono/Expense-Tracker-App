@@ -51,18 +51,13 @@ body {
   [data-theme='dark'] {
     /* Track */
     ::-webkit-scrollbar-track {
-      @apply bg-neutral-600;
+      @apply bg-neutral-700;
     }
 
     /* Handle */
     ::-webkit-scrollbar-thumb {
       @apply bg-neutral-800;
     }
-
-    /* Handle on hover */
-    ::-webkit-scrollbar-thumb:hover {
-      @apply bg-neutral-700;
-    } 
   }
 }
 
