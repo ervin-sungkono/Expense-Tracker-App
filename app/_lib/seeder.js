@@ -45,9 +45,8 @@ export function generateBudgets(count) {
     const end = new Date(); // Current date
 
     for(let i = 0; i < count; i++) {
-        const raw_start_date = getRandomDate(start, end);
-        const start_date = raw_start_date.toISOString().split('T')[0];
-        const end_date = getRandomDate(raw_start_date, end).toISOString().split('T')[0];
+        const start_date = getRandomDate(start, end);
+        const end_date = getRandomDate(start_date, end);
         const amount = randomBetween(1000, 50000);
         const categoryId = randomBetween(1, 12);
         const repeat = i % 5; // every 5 item will be repeatable budget

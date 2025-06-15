@@ -144,15 +144,29 @@ class ExpenseDB extends Dexie {
             .toArray();
     }
 
-    getAllBudgets() {
+    getAllBudgets({ active = false }) {
+        if(active) {
+            return this.budgets
+                .filter(budget => {
+                    if(!isInDateRange(new Date(), [budget.start_date, budget.end_date])) return false;
+                    return true;
+                })
+                .toArray();
+        }
         return this.budgets.toArray();
     }
 
-    getActiveBudget(dateRange) {
-        return this.budgets
-            .where('start_date')
-            .between(dateRange[0], dateRange[1])
-            .toArray();
+    getPaginatedBudgets(limit, { active = false } = {}) {
+        if(active) {
+            return this.budgets
+                .filter(budget => {
+                    if(!isInDateRange(new Date(), [budget.start_date, budget.end_date])) return false;
+                    return true;
+                })
+                .limit(limit)
+                .toArray();
+        }
+        return this.budgets.limit(limit).toArray();
     }
 
     addTransaction({ date, amount, categoryId, shopId, owner, type, remarks }) {
