@@ -7,11 +7,10 @@ import { db } from "@/app/_lib/db";
 import { saveAs } from "file-saver";
 import ThemeSwitch from "../common/ThemeSwitch";
 import Dialog from "../common/Dialog";
-import Page from "../common/Page";
+import CategoryListPage from "../common/page/CategoryListPage";
+import AboutAppPage from "../common/page/AboutAppPage";
 // import ChangeCurrencyDialog from "./ChangeCurrencyDialog";
 
-const CategoryList = dynamic(() => import("../common/CategoryList"));
-const AboutApp = dynamic(() => import("../settings/AboutApp"));
 const ImportDataForm = dynamic(() => import("./ImportDataForm"));
 const DeleteAccountForm = dynamic(() => import("./DeleteAccountForm"));
 const ChangeUsernameForm = dynamic(() => import("./ChangeUsernameForm"));
@@ -145,13 +144,10 @@ export default function SettingsList() {
     return(
         <>
             <List items={SETTING_ITEMS}/>
-            <Page
-                title={"Category List"}
+            <CategoryListPage
                 show={showCategory}
                 hideFn={() => setShowCategory(false)}
-            >
-                <CategoryList/>
-            </Page>
+            />
             <Button style="danger" label={"Delete Account"} onClick={() => setDeleteAccount(true)} className="mt-8 pb-4"/>
             <Dialog
                 show={showUsername}
@@ -176,13 +172,10 @@ export default function SettingsList() {
             >
                 <DeleteAccountForm onCancel={() => setDeleteAccount(false)}/>
             </Dialog>
-            <Page
-                title={"About Xpensed"}
+            <AboutAppPage
                 show={showAbout}
                 hideFn={() => setShowAbout(false)}
-            >
-                <AboutApp/>
-            </Page>
+            />
         </>
     )
 }

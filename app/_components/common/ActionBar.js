@@ -1,13 +1,10 @@
 'use client'
-import dynamic from "next/dynamic";
 import { IoMdMore as MoreIcon } from "react-icons/io";
 import ContextMenu from "./ContextMenu";
 import BalanceView from "./BalanceView";
 import { useState } from "react";
-import Page from "./Page";
-
-const CategoryList = dynamic(() => import("./CategoryList"));
-const AboutApp = dynamic(() => import("../settings/AboutApp"));
+import CategoryListPage from "./page/CategoryListPage";
+import AboutAppPage from "./page/AboutAppPage";
 
 export default function ActionBar() {
     const [showMenu, setShowMenu] = useState(false);
@@ -50,20 +47,14 @@ export default function ActionBar() {
                     hideOnItemClick
                 />
             </div>
-            <Page
-                title={"Category List"}
+            <CategoryListPage
                 show={showCategory}
                 hideFn={() => setShowCategory(false)}
-            >
-                <CategoryList/>
-            </Page>
-            <Page
-                title={"About Xpensed"}
+            />
+            <AboutAppPage
                 show={showAbout}
                 hideFn={() => setShowAbout(false)}
-            >
-                <AboutApp/>
-            </Page>
+            />
         </div>
     )
 }
