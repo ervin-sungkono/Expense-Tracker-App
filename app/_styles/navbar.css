@@ -35,7 +35,7 @@
 }
 
 .nav-fab {
-    @apply relative flex justify-center z-fixed;
+    @apply relative h-full flex justify-center z-fixed;
 }
 
 .nav-fab .fab-button {
@@ -43,7 +43,7 @@
 }
 
 .nav-fab > .fab-wrapper {
-    @apply absolute top-0 -translate-y-3/4 before:absolute;
+    @apply absolute top-0 -translate-y-1/4 before:absolute;
 }
 
 .nav-fab > .fab-wrapper::before {
