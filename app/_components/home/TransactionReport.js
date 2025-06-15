@@ -7,44 +7,63 @@ import { useEffect, useState } from "react";
 import SubHeader from "./SubHeader";
 import SelectField from "../common/SelectField";
 import { MONTHS } from "@/app/_lib/const";
-import { getMonthlyLabels, getWeeks } from "@/app/_lib/utils";
+import { getMonthlyLabels, getWeeklyLabels, getWeekNumber, getWeekRanges } from "@/app/_lib/utils";
 
 export default function TransactionReport() {
     const transactions = useLiveQuery(() => db.getAllTransactions());
     const categories = useLiveQuery(() => db.getAllCategories());
     const shops = useLiveQuery(() => db.getAllShops());
 
-    const [weeks, setWeeks] = useState(null);
-    const [selectedWeek, setSelectedWeek] = useState(0);
+    
+    const [selectedWeek, setSelectedWeek] = useState(getWeekNumber(new Date));
     const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth());
     const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
+    const [weeks, setWeeks] = useState(null);
     const [weekOptions, setWeekOptions] = useState(null);
     const [yearOptions, setYearOptions] = useState(null);
 
-    const [monthMap, setMonthMap] = useState({});
-    const [yearMap, setYearMap] = useState({});
+    const [weekMap, setWeekMap] = useState(null);
+    const [monthMap, setMonthMap] = useState(null);
+    const [yearMap, setYearMap] = useState(null);
+
+    const [selectedType, setSelectedType] = useState('Expense');
 
     useEffect(() => {
-        const years = Object.keys(yearMap);
-        if(years.length > 0) {
+        if(yearMap) {
+            const yearList = Object.keys(yearMap);
+            const years = yearList.length > 0 ? yearList : [`${new Date().getFullYear()}`];
             setYearOptions(years.map(year => ({
                 id: Number(year),
                 label: year
             })))
+            
+            const newWeeks = years.reduce(
+                (acc, year) => {
+                    acc[year] = getWeekRanges(Number(year)).map(weekRange => ({
+                        labels: getWeeklyLabels(weekRange),
+                        ...weekRange
+                    }))
+                    return acc;
+                }
+            , {});
+            setWeeks(newWeeks);
         }
     }, [yearMap])
 
     useEffect(() => {
-        if(selectedMonth && selectedYear) {
-            const _weeks = getWeeks(selectedMonth, selectedYear);
-
-            setWeeks(_weeks);
-            setWeekOptions(_weeks?.map((_, index) => ({ id: index, label: `Week ${index + 1}` })));
+        if(selectedYear && weeks) {
+            setWeekOptions(weeks[selectedYear]
+                .map((_, index) => ({ 
+                    id: index + 1, 
+                    label: `Week ${index + 1}`
+                }))
+            );
         }
-    }, [selectedMonth, selectedYear])
+    }, [selectedYear, weeks])
 
     useEffect(() => {
         if(transactions && categories && shops) {
+            const newWeekMap = {};
             const newMonthMap = {};
             const newYearMap = {};
             const categoriesMap = new Map(categories.map(category => [String(category.id), category.name]));
@@ -54,27 +73,50 @@ export default function TransactionReport() {
                 const date = new Date(transaction.date);
                 const month = date.getMonth();
                 const year = date.getFullYear();
+                const week = getWeekNumber(date, year);
+                const weekKey = `${year}W${week}`;
                 const monthKey = `${year}-${month}`
 
                 transaction.category = categoriesMap.get(transaction.categoryId);
                 transaction.shop = transaction.shopId ? shopsMap.get(transaction.shopId) : '';
 
-                newMonthMap[monthKey] = (newMonthMap[monthKey] || []).concat(transaction);
-                newYearMap[year] = (newYearMap[year] || []).concat(transaction);
+                if(!newWeekMap[weekKey]) {
+                    newWeekMap[weekKey] = {
+                        'Income': [],
+                        'Expense': []
+                    }
+                }
+
+                if(!newMonthMap[monthKey]) {
+                    newMonthMap[monthKey] = {
+                        'Income': [],
+                        'Expense': []
+                    }
+                }
+                if(!newYearMap[year]) {
+                    newYearMap[year] = {
+                        'Income': [],
+                        'Expense': []
+                    }
+                }
+
+                newWeekMap[weekKey][transaction.type].push(transaction);
+                newMonthMap[monthKey][transaction.type].push(transaction);
+                newYearMap[year][transaction.type].push(transaction);
             })
 
+            setWeekMap(newWeekMap);
             setMonthMap(newMonthMap);
             setYearMap(newYearMap);
         }
     }, [transactions, categories, shops])
 
     const contents = [
-        // TODO: make weekly report graph
         {
             id: 'weekly',
             label: 'Weekly',
             header: () => (
-                <div className="px-3 pt-2 grid grid-cols-3 gap-2">
+                <div className="px-3 pt-2 grid grid-cols-2 gap-2">
                     {weekOptions ? 
                     <SelectField
                         name={"week"}
@@ -83,17 +125,7 @@ export default function TransactionReport() {
                         _options={weekOptions}
                         onChange={(val) => setSelectedWeek(val)}
                     /> :
-                    <div className="w-full h-full rounded-md bg-neutral-300 dark:bg-neutral-600 animate-pulse"></div>}
-                    <SelectField
-                        name={"month"}
-                        placeholder={"Month"}
-                        _selected={selectedMonth}
-                        _options={MONTHS.map((month, index) => ({
-                            id: index,
-                            label: month
-                        }))} 
-                        onChange={(val) => setSelectedMonth(val)}
-                    />
+                    <div className="w-full h-9 md:h-10 rounded-md bg-neutral-300 dark:bg-neutral-800 animate-pulse"></div>}
                     {yearOptions ? <SelectField 
                         name={"year"}
                         placeholder={"Year"}
@@ -101,14 +133,14 @@ export default function TransactionReport() {
                         _options={yearOptions}
                         onChange={(val) => setSelectedYear(val)}
                     /> :
-                    <div className="w-full h-full rounded-md bg-neutral-300 dark:bg-neutral-600 animate-pulse"></div>}
+                    <div className="w-full h-9 md:h-10 rounded-md bg-neutral-300 dark:bg-neutral-800 animate-pulse"></div>}
                 </div>
             ),
             component: <TransactionGraph 
-                type="WEEKLY" 
-                labels={getMonthlyLabels(selectedYear, selectedMonth)} 
-                transactionData={monthMap[`${selectedYear}-${selectedMonth}`]}
-                title={`Week_${selectedWeek + 1}_${MONTHS[selectedMonth]}_${selectedYear}`}
+                type="WEEKLY"
+                labels={(weeks && weeks[selectedYear]?.[selectedWeek - 1]?.labels)} 
+                transactionData={weekMap && weekMap[`${selectedYear}W${selectedWeek}`]?.[selectedType]}
+                title={`WEEK_${selectedWeek}_${selectedYear}`}
             />
         },
         {
@@ -139,7 +171,7 @@ export default function TransactionReport() {
             component: <TransactionGraph 
                 type="MONTHLY" 
                 labels={getMonthlyLabels(selectedYear, selectedMonth)} 
-                transactionData={monthMap[`${selectedYear}-${selectedMonth}`]} 
+                transactionData={monthMap && monthMap[`${selectedYear}-${selectedMonth}`]?.[selectedType]} 
                 title={`${MONTHS[selectedMonth]}_${selectedYear}`}
             />
         },
@@ -159,7 +191,7 @@ export default function TransactionReport() {
             component: <TransactionGraph 
                 type="ANNUAL" 
                 labels={MONTHS} 
-                transactionData={yearMap[selectedYear]} 
+                transactionData={yearMap && yearMap[selectedYear]?.[selectedType]} 
                 title={`${selectedYear}`}
             />
         }
