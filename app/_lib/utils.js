@@ -86,11 +86,26 @@ export function getBase64(file) {
 }
 
 export function getMonthlyLabels(year, month) {
-    const daysInMonth = new Date(year, month, 0).getDate();
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
 
     const result = [];
     for(let date = 1; date <= daysInMonth; date++) {
         result.push(formatDateString(new Date(year, month, date)));
+    }
+
+    return result;
+}
+
+/**
+ * 
+ * @param {WeekRange} weekRange 
+ */
+export function getWeeklyLabels(weekRange) {
+    if(!weekRange) return [];
+
+    const result = [];
+    for(let date = weekRange.start; date <= weekRange.end; date.setDate(date.getDate() + 1)) {
+        result.push(formatDateString(date));
     }
 
     return result;
@@ -130,11 +145,12 @@ export function getDebtLoanType(name) {
     return null;
 }
 
-export function getWeeks(month, year){
-    return Array(new Date(year, month, 0).getDate()).fill(0).map((_,i) => new Date(year, month-1, i+1)).map((d,i,a) => !i && d.getDay() ? [Array(d.getDay()).fill(null), d.getDate()] : d.getDate() === a.length && d.getDay() < 6 ? [d.getDate(), Array(6-d.getDay()).fill(null)] : d.getDate()).flat(2).map((d,i,a) => a.length ? a.splice(0,7) : null).filter(w => w);
-}
-
-
+/**
+ * 
+ * @param {number} amount 
+ * @param {number[]} range 
+ * @returns 
+ */
 export function isInAmountRange(amount, range) {
     const [min, max] = range;
 
@@ -178,4 +194,75 @@ export function dateToLocalInput(date = new Date()) {
 
     const dateString = `${year}-${month}-${day}T${hour}:${minute}`;
     return dateString;
+}
+
+/**
+ * @typedef {Object} WeekRange
+ * @property {Date} start - Starting date of the week
+ * @property {Date} end - End date of the week
+ * 
+ * @param {number} year Year to get the week range
+ * @returns {WeekRange[]}
+ */
+export function getWeekRanges(year) {
+  const weekRanges = [];
+  const startDate = new Date(year, 0, 1);
+  const endDate = new Date(year, 12, 0);
+
+  // Adjust to the first Monday of the year
+  let current = new Date(startDate);
+  const day = current.getDay();
+  const diff = (day === 0 ? -6 : 1) - day; // shift Sunday to previous Monday, others to next Monday
+  current.setDate(current.getDate() + diff);
+
+  while (current <= endDate) {
+    const weekStart = new Date(current);
+    const weekEnd = new Date(current);
+    weekEnd.setDate(weekEnd.getDate() + 6);
+
+    // Only include weeks that at starts from the following year
+    if (weekStart.getFullYear() === year || weekEnd.getFullYear() === year) {
+      weekRanges.push({
+        start: weekStart,
+        end: weekEnd
+      });
+    }
+
+    current.setDate(current.getDate() + 7); // Move to next week
+  }
+
+  return weekRanges;
+}
+
+/**
+ * 
+ * @param {Date} date
+ * @param {number} year
+ * @returns {number} Week in the year of given date
+ */
+export function getWeekNumber(dateInput, year) {
+  const date = new Date(dateInput);
+  if (!year) {
+    year = date.getFullYear();
+  }
+
+  // Find the first Monday of the year
+  const jan1 = new Date(year, 0, 1);
+  const dayOfWeek = jan1.getDay(); // 0 = Sunday, 1 = Monday, ..., 6 = Saturday
+  const offset = (dayOfWeek === 0 ? -6 : 1) - dayOfWeek;
+
+  const firstMonday = new Date(jan1);
+  firstMonday.setDate(jan1.getDate() + offset);
+
+  // Difference in days from the first Monday
+  const diffTime = date - firstMonday;
+  const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+
+  if (diffDays < 0) {
+    return 0; // before first week of the year
+  }
+
+  const weekNumber = Math.floor(diffDays / 7) + 1;
+
+  return weekNumber;
 }

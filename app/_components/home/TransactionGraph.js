@@ -84,7 +84,7 @@ export default function TransactionGraph({ transactionData = [], labels, type = 
                 const month = date.getMonth();
                 const year = date.getFullYear();
 
-                if(type === 'MONTHLY') {
+                if(type === 'MONTHLY' || type === 'WEEKLY') {
                     labelsMap[formatDateString(date)] += transaction.amount;
                 } else if(type === 'ANNUAL') {
                     labelsMap[MONTHS[month]] += transaction.amount;
@@ -127,7 +127,7 @@ export default function TransactionGraph({ transactionData = [], labels, type = 
                 plugins: {
                     legend: {
                         display: false
-                    }
+                    },
                 },
                 scales: {
                     x: {
@@ -139,7 +139,7 @@ export default function TransactionGraph({ transactionData = [], labels, type = 
                             callback: function(value) {
                                 let labelValue = this.getLabelForValue(value);
 
-                                if(type === 'MONTHLY') return new Date(labelValue).toLocaleDateString('en-US', { day: '2-digit', month: '2-digit', year: 'numeric' });
+                                if(type === 'MONTHLY' || type === 'WEEKLY') return new Date(labelValue).toLocaleDateString('en-US', { day: '2-digit', month: '2-digit', year: 'numeric' });
                                 if(type === 'ANNUAL') return labelValue.slice(0,3);
                                 return labelValue;
                             }
@@ -160,7 +160,7 @@ export default function TransactionGraph({ transactionData = [], labels, type = 
                 }
             }); 
         }
-    }, [labels, data])
+    }, [labels, data, type])
 
     if(transactionData && transactionData.length === 0) return (
         <div className="flex justify-center items-center h-48 xs:h-64 px-3 py-4">
@@ -176,7 +176,7 @@ export default function TransactionGraph({ transactionData = [], labels, type = 
                     data={chartData}
                     options={chartOptions}
                 /> :
-                <div className="w-full h-full px-3 py-4">
+                <div className="relative w-full h-full aspect-video px-3 py-4">
                     <div className="w-full h-full rounded-lg bg-neutral-300 dark:bg-neutral-800 animate-pulse"></div>
                 </div>
             }
