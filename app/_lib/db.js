@@ -19,10 +19,22 @@ class ExpenseDB extends Dexie {
             expenses: '++id, date, amount, categoryId, shopId, remarks',
             categories: '++id, name, budget',
             shops: '++id, name, image, location'
-        })
+        }).upgrade(async() => {
+            await this.resetDB();
+        });
+
+        this.version(2).stores({
+            transactions: '++id, date, amount, categoryId, shopId, owner, type, remarks',
+            expenses: null,
+            categories: '++id, icon, name, type, parentId, mutable',
+            budgets: '++id, amount, categoryId, start_date, end_date, repeat',
+            shops: '++id, name, image, location'
+        }).upgrade(async() => {
+            await this.resetDB();
+        });
 
         this.version(DB_VERSION).stores({
-            transactions: '++id, date, amount, categoryId, shopId, owner, type, remarks',
+            transactions: '++id, date, amount, categoryId, shopId, owner, type, remarks, [categoryId+date]',
             expenses: null,
             categories: '++id, icon, name, type, parentId, mutable',
             budgets: '++id, amount, categoryId, start_date, end_date, repeat',
@@ -70,6 +82,24 @@ class ExpenseDB extends Dexie {
         const lastDay = new Date(year, month + 1, 0, 23, 59, 59); // last day of the month
 
         return this.transactions.where('date').between(firstDay, lastDay).toArray();
+    }
+
+    async getTransactionsRange(startDate, endDate, categoryId) {
+        const category = await this.getCategoryById(categoryId);
+        const childCategories = await this.getChildCategories(categoryId);
+
+        const categories = [category, ...childCategories].map(c => c.id);
+
+        const results = await Promise.all(
+            categories.map(id => (
+                this.transactions
+                    .where('[categoryId+date]')
+                    .between([categoryId, startDate], [categoryId, endDate])
+                    .toArray()
+            ))
+        )
+
+        return results.flat();
     }
 
     getTransactionsByCategory(categoryId) {
@@ -144,7 +174,7 @@ class ExpenseDB extends Dexie {
             .toArray();
     }
 
-    getAllBudgets({ active = false }) {
+    getAllBudgets({ active = false } = {}) {
         if(active) {
             return this.budgets
                 .filter(budget => {

@@ -1,4 +1,4 @@
-import { getDebtLoanType } from "./utils";
+import { getDebtLoanType, isInDateRange } from "./utils";
 import { icons } from "./const/icons";
 
 function getRandomDate(start, end) {
@@ -47,9 +47,17 @@ export function generateBudgets(count) {
     for(let i = 0; i < count; i++) {
         const start_date = getRandomDate(start, end);
         const end_date = getRandomDate(start_date, end);
-        const amount = randomBetween(1000, 50000);
+        start_date.setHours(0);
+        start_date.setMinutes(0);
+        start_date.setSeconds(0);
+
+        end_date.setHours(23);
+        end_date.setMinutes(59);
+        end_date.setSeconds(59);
+
+        const amount = randomBetween(100000, 5000000);
         const categoryId = randomBetween(1, 12);
-        const repeat = i % 5; // every 5 item will be repeatable budget
+        const repeat = isInDateRange(new Date(), [start_date, end_date]); // only active budgets are set repeatable
 
         budgets.push({ amount, categoryId, start_date, end_date, repeat });
     }
