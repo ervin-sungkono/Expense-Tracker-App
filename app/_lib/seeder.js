@@ -41,8 +41,9 @@ export function generateTransactions(count) {
 // budgets: '++id, amount, categoryId, start_date, end_date, repeat',
 export function generateBudgets(count) {
     const budgets = [];
-    const start = new Date(2020, 0, 1); // January 1, 2020
+    const start = new Date(2022, 0, 1); // January 1, 2020
     const end = new Date(); // Current date
+    end.setDate(end.getDate() + 90); // 90 days ahead of today's date
 
     for(let i = 0; i < count; i++) {
         const start_date = getRandomDate(start, end);

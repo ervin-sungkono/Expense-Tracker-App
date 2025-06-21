@@ -4,7 +4,6 @@ import VirtualizedTransactionList from "../_components/transactions/VirtualizedT
 import { useEffect, useState, Suspense } from "react";
 import { db } from "../_lib/db";
 import { useLiveQuery } from "dexie-react-hooks";
-import CategoryTab from "../_components/categories/CategoryTab";
 import SearchBar from "../_components/common/Searchbar";
 import Header from "../_components/common/Header";
 import IconButton from "../_components/common/IconButton";

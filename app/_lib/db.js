@@ -177,18 +177,22 @@ class ExpenseDB extends Dexie {
     getAllBudgets({ active = false } = {}) {
         if(active) {
             return this.budgets
+                .orderBy('start_date')
+                .reverse()
                 .filter(budget => {
                     if(!isInDateRange(new Date(), [budget.start_date, budget.end_date])) return false;
                     return true;
                 })
                 .toArray();
         }
-        return this.budgets.toArray();
+        return this.budgets.orderBy('start_date').reverse().toArray();
     }
 
     getPaginatedBudgets(limit, { active = false } = {}) {
         if(active) {
             return this.budgets
+                .orderBy('start_date')
+                .reverse()
                 .filter(budget => {
                     if(!isInDateRange(new Date(), [budget.start_date, budget.end_date])) return false;
                     return true;
@@ -196,7 +200,7 @@ class ExpenseDB extends Dexie {
                 .limit(limit)
                 .toArray();
         }
-        return this.budgets.limit(limit).toArray();
+        return this.budgets.orderBy('start_date').reverse().limit(limit).toArray();
     }
 
     addTransaction({ date, amount, categoryId, shopId, owner, type, remarks }) {

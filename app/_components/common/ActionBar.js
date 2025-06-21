@@ -5,6 +5,7 @@ import BalanceView from "./BalanceView";
 import { useState } from "react";
 import CategoryListPage from "./page/CategoryListPage";
 import AboutAppPage from "./page/AboutAppPage";
+import BudgetListPage from "./page/BudgetListPage";
 
 export default function ActionBar() {
     const [showMenu, setShowMenu] = useState(false);
@@ -54,6 +55,10 @@ export default function ActionBar() {
             <AboutAppPage
                 show={showAbout}
                 hideFn={() => setShowAbout(false)}
+            />
+            <BudgetListPage
+                show={showBudget}
+                hideFn={() => setShowBudget(false)}
             />
         </div>
     )

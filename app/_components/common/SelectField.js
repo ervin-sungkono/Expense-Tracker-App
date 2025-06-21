@@ -47,12 +47,12 @@ export default function SelectField({ customSelected, label, name, required = fa
                 {!overrideOnClick &&
                 <div className={`${showOption ? 'block' : 'hidden'}`}>
                     <div className="fixed top-0 left-0 w-full h-full bg-transparent z-10" onClick={() => setShowOption(false)}></div>
-                    <div ref={dropdownRef} className="min-w-40 max-w-72 max-h-96 overflow-y-auto absolute left-0 -bottom-2 translate-y-full shadow-lg bg-light dark:bg-neutral-600 py-2 rounded-md z-50">
+                    <div ref={dropdownRef} className="min-w-40 max-w-72 max-h-96 overflow-y-auto absolute left-0 -bottom-2 translate-y-full shadow-lg bg-light dark:bg-neutral-800 py-2 rounded-md z-50">
                         {options.map(option => (
                             <div 
                                 id={`${name}-${option.id}`}
                                 key={option.id}
-                                className={`cursor-pointer w-full line-clamp-1 wrap-anywhere px-4 py-1.5 ${(selected && selected.id == option.id) ? 'bg-neutral-200 dark:bg-neutral-500' : 'hover:bg-neutral-200 hover:dark:bg-neutral-500'} text-sm`}
+                                className={`cursor-pointer w-full line-clamp-1 wrap-anywhere px-4 py-1.5 ${(selected && selected.id == option.id) ? 'bg-neutral-200 dark:bg-neutral-700' : 'hover:bg-neutral-200 hover:dark:bg-neutral-700'} text-sm`}
                                 onClick={() => {
                                     setSelected(option);
                                     setShowOption(false);
