@@ -126,6 +126,42 @@ export function nFormatter(num, digits) {
   return item ? (num / item.value).toFixed(digits).replace(regexp, "").concat(item.symbol) : "0";
 }
 
+/**
+ * 
+ * @param {Date} date 
+ * @param {string} locale 
+ * @param {object} options 
+ * @returns 
+ */
+export function formatDate(date, format = 'DD/MM/YYYY') {
+  const map = {
+    DD: String(date.getDate()).padStart(2, '0'),
+    D: date.getDate(),
+    MM: String(date.getMonth() + 1).padStart(2, '0'),
+    M: date.getMonth() + 1,
+    YYYY: date.getFullYear(),
+    YY: String(date.getFullYear()).slice(-2),
+  };
+
+  return format.replace(/YYYY|YY|MM|M|DD|D/g, match => map[match]);
+}
+
+/**
+ * 
+ * @param {Date} date1 - Start date
+ * @param {Date} date2 - End date
+ * @returns 
+ */
+export function getDayDifference(date1, date2) {
+    const msPerDay = 1000 * 60 * 60 * 24;
+    
+    // Normalize both dates to midnight UTC to avoid daylight saving shifts
+    const utc1 = Date.UTC(date1.getFullYear(), date1.getMonth(), date1.getDate());
+    const utc2 = Date.UTC(date2.getFullYear(), date2.getMonth(), date2.getDate());
+
+    return Math.floor((utc2 - utc1) / msPerDay);
+}
+
 function isDebtLoanExpense(name) {
     return name && (name === 'Repayment' || name === 'Loan')
 }
