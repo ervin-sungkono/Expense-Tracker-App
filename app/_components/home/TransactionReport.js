@@ -13,7 +13,7 @@ export default function TransactionReport() {
     const categories = useLiveQuery(() => db.getAllCategories());
     const shops = useLiveQuery(() => db.getAllShops());
     
-    const [selectedWeek, setSelectedWeek] = useState(getWeekNumber(new Date));
+    const [selectedWeek, setSelectedWeek] = useState(getWeekNumber(new Date()));
     const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth());
     const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
     const [weeks, setWeeks] = useState(null);
@@ -126,6 +126,7 @@ export default function TransactionReport() {
                         'Expense': []
                     }
                 }
+
                 if(!newYearMap[year]) {
                     newYearMap[year] = {
                         'Income': [],
