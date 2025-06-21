@@ -5,6 +5,7 @@ import { useLiveQuery } from "dexie-react-hooks";
 import Image from "next/image";
 import { memo, useEffect, useState } from "react"
 import { IoChevronForward as RightIcon } from "react-icons/io5";
+import LoadingSpinner from "../common/LoadingSpinner";
 
 function BudgetCard({ budget, onClick, style }) {
     const { amount, categoryId, start_date, end_date } = budget;
@@ -30,7 +31,13 @@ function BudgetCard({ budget, onClick, style }) {
     }
 
     if(!transactions || !category) {
-        return <div style={style}>Loading..</div>
+        return (
+            <div style={style} className="pb-3">
+                <div className="flex justify-center items-center w-full h-full rounded-lg bg-light dark:bg-neutral-800">
+                    <LoadingSpinner size="medium"/>
+                </div>
+            </div>
+        )
     }
     return (
         <div style={style} className="pb-3">
