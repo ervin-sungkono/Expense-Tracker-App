@@ -147,6 +147,22 @@ export function getDebtLoanType(name) {
 
 /**
  * 
+ * @param {string} categoryName 
+ * @returns 
+ */
+export function getOwnerLabel(categoryName) {
+    if (categoryName === "Debt Collection" || categoryName == "Loan") {
+        return "Borrower";
+    }
+    if (categoryName === "Debt" || categoryName === "Repayment") {
+        return "Lender";
+    }
+
+    return "";
+}
+
+/**
+ * 
  * @param {number} amount 
  * @param {number[]} range 
  * @returns 

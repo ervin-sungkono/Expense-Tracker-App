@@ -8,7 +8,7 @@ import { useState } from "react";
 import Button from "../common/Button";
 import { DateValidator, NumberValidator, StringValidator } from "@/app/_lib/validator";
 import Image from "next/image";
-import { dateToLocalInput } from "@/app/_lib/utils";
+import { dateToLocalInput, getOwnerLabel } from "@/app/_lib/utils";
 import SelectCategoryPage from "../common/page/SelectCategoryPage";
 
 export default function AddTransactionForm({ transaction = {}, onSubmit }) {
@@ -161,7 +161,7 @@ export default function AddTransactionForm({ transaction = {}, onSubmit }) {
                     {selectedCategory?.type === 'DebtLoan' && 
                     <InputField 
                         name={"owner"} 
-                        label={selectedCategory.name === 'Loan' ? 'Borrower' : 'Lender'} 
+                        label={getOwnerLabel(selectedCategory.name)} 
                         placeholder={selectedCategory.name === 'Loan' ? 'Enter Borrower\'s name' : 'Enter Lender\s name'}
                         defaultValue={transaction.owner ?? 'someone'}
                         errorMessage={errorMessage?.owner}

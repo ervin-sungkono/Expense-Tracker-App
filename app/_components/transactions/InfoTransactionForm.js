@@ -2,7 +2,7 @@
 import { useState } from "react";
 import Dialog from "../common/Dialog";
 import Button from "../common/Button";
-import { formatCurrency, formatDateString } from "@/app/_lib/utils";
+import { formatCurrency, formatDateString, getOwnerLabel } from "@/app/_lib/utils";
 import AddTransactionForm from "./AddTransactionForm";
 import DeleteTransactionForm from "./DeleteTransactionForm";
 
@@ -34,7 +34,7 @@ export default function InfoTransactionForm({ transaction, hideFn }) {
             isHidden: transaction.shop == null
         },
         {
-            label: "Owner",
+            label: getOwnerLabel(transaction.category.name),
             value: transaction.owner,
             isHidden: transaction.owner == null
         },
