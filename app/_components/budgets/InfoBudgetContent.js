@@ -6,8 +6,8 @@ export default function InfoBudgetContent({ budget = {} }) {
     const totalDays = getDayDifference(budget.start_date, budget.end_date);
     const daysSinceStart = getDayDifference(budget.start_date, new Date());
     const activeDays = Math.max(0, Math.min(daysSinceStart, totalDays));
-    const averageSpending = Math.max(0, Math.round(budget.totalTransaction / (activeDays + 1)));
-    const estimatedSpending = Math.max(0, Math.round(budget.remainingBudget / (budget.remainingDays + 1)));
+    const averageSpending = Math.max(0, Math.round(budget.totalTransaction / activeDays));
+    const estimatedSpending = Math.max(0, Math.round(budget.remainingBudget / budget.remainingDays));
 
     const contents = [
         {
