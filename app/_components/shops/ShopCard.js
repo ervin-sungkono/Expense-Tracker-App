@@ -1,16 +1,16 @@
 import Image from "next/image";
 import { IoLocationSharp as LocationIcon } from "react-icons/io5";
-import { useState } from "react";
-import Dialog from "../common/Dialog";
-import InfoShopForm from "./InfoShopForm";
 
-export default function ShopCard({ shop, isOdd, style }) {
+export default function ShopCard({ shop, isOdd, style, onClick }) {
     const { image, name, location } = shop;
-    const [showDialog, setShowDialog] = useState(false);
+
+    const handleShopClick = () => {
+        onClick && onClick(shop);
+    }
 
     return (
         <div>
-            <div onClick={() => setShowDialog(true)} style={style} className={`cursor-pointer w-full h-full flex flex-col ${!isOdd ? 'pr-2' : ''} pb-2`}>
+            <div onClick={handleShopClick} style={style} className={`cursor-pointer w-full h-full flex flex-col ${!isOdd ? 'pr-2' : ''} pb-2`}>
                 <div className="relative w-full aspect-video bg-light dark:bg-neutral-800 rounded-t-lg overflow-hidden">
                     {image && <Image src={image} className="object-contain" fill alt={`${name} Image`}/>}
                 </div>
@@ -24,12 +24,6 @@ export default function ShopCard({ shop, isOdd, style }) {
                     </div>
                 </div>
             </div>
-            <Dialog
-                show={showDialog}
-                hideFn={() => setShowDialog(false)}
-            >
-                <InfoShopForm shop={shop} hideFn={() => setShowDialog(false)}/>
-            </Dialog>
         </div>
     )
 }
