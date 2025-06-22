@@ -1,7 +1,7 @@
 'use client'
 import Layout from "../_components/layout/Layout";
 import VirtualizedTransactionList from "../_components/transactions/VirtualizedTransactionList";
-import { useEffect, useState, Suspense } from "react";
+import { useEffect, useState, Suspense, useRef } from "react";
 import { db } from "../_lib/db";
 import { useLiveQuery } from "dexie-react-hooks";
 import SearchBar from "../_components/common/Searchbar";
@@ -49,6 +49,7 @@ export default function Transactions() {
     const shops = useLiveQuery(() => db.getAllShops());
 
     const [filterMode, setFilterMode] = useState(false);
+    const scrollRef = useRef(null);
 
     useEffect(() => {        
         setLimit(PAGE_SIZE); // Refresh page limit
@@ -114,6 +115,12 @@ export default function Transactions() {
         if(shop) setShop(shop);
     }
 
+    const handleSubmitFilter = () => {
+        setFilterMode(false);
+        setLimit(PAGE_SIZE); // reset limit
+        scrollRef.current?.scrollToItem(0);
+    }
+
     const fetchMoreData = async() => {
         setLimit(currentLimit => currentLimit + PAGE_SIZE);
     };
@@ -138,6 +145,7 @@ export default function Transactions() {
                 </div>
                 <div className="flex grow mb-2">
                     <VirtualizedTransactionList
+                        scrollRef={scrollRef}
                         items={transactions}
                         loadMore={fetchMoreData}
                         hasNextPage={transactionQuery && transactionQuery.length > 0 && transactionQuery.length % PAGE_SIZE === 0}
@@ -149,7 +157,7 @@ export default function Transactions() {
                 hideFn={() => setFilterMode(false)}
             >
                 <FilterTransaction
-                    onSubmit={() => setFilterMode(false)}
+                    onSubmit={handleSubmitFilter}
                     filterOptions={filterOptions}
                     setFilterOptions={setFilterOptions}
                 />

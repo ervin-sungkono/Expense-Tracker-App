@@ -27,7 +27,7 @@ const renderItem = (item) => {
   );
 };
 
-const VirtualizedTransactionList = ({ items, loadMore, hasNextPage }) => {
+const VirtualizedTransactionList = ({ scrollRef, items, loadMore, hasNextPage }) => {
   const isItemLoaded = index => !hasNextPage || index < items.length;
   const { listRef, setSize, getSize, resetAfterIndex } = useDynamicItemSize();
 
@@ -71,6 +71,7 @@ const VirtualizedTransactionList = ({ items, loadMore, hasNextPage }) => {
               ref={(ele) => {
                 ref(ele);
                 listRef.current = ele;
+                if(scrollRef) scrollRef.current = ele;
               }}
               itemData={items}
               style={{willChange: 'initial'}}

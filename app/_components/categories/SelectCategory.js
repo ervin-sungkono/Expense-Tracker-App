@@ -51,6 +51,7 @@ export default function SelectCategory({ categories, onCategorySelected, onCance
         if(categoryData && categoryData[selectedType]) {
             console.log('TRIGGER ITEM SIZE RECOMPUTE');
             categoryRef.current?.resetAfterIndex(0);
+            categoryRef.current?.scrollToItem(0);
         }
     }, [categoryData, selectedType])
 

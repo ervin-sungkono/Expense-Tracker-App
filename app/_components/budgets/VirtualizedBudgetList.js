@@ -19,7 +19,7 @@ const Row = ({ index, style, data: { items, onBudgetClicked } }) => {
 
 const MemoizedRow = memo(Row);
 
-const VirtualizedCategoryList = ({ items, hasNextPage, loadMore, onBudgetClicked }) => {
+const VirtualizedCategoryList = ({ scrollRef, items, hasNextPage, loadMore, onBudgetClicked }) => {
     const isItemLoaded = index => !hasNextPage || index < items.length;
 
     if(!items) {
@@ -50,7 +50,10 @@ const VirtualizedCategoryList = ({ items, hasNextPage, loadMore, onBudgetClicked
                 >
                     {({ onItemsRendered, ref }) => (  
                         <FixedSizeList
-                            ref={ref}
+                            ref={(ele) => {
+                                ref(ele);
+                                if(scrollRef) scrollRef.current = ele;
+                            }}
                             onItemsRendered={onItemsRendered}
                             height={height}
                             width={width}
