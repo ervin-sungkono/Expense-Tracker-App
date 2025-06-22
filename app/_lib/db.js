@@ -176,7 +176,7 @@ class ExpenseDB extends Dexie {
 
     /**
      * 
-     * @param {'active' | 'finished'} type 
+     * @param {'active' | 'finished' | 'upcoming'} type 
      * @returns 
      */
     getAllBudgets(type) {
@@ -196,6 +196,18 @@ class ExpenseDB extends Dexie {
                 .reverse()
                 .filter(budget => {
                     if(isInDateRange(new Date(), [budget.start_date, budget.end_date])) return false;
+                    if(new Date().getTime() < budget.start_date.getTime()) return false; // not yet started
+                    return true;
+                })
+                .toArray();
+        }
+        if(type === 'upcoming') {
+            return this.budgets
+                .orderBy('start_date')
+                .reverse()
+                .filter(budget => {
+                    if(isInDateRange(new Date(), [budget.start_date, budget.end_date])) return false;
+                    if(new Date().getTime() > budget.end_date.getTime()) return false; // already finished
                     return true;
                 })
                 .toArray();
@@ -205,7 +217,7 @@ class ExpenseDB extends Dexie {
 
     /**
      * 
-     * @param {'active' | 'finished'} type 
+     * @param {'active' | 'finished' | 'upcoming'} type 
      * @returns 
      */
     getPaginatedBudgets(limit, type) {
