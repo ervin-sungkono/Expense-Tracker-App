@@ -56,7 +56,7 @@ export default function ImageUploader({ label, name, initialValue, dropzoneOptio
         <div className="w-full flex flex-col gap-2">
             {label && <div className="block font-semibold text-xs md:text-sm text-dark-blue">{label} {dropzoneOptions.maxSize && <span>(max {(dropzoneOptions.maxSize / (1000 * 1000)).toFixed(0)}</span>} MB)</div>}
             <div {...getRootProps({className: 'relative dropzone cursor-pointer border focus:border-sky-blue border-deep-blue dark:border-ocean-blue/60 px-3 md:px-4 py-2 md:py-2.5 rounded-md'})}>
-                <div className="relative flex justify-center items-center w-full h-48 bg-neutral-200 dark:bg-neutral-600 rounded-sm mb-2">
+                <div className="relative flex justify-center items-center w-full h-48 bg-neutral-200 dark:bg-neutral-700 rounded-sm mb-2">
                     {previewImage ? 
                     <Image src={previewImage} alt="Preview Image" fill className="object-contain aspect-square"/> :
                     <p className="text-dark/80 dark:text-white/80 font-semibold">Preview Image</p>}
