@@ -2,7 +2,7 @@
 import { useEffect, useRef, useState } from "react"
 
 export default function SelectField({ customSelected, label, name, required = false, _selected, placeholder, _options = [], errorMessage, onChange, overrideOnClick, disabled }){
-    const [options, setOptions] = useState(_options);
+    const [options, setOptions] = useState(() => _options);
     const [selected, setSelected] = useState(null);
     const [showOption, setShowOption] = useState(false);
     const dropdownRef = useRef();

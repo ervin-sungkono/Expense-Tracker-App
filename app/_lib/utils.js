@@ -229,7 +229,7 @@ export function isInDateRange(date, range) {
 }
 
 function zeroBased(value) {
-    return value < 10 ? `0${value}` : `${value}`;
+    return value.toString().padStart(2, '0');
 }
 
 /**
@@ -246,6 +246,20 @@ export function dateToLocalInput(date = new Date()) {
 
     const dateString = `${year}-${month}-${day}T${hour}:${minute}`;
     return dateString;
+}
+
+/**
+ * 
+ * @param {Date} date 
+ * @returns Value in date input format
+ */
+export function dateToInputValue(date = new Date()) {
+  const year = date.getFullYear();
+  const month = zeroBased(date.getMonth() + 1); // Month is 0-based
+  const day = zeroBased(date.getDate());
+
+  const dateString = `${year}-${month}-${day}`
+  return dateString;
 }
 
 /**
@@ -317,4 +331,61 @@ export function getWeekNumber(dateInput, year) {
   const weekNumber = Math.floor(diffDays / 7) + 1;
 
   return weekNumber;
+}
+
+/**
+ * 
+ * @param {string} type Type of date range
+ * @param {*} date Given date to get the range
+ * @returns
+ */
+export function getDateRange(type, date = new Date()) {
+  const d = new Date(date); // Copy to avoid mutating input
+  d.setHours(0, 0, 0, 0);
+
+  let start, end;
+
+  switch (type) {
+    case 'daily':
+      start = new Date(d);
+      end = new Date(d);
+      break;
+
+    case 'weekly': {
+      const day = d.getDay(); // 0 (Sun) - 6 (Sat)
+      const diffToMonday = (day + 6) % 7; // make Monday=0
+      start = new Date(d);
+      start.setDate(d.getDate() - diffToMonday);
+      end = new Date(start);
+      end.setDate(start.getDate() + 6);
+      break;
+    }
+
+    case 'monthly':
+      start = new Date(d.getFullYear(), d.getMonth(), 1);
+      end = new Date(d.getFullYear(), d.getMonth() + 1, 0);
+      break;
+
+    case 'quarter': {
+      const quarter = Math.floor(d.getMonth() / 3);
+      const startMonth = quarter * 3;
+      start = new Date(d.getFullYear(), startMonth, 1);
+      end = new Date(d.getFullYear(), startMonth + 3, 0);
+      break;
+    }
+
+    case 'annual':
+      start = new Date(d.getFullYear(), 0, 1);
+      end = new Date(d.getFullYear(), 11, 31);
+      break;
+
+    default:
+      start = undefined;
+      end = undefined;
+  }
+
+  // Set end time to 23:59:59.999
+  if(end) end.setHours(23, 59, 59, 999);
+
+  return [start, end];
 }
