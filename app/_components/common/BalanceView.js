@@ -45,7 +45,7 @@ export default function BalanceView() {
             <div className="text-lg font-semibold">
                 {hideBalance ? generateAsterisks(balance.length) : balance}
             </div>
-            <div onClick={toggleBalanceVisibility} className="ml-1 p-1.5">
+            <div onClick={toggleBalanceVisibility} className="cursor-pointer ml-1 p-1.5">
                 {hideBalance ? <ShowIcon size={20}/> : <HideIcon size={20}/>}
             </div>
         </div>
