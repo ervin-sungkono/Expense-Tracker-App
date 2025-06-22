@@ -10,9 +10,9 @@ export default function BudgetTab({ selected = null, onChange, excluded = [] }) 
     }
 
     const tabs = [
-        {id: 'all', label: 'All'},
         {id: 'active', label: 'Active'},
         {id: 'finished', label: 'Finished'},
+        {id: 'upcoming', label: 'Upcoming'},
     ].filter(tab => !excluded.includes(tab.id))
 
     useEffect(() => {

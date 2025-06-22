@@ -12,6 +12,8 @@ function BudgetCard({ budget, onClick, style }) {
 
     const remainingBudget = amount - totalTransaction;
     const todayDate = new Date();
+    const totalDays = getDayDifference(start_date, end_date);
+    const remainingDays = Math.max(0, Math.min(getDayDifference(todayDate, end_date), totalDays));
 
     const category = useLiveQuery(() => db.getCategoryById(categoryId));
     const transactions = useLiveQuery(() => db.getTransactionsRange(start_date, end_date, categoryId));
@@ -27,7 +29,13 @@ function BudgetCard({ budget, onClick, style }) {
     }, [transactions]);
 
     const handleBudgetClicked = () => {
-        onClick && onClick({ budget, totalTransaction });
+        onClick && onClick({ 
+            ...budget, 
+            totalTransaction, 
+            remainingBudget, 
+            remainingDays, 
+            category 
+        });
     }
 
     if(!transactions || !category) {
@@ -61,7 +69,7 @@ function BudgetCard({ budget, onClick, style }) {
                             <div className="absolute top-0 left-0 h-full bg-basic-gradient rounded-full" style={{ width: `${remainingBudget / amount * 100}%` }}></div>}
                         </div>
                         <div className="flex justify-between mt-2 font-medium">
-                            <p className="text-sm">{Math.max(getDayDifference(todayDate, end_date), 0)} days left</p>
+                            <p className="text-sm">{remainingDays} days left</p>
                             {remainingBudget < 0 ? 
                             <p className="flex flex-col items-end gap-0.5 text-sm">
                                 <span className="text-xs text-dark/60 dark:text-white/60">Overspent</span> 
