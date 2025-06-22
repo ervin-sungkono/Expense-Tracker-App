@@ -59,8 +59,8 @@ function CategoryCard({ category, onClick, style, depth = 0 }) {
                         </div>}
                     </div>
                 </div>
-                {(depth === 0 && category.data?.length > 0) && <span className="absolute left-3 top-14 w-0.5 bg-neutral-200 dark:bg-neutral-600" style={{height: category.data.length * 56 - 28}}></span>}
-                {depth > 0 && <span className="absolute -left-3 top-1/2 -translate-y-1/2 w-3 h-0.5 bg-neutral-200 dark:bg-neutral-600"></span>}
+                {(depth === 0 && category.data?.length > 0) && <span className="absolute left-3 top-14 w-0.5 bg-neutral-200 dark:bg-neutral-700" style={{height: category.data.length * 56 - 28}}></span>}
+                {depth > 0 && <span className="absolute -left-3 top-1/2 -translate-y-1/2 w-3 h-0.5 bg-neutral-200 dark:bg-neutral-700"></span>}
                 <ContextMenu 
                     items={contextMenuItems} 
                     show={showMenu} 
