@@ -25,7 +25,7 @@ export default function Dialog({ children, show = false, hideFn = null, hideCanc
                     <CloseIcon size={20}/>
                 </button>}
             </div>
-            <div className="pointer-events-none overlay absolute bg-neutral-800/60 w-full h-full"></div>
+            <div className={`pointer-events-none overlay absolute top-0 left-0 backdrop-blur-xl bg-neutral-700/60 w-full h-full ${show ? 'animate-[fade-in_.35s_forwards_ease-in-out]' : 'animate-[fade-out_.35s_forwards_ease-in-out]'}`}></div>
         </div>
     )
 }
