@@ -23,7 +23,7 @@ const useDynamicItemSize = () => {
     listRef,
     setSize,
     getSize,
-    resetAfterIndex,
+    resetAfterIndex
   }
 }
 
