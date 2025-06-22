@@ -174,8 +174,13 @@ class ExpenseDB extends Dexie {
             .toArray();
     }
 
-    getAllBudgets({ active = false } = {}) {
-        if(active) {
+    /**
+     * 
+     * @param {'active' | 'finished'} type 
+     * @returns 
+     */
+    getAllBudgets(type) {
+        if(type === 'active') {
             return this.budgets
                 .orderBy('start_date')
                 .reverse()
@@ -185,16 +190,43 @@ class ExpenseDB extends Dexie {
                 })
                 .toArray();
         }
+        if(type === 'finished') {
+            return this.budgets
+                .orderBy('start_date')
+                .reverse()
+                .filter(budget => {
+                    if(isInDateRange(new Date(), [budget.start_date, budget.end_date])) return false;
+                    return true;
+                })
+                .toArray();
+        }
         return this.budgets.orderBy('start_date').reverse().toArray();
     }
 
-    getPaginatedBudgets(limit, { active = false } = {}) {
-        if(active) {
+    /**
+     * 
+     * @param {'active' | 'finished'} type 
+     * @returns 
+     */
+    getPaginatedBudgets(limit, type) {
+        if(type === 'active') {
             return this.budgets
                 .orderBy('start_date')
                 .reverse()
                 .filter(budget => {
                     if(!isInDateRange(new Date(), [budget.start_date, budget.end_date])) return false;
+                    return true;
+                })
+                .limit(limit)
+                .toArray();
+        }
+        if(type === 'finished') {
+            return this.budgets
+                .orderBy('start_date')
+                .reverse()
+                .filter(budget => {
+                    if(isInDateRange(new Date(), [budget.start_date, budget.end_date])) return false;
+                    if(new Date().getTime() < new Date(budget.start_date).getTime()) return false; // not started yet
                     return true;
                 })
                 .limit(limit)

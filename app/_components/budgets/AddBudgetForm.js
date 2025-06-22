@@ -223,7 +223,7 @@ export default function AddBudgetForm({ budget = {}, onSubmit }) {
                 hideFn={() => setSelectCategory(false)}
                 showTab
                 hideCancelButton
-                categories={categories.filter(c => !excludedCategory.includes(c.name))}
+                categories={categories?.filter(c => !excludedCategory.includes(c.name))}
                 onCategorySelected={handleCategorySelect}
                 onCancelSelection={handleCancelSelection}
                 defaultType="Expense"
