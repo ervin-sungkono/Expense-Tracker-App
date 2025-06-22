@@ -41,7 +41,7 @@ function BudgetCard({ budget, onClick, style }) {
     }
     return (
         <div style={style} className="pb-3">
-            <div onClick={handleBudgetClicked} className="cursor-pointer flex gap-2 md:gap-4 px-4 py-4 rounded-lg bg-light dark:bg-neutral-800">
+            <div onClick={handleBudgetClicked} className="cursor-pointer flex gap-2 md:gap-4 px-4 py-4 rounded-lg bg-light dark:bg-neutral-800 active:scale-95 transition-transform duration-150 ease-in-out">
                 <div className="relative w-8 h-8 md:w-10 md:h-10 flex shrink-0 justify-center items-center bg-ocean-blue rounded-full">
                     <Image className="object-contain p-1.5 md:p-2" src={`./category_icons/${category.icon}`} alt="" fill/>
                 </div>

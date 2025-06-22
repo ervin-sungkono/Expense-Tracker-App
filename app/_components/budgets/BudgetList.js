@@ -6,13 +6,15 @@ import { useLiveQuery } from "dexie-react-hooks";
 import { db } from "@/app/_lib/db";
 import Dialog from "../common/Dialog";
 import AddBudgetForm from "./AddBudgetForm";
+import BudgetTab from "./BudgetTab";
 
 export default function BudgetList() {
     const PAGE_SIZE = 10;
 
+    const [budgetType, setBudgetType] = useState(null);
     const [showDialog, setShowDialog] = useState(false);
     const [limit, setLimit] = useState(PAGE_SIZE);
-    const budgets = useLiveQuery(() => db.getPaginatedBudgets(limit, { active: true }), [limit]);
+    const budgets = useLiveQuery(() => db.getPaginatedBudgets(limit, budgetType), [limit, budgetType]);
 
     const fetchMoreData = async() => {
         setLimit(currentLimit => currentLimit + PAGE_SIZE);
@@ -20,6 +22,7 @@ export default function BudgetList() {
 
     return (
         <div className="grow flex flex-col">
+            <BudgetTab selected={'all'} onChange={(type) => setBudgetType(type)}/>
             <div className="grow">
                 <VirtualizedBudgetList
                     items={budgets}
