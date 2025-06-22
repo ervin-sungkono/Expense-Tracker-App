@@ -9,22 +9,22 @@ import Image from 'next/image';
 
 const COLUMN_CNT = 2;
 
-const Row = ({ columnIndex, rowIndex, style, data }) => {
+const Row = ({ columnIndex, rowIndex, style, data: {items, onShopClick} }) => {
   const index = rowIndex * COLUMN_CNT + columnIndex;
 
-  if(index >= data.length) return; // if the index is more than available data, it is not a valid index
+  if(index >= items.length) return; // if the index is more than available data, it is not a valid index
 
-  const item = data[rowIndex * COLUMN_CNT + columnIndex]; // load the item from data
+  const item = items[rowIndex * COLUMN_CNT + columnIndex]; // load the item from data
   if(!item) return <div style={style} className='flex justify-center items-center animate-pulse'><p>Loading more data..</p></div>
   
   return (
-      <ShopCard shop={item} isOdd={index % 2 === 1} style={style}/>
+      <ShopCard shop={item} onClick={onShopClick} isOdd={index % 2 === 1} style={style}/>
   );
 };
 
 const MemoizedRow = memo(Row);
 
-const VirtualizedShopList = ({ items, loadMore, hasNextPage }) => {
+const VirtualizedShopList = ({ items, loadMore, hasNextPage, onShopClick }) => {
   const isItemLoaded = index => !hasNextPage || index < items.length;
 
   if(!items) {
@@ -61,7 +61,7 @@ const VirtualizedShopList = ({ items, loadMore, hasNextPage }) => {
                 columnCount={COLUMN_CNT}
                 height={height}
                 width={width}
-                itemData={items}
+                itemData={{items, onShopClick}}
                 style={{willChange: 'initial'}}
                 ref={ref}
                 onItemsRendered={(props) => onItemsRendered({

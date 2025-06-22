@@ -15,6 +15,7 @@ export default function Shops() {
     const PAGE_SIZE = 10;
     const [limit, setLimit] = useState(PAGE_SIZE);
     const [searchText, setSearchText] = useState("");
+    const [selectedShop, setSelectedShop] = useState(null);
 
     const shops = useLiveQuery(
         () => db.getPaginatedShops(limit, searchText), 
@@ -31,6 +32,11 @@ export default function Shops() {
         setLimit(currentLimit => currentLimit + PAGE_SIZE);
     };
 
+    const handleShopAdd = (shop = null) => {
+        setSelectedShop(shop);
+        setShowAdd(true);
+    }
+
     return(
         <Layout pathname={"/shops"}>
             <div className="h-full flex flex-col">
@@ -42,7 +48,7 @@ export default function Shops() {
                             onSearch={(value) => setSearchText(value.toLowerCase())}
                         />
                         <div className="relative z-0">
-                            <IconButton icon={<PlusIcon size={20}/>} contained onClick={() => setShowAdd(!showAdd)}/>
+                            <IconButton icon={<PlusIcon size={20}/>} contained onClick={handleShopAdd}/>
                         </div>
                     </div>
                 </div>
@@ -51,13 +57,17 @@ export default function Shops() {
                         items={shops}
                         loadMore={fetchMoreData}
                         hasNextPage={shops && shops.length > 0 && shops.length % PAGE_SIZE === 0}
+                        onShopClick={handleShopAdd}
                     />
                 </div>
                 <Dialog
                     show={showAdd}
                     hideFn={() => setShowAdd(false)}
                 >
-                    <InfoShopForm hideFn={() => setShowAdd(false)}/>
+                    <InfoShopForm 
+                        shop={selectedShop} 
+                        hideFn={() => setShowAdd(false)}
+                    />
                 </Dialog>
             </div>
         </Layout>
