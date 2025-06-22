@@ -4,12 +4,12 @@ import { formatCurrency, formatDate, getDayDifference } from "@/app/_lib/utils";
 import { useLiveQuery } from "dexie-react-hooks";
 import Image from "next/image";
 import { memo, useEffect, useState } from "react"
-import { IoChevronForward as RightIcon } from "react-icons/io5";
 import LoadingSpinner from "../common/LoadingSpinner";
 
 function BudgetCard({ budget, onClick, style }) {
     const { amount, categoryId, start_date, end_date } = budget;
     const [totalTransaction, setTotalTransaction] = useState(0);
+
     const remainingBudget = amount - totalTransaction;
     const todayDate = new Date();
 
@@ -55,7 +55,7 @@ function BudgetCard({ budget, onClick, style }) {
                             <p className="text-sm">{formatDate(start_date)}</p>
                             <p className="text-sm">{formatDate(end_date)}</p>
                         </div>
-                        <div className="relative w-full h-1.5 md:h-2 bg-neutral-700 rounded-full">
+                        <div className="relative w-full h-1.5 md:h-2 bg-neutral-200 dark:bg-neutral-700 rounded-full">
                             {remainingBudget < 0 ? 
                             <div className="absolute top-0 left-0 h-full bg-danger-gradient rounded-full" style={{ width: '100%' }}></div> :
                             <div className="absolute top-0 left-0 h-full bg-basic-gradient rounded-full" style={{ width: `${remainingBudget / amount * 100}%` }}></div>}

@@ -7,7 +7,7 @@ import Button from "../common/Button";
 const CategoryTab = dynamic(() => import('./CategoryTab'));
 const SearchBar = dynamic(() => import('../common/Searchbar'));
 
-export default function SelectCategory({ categories, onCategorySelected, onCancelSelection, defaultType = 'Expense', showTab = false, showSearch = false, hideCancelButton = false }) {
+export default function SelectCategory({ categories, onCategorySelected, onCancelSelection, defaultType = 'Expense', showTab = false, showSearch = false, hideCancelButton = false, excludedTabs }) {
     const [searchText, setSearchText] = useState('');
     const [selectedType, setSelectedType] = useState(defaultType);
     const [categoryData, setCategoryData] = useState(null);
@@ -66,7 +66,7 @@ export default function SelectCategory({ categories, onCategorySelected, onCance
 
     return(
         <div className="grow flex flex-col gap-2">
-            {showTab && <CategoryTab selected={selectedType} onChange={(type) => setSelectedType(type)}/>}
+            {showTab && <CategoryTab selected={selectedType} onChange={(type) => setSelectedType(type)} excluded={excludedTabs}/>}
             {showSearch && <SearchBar
                 placeholder={"Search category"}
                 onSearch={(val) => setSearchText(val.toLowerCase())}

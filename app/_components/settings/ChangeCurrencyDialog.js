@@ -47,7 +47,6 @@ export default function ChangeCurrencyDialog({ show, hideFn }) {
             }
 
             setCurrency(currency);
-            form.reset();
             hideFn && hideFn();
         } catch(e) {
             console.log(e);

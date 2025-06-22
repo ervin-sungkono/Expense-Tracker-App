@@ -4,6 +4,8 @@ import Button from "../common/Button";
 import VirtualizedBudgetList from "./VirtualizedBudgetList"
 import { useLiveQuery } from "dexie-react-hooks";
 import { db } from "@/app/_lib/db";
+import Dialog from "../common/Dialog";
+import AddBudgetForm from "./AddBudgetForm";
 
 export default function BudgetList() {
     const PAGE_SIZE = 10;
@@ -28,6 +30,12 @@ export default function BudgetList() {
             <div className="flex justify-center mt-2">
                 <Button label={"Add New Budget"} onClick={() => setShowDialog(true)}/>
             </div>
+            <Dialog
+                show={showDialog}
+                hideFn={() => setShowDialog(false)}
+            >
+                <AddBudgetForm onSubmit={() => setShowDialog(false)}/>
+            </Dialog>
         </div>
     )
 }

@@ -90,7 +90,6 @@ export default function AddTransactionForm({ transaction = {}, onSubmit }) {
                 db.addTransaction(payload);
             }
             
-            form.reset();
             onSubmit && onSubmit();
         } catch(e) {
             console.log(e);

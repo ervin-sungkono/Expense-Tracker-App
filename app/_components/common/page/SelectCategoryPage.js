@@ -4,7 +4,7 @@ import Page from "./Page";
 
 const SelectCategory = dynamic(() => import("../../categories/SelectCategory"));
 
-export default function SelectCategoryPage({ show, hideFn, categories, onCategorySelected, onCancelSelection, defaultType, showTab = false, showSearch = false, hideCancelButton = false }){
+export default function SelectCategoryPage({ show, hideFn, categories, onCategorySelected, onCancelSelection, defaultType, showTab = false, showSearch = false, hideCancelButton = false, excludedTabs }){
     return (
          <Page
             title={"Select Category"}
@@ -19,6 +19,7 @@ export default function SelectCategoryPage({ show, hideFn, categories, onCategor
                 showTab={showTab}
                 showSearch={showSearch}
                 hideCancelButton={hideCancelButton}
+                excludedTabs={excludedTabs}
             />
         </Page>      
     )
