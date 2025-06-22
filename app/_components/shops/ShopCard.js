@@ -10,7 +10,7 @@ export default function ShopCard({ shop, isOdd, style, onClick }) {
 
     return (
         <div>
-            <div onClick={handleShopClick} style={style} className={`cursor-pointer w-full h-full flex flex-col ${!isOdd ? 'pr-2' : ''} pb-2`}>
+            <div onClick={handleShopClick} style={style} className={`cursor-pointer w-full h-full flex flex-col active:scale-95 transition-transform duration-150 ease-in-out ${!isOdd ? 'pr-2' : ''} pb-2`}>
                 <div className="relative w-full aspect-video bg-light dark:bg-neutral-800 rounded-t-lg overflow-hidden">
                     {image && <Image src={image} className="object-contain" fill alt={`${name} Image`}/>}
                 </div>
