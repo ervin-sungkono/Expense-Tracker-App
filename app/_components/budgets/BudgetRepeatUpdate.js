@@ -13,7 +13,7 @@ export default function BudgetRepeatUpdate() {
         const date = new Date();
 
         // If date not stored or the day difference between stored date and current date is 1
-        if(!storedDate || getDayDifference(storedDate, date) >= 1) {
+        if(!storedDate || getDayDifference(storedDate, date) > 1) {
             // Execute function
             console.log('LAST UPDATED', date.toISOString());
             setLastUpdate(date.toISOString());
