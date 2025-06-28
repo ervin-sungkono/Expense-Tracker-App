@@ -89,7 +89,6 @@ function CategoryCard({ category, onClick, style, depth = 0 }) {
                         onDelete={() => setShowDelete(false)}
                     />
                 </Dialog>
-                
             </div>
             {category.data &&
             category.data.map(subcategory => (
