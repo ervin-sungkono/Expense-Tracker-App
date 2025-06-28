@@ -7,15 +7,12 @@ import { db } from "@/app/_lib/db";
 import Dialog from "../common/Dialog";
 import AddBudgetForm from "./AddBudgetForm";
 import BudgetTab from "./BudgetTab";
-import InfoBudgetContent from "./InfoBudgetContent";
 
 export default function BudgetList() {
     const PAGE_SIZE = 10;
 
-    const [budgetData, setBudgetData] = useState(null);
     const [budgetType, setBudgetType] = useState(null);
     const [showAdd, setShowAdd] = useState(false);
-    const [showInfo, setShowInfo] = useState(false);
     const [limit, setLimit] = useState(PAGE_SIZE);
     const budgets = useLiveQuery(() => db.getPaginatedBudgets(limit, budgetType), [limit, budgetType]);
     const scrollRef = useRef(null);
@@ -44,7 +41,6 @@ export default function BudgetList() {
                     items={budgets}
                     hasNextPage={budgets && budgets.length % PAGE_SIZE === 0}
                     loadMore={fetchMoreData}
-                    onBudgetClicked={handleBudgetClick}
                 />
             </div>
             <div className="flex justify-center mt-2">
@@ -55,12 +51,6 @@ export default function BudgetList() {
                 hideFn={() => setShowAdd(false)}
             >
                 <AddBudgetForm onSubmit={() => setShowAdd(false)}/>
-            </Dialog>
-            <Dialog
-                show={showInfo}
-                hideFn={() => setShowInfo(false)}
-            >
-                <InfoBudgetContent budget={budgetData}/>
             </Dialog>
         </div>
     )
