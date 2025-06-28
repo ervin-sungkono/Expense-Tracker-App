@@ -6,10 +6,13 @@ import Image from "next/image";
 import { memo, useEffect, useState } from "react"
 import LoadingSpinner from "../common/LoadingSpinner";
 import BudgetProgress from "./BudgetProgress";
+import Dialog from "../common/Dialog";
+import InfoBudgetContent from "./InfoBudgetContent";
 
-function BudgetCard({ budget, onClick, style }) {
+function BudgetCard({ budget, style }) {
     const { amount, categoryId, start_date, end_date } = budget;
     const [totalTransaction, setTotalTransaction] = useState(0);
+    const [showInfo, setShowInfo] = useState(false);
 
     const remainingBudget = amount - totalTransaction;
     const todayDate = new Date();
@@ -30,16 +33,6 @@ function BudgetCard({ budget, onClick, style }) {
         }
     }, [transactions]);
 
-    const handleBudgetClicked = () => {
-        onClick && onClick({ 
-            ...budget, 
-            totalTransaction, 
-            remainingBudget, 
-            remainingDays, 
-            category 
-        });
-    }
-
     if(!transactions || !category) {
         return (
             <div style={style} className="pb-3">
@@ -51,7 +44,7 @@ function BudgetCard({ budget, onClick, style }) {
     }
     return (
         <div style={style} className="pb-3">
-            <div onClick={handleBudgetClicked} className="cursor-pointer flex gap-2 md:gap-4 px-4 py-4 rounded-lg bg-light dark:bg-neutral-800 active:scale-95 transition-transform duration-150 ease-in-out">
+            <div onClick={() => setShowInfo(true)} className="cursor-pointer flex gap-2 md:gap-4 px-4 py-4 rounded-lg bg-light dark:bg-neutral-800 active:scale-95 transition-transform duration-150 ease-in-out">
                 <div className="relative w-8 h-8 md:w-10 md:h-10 flex shrink-0 justify-center items-center bg-ocean-blue rounded-full">
                     <Image className="object-contain p-1.5 md:p-2" src={`./category_icons/${category.icon}`} alt="" fill/>
                 </div>
@@ -69,6 +62,21 @@ function BudgetCard({ budget, onClick, style }) {
                     />
                 </div> 
             </div>
+            <Dialog
+                show={showInfo}
+                hideFn={() => setShowInfo(false)}
+            >
+                <InfoBudgetContent 
+                    budget={{ 
+                        ...budget, 
+                        totalTransaction, 
+                        remainingBudget, 
+                        remainingDays, 
+                        category 
+                    }} 
+                    hideFn={() => setShowInfo(false)}
+                />
+            </Dialog>
         </div>
     )
 }

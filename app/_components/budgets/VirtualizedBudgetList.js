@@ -7,19 +7,19 @@ import Image from 'next/image';
 import InfiniteLoader from 'react-window-infinite-loader';
 import BudgetCard from './BudgetCard';
 
-const Row = ({ index, style, data: { items, onBudgetClicked } }) => {
+const Row = ({ index, style, data: { items } }) => {
   const item = items[index];
 
   if(!item) return <div style={style} className='flex justify-center items-center animate-pulse'><p>Loading more data..</p></div>
   
   return (
-      <BudgetCard budget={item} onClick={onBudgetClicked} style={style}/>
+      <BudgetCard budget={item} style={style}/>
   );
 };
 
 const MemoizedRow = memo(Row);
 
-const VirtualizedCategoryList = ({ scrollRef, items, hasNextPage, loadMore, onBudgetClicked }) => {
+const VirtualizedCategoryList = ({ scrollRef, items, hasNextPage, loadMore }) => {
     const isItemLoaded = index => !hasNextPage || index < items.length;
 
     if(!items) {
@@ -59,7 +59,7 @@ const VirtualizedCategoryList = ({ scrollRef, items, hasNextPage, loadMore, onBu
                             width={width}
                             itemCount={items.length}
                             itemSize={152}
-                            itemData={{ items, onBudgetClicked }}
+                            itemData={{ items }}
                             style={{willChange: 'initial'}}
                         >
                             {MemoizedRow}
