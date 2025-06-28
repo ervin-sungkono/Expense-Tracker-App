@@ -1,6 +1,7 @@
 'use client'
 import { formatCurrency, formatDateString, getDayDifference, isInDateRange } from "@/app/_lib/utils";
 import Button from "../common/Button";
+import BudgetProgress from "./BudgetProgress";
 
 export default function InfoBudgetContent({ budget = {} }) {
     const totalDays = getDayDifference(budget.start_date, budget.end_date);
@@ -25,7 +26,8 @@ export default function InfoBudgetContent({ budget = {} }) {
         },
         {
             label: "Target daily spending",
-            value: formatCurrency(estimatedSpending)
+            value: formatCurrency(estimatedSpending),
+            hidden: !isInDateRange(new Date(), [budget.start_date, budget.end_date])
         },
         {
             label: "Category",
@@ -46,25 +48,12 @@ export default function InfoBudgetContent({ budget = {} }) {
                         </div>
                     ))}
                 </div>
-                <div className="flex flex-col mt-1">
-                    <div className="relative w-full h-1.5 md:h-2 bg-neutral-200 dark:bg-neutral-700 rounded-full">
-                        {budget.remainingBudget < 0 ? 
-                        <div className="absolute top-0 left-0 h-full bg-danger-gradient rounded-full" style={{ width: '100%' }}></div> :
-                        <div className="absolute top-0 left-0 h-full bg-basic-gradient rounded-full" style={{ width: `${budget.remainingBudget / budget.amount * 100}%` }}></div>}
-                    </div>
-                    <div className="flex justify-between mt-2 font-medium">
-                        <p className="text-sm">{budget.remainingDays} days left</p>
-                        {budget.remainingBudget < 0 ? 
-                        <p className="flex flex-col items-end gap-0.5 text-sm">
-                            <span className="text-xs text-dark/60 dark:text-white/60">Overspent</span> 
-                            <span>{formatCurrency(budget.remainingBudget * -1)}</span>
-                        </p> :
-                        <p className="flex flex-col items-end gap-0.5 text-sm">
-                            <span className="text-xs text-dark/60 dark:text-white/60">Remaining</span>
-                            <span>{formatCurrency(budget.remainingBudget)}</span>
-                        </p>}
-                    </div>
-                </div>
+                <BudgetProgress
+                    daysSinceStart={daysSinceStart}
+                    remainingDays={budget.remainingDays}
+                    remainingBudget={budget.remainingBudget}
+                    budgetAmount={budget.amount}
+                />
             </div>
             <div className="flex justify-end gap-2.5">
                 <Button label={"Delete"} style="danger" contained/>
