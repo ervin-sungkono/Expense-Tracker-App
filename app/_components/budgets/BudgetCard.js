@@ -1,10 +1,11 @@
 'use client'
 import { db } from "@/app/_lib/db";
-import { formatCurrency, formatDate, getDayDifference } from "@/app/_lib/utils";
+import { formatCurrency, getDayDifference } from "@/app/_lib/utils";
 import { useLiveQuery } from "dexie-react-hooks";
 import Image from "next/image";
 import { memo, useEffect, useState } from "react"
 import LoadingSpinner from "../common/LoadingSpinner";
+import BudgetProgress from "./BudgetProgress";
 
 function BudgetCard({ budget, onClick, style }) {
     const { amount, categoryId, start_date, end_date } = budget;
@@ -12,6 +13,7 @@ function BudgetCard({ budget, onClick, style }) {
 
     const remainingBudget = amount - totalTransaction;
     const todayDate = new Date();
+    const daysSinceStart = getDayDifference(start_date, new Date());
     const totalDays = getDayDifference(start_date, end_date);
     const remainingDays = Math.max(0, Math.min(getDayDifference(todayDate, end_date), totalDays));
 
@@ -58,29 +60,13 @@ function BudgetCard({ budget, onClick, style }) {
                         <p className="text-base font-medium grow">{category.name}</p>
                         <div className="text-base font-semibold">{formatCurrency(amount)}</div>
                     </div>
-                    <div className="flex flex-col mt-1">
-                        <div className="flex justify-between mb-1.5 text-dark/80 dark:text-white/80">
-                            <p className="text-sm">{formatDate(start_date)}</p>
-                            <p className="text-sm">{formatDate(end_date)}</p>
-                        </div>
-                        <div className="relative w-full h-1.5 md:h-2 bg-neutral-200 dark:bg-neutral-700 rounded-full">
-                            {remainingBudget < 0 ? 
-                            <div className="absolute top-0 left-0 h-full bg-danger-gradient rounded-full" style={{ width: '100%' }}></div> :
-                            <div className="absolute top-0 left-0 h-full bg-basic-gradient rounded-full" style={{ width: `${remainingBudget / amount * 100}%` }}></div>}
-                        </div>
-                        <div className="flex justify-between mt-2 font-medium">
-                            <p className="text-sm">{remainingDays} days left</p>
-                            {remainingBudget < 0 ? 
-                            <p className="flex flex-col items-end gap-0.5 text-sm">
-                                <span className="text-xs text-dark/60 dark:text-white/60">Overspent</span> 
-                                <span>{formatCurrency(remainingBudget * -1)}</span>
-                            </p> :
-                            <p className="flex flex-col items-end gap-0.5 text-sm">
-                                <span className="text-xs text-dark/60 dark:text-white/60">Remaining</span>
-                                <span>{formatCurrency(remainingBudget)}</span>
-                            </p>}
-                        </div>
-                    </div>
+                    <BudgetProgress
+                        dateRange={[start_date, end_date]}
+                        daysSinceStart={daysSinceStart}
+                        remainingDays={remainingDays}
+                        remainingBudget={remainingBudget}
+                        budgetAmount={amount}
+                    />
                 </div> 
             </div>
         </div>
