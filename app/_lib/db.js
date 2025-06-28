@@ -204,7 +204,6 @@ class ExpenseDB extends Dexie {
         if(type === 'upcoming') {
             return this.budgets
                 .orderBy('start_date')
-                .reverse()
                 .filter(budget => {
                     if(isInDateRange(new Date(), [budget.start_date, budget.end_date])) return false;
                     if(new Date().getTime() > budget.end_date.getTime()) return false; // already finished
@@ -239,6 +238,17 @@ class ExpenseDB extends Dexie {
                 .filter(budget => {
                     if(isInDateRange(new Date(), [budget.start_date, budget.end_date])) return false;
                     if(new Date().getTime() < new Date(budget.start_date).getTime()) return false; // not started yet
+                    return true;
+                })
+                .limit(limit)
+                .toArray();
+        }
+        if(type === 'upcoming') {
+            return this.budgets
+                .orderBy('start_date')
+                .filter(budget => {
+                    if(isInDateRange(new Date(), [budget.start_date, budget.end_date])) return false;
+                    if(new Date().getTime() > budget.end_date.getTime()) return false; // already finished
                     return true;
                 })
                 .limit(limit)
