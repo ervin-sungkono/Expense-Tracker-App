@@ -1,6 +1,6 @@
 'use client'
 import dynamic from "next/dynamic";
-import { formatCurrency, formatDateString } from "@/app/_lib/utils";
+import { formatCurrency } from "@/app/_lib/utils";
 import { memo, useState } from "react";
 import { useLongPress } from "use-long-press";
 import ContextMenu from "../common/ContextMenu";
@@ -46,11 +46,11 @@ function TransactionCard({ transaction }) {
             <div {...handlers()} onClick={!isMobile ? () => setShowMenu(true) : null} className="w-full h-full cursor-pointer px-2.5 md:px-4 py-2 flex active:bg-neutral-300/30 dark:active:bg-light/10 transition-colors duration-150 ease-in-out">
                 <div className="w-full flex items-center gap-2.5">
                     <div className="relative shrink-0 w-8 h-8 md:w-10 md:h-10 flex justify-center items-center bg-ocean-blue rounded-full">
-                        {category.icon && <Image className="object-contain p-1.5 md:p-2" src={`./category_icons/${category.icon}`} alt="" fill/>}
+                        {category?.icon && <Image className="object-contain p-1.5 md:p-2" src={`./category_icons/${category?.icon}`} alt="" fill/>}
                     </div>
                     <div className="w-full flex items-center gap-1.5">
                         <div className="grow flex flex-col gap-1">
-                            <p className="text-sm md:text-base font-medium grow">{category.name}</p>
+                            <p className="text-sm md:text-base font-medium grow">{category?.name}</p>
                             <p className="text-xs md:text-sm line-clamp-1 text-dark/80 dark:text-white/80">{remarks}</p>
                         </div>
                         <p className="text-sm md:text-base font-medium">{formatCurrency(amount)}</p>

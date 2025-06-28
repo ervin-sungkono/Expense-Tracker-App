@@ -8,8 +8,8 @@ import { useEffect, useState } from "react";
 import Button from "../common/Button";
 import { StringValidator } from "@/app/_lib/validator";
 import { useLiveQuery } from "dexie-react-hooks";
-import SelectIconPage from "../common/page/SelectIconPage";
-import SelectCategoryPage from "../common/page/SelectCategoryPage";
+const SelectIconPage = dynamic(() => import("../common/page/SelectIconPage"));
+const SelectCategoryPage = dynamic(() => import("../common/page/SelectCategoryPage"));
 
 export default function AddCategoryForm({ category = {}, onSubmit }) {
     const [errorMessage, setErrorMessage] = useState({});

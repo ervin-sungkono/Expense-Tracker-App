@@ -146,6 +146,16 @@ class ExpenseDB extends Dexie {
         return this.categories.where({ id: categoryId }).first();
     }
 
+    async getMergeCategories(categoryId) {
+        const category = await this.getCategoryById(categoryId);
+
+        if(category.parentId) {
+            return this.categories.filter(c => c.type === category?.type && c.id !== categoryId).toArray();
+        } else {
+            return this.categories.filter(c => c.type === category?.type && c.id !== categoryId && c.parentId !== categoryId).toArray();
+        }
+    }
+
     getParentCategories(type) {
         return this.categories.filter(category => category.parentId === null && category.type === type).toArray();
     }
@@ -299,12 +309,14 @@ class ExpenseDB extends Dexie {
     }
 
     // Keep the sub categories and transactions by merging it with a new prent category
-    mergeCategory(categoryId, newParentId) {
-         return this.transaction('rw', this.transactions, this.budgets, this.categories, () => {
+    async mergeCategory(categoryId, newParentId) {
+        const newCategory = await this.getCategoryById(newParentId);
+
+        return this.transaction('rw', this.transactions, this.budgets, this.categories, () => {
             if(newParentId) {
                 this.transactions.where({ categoryId }).modify({ categoryId: newParentId });
                 this.budgets.where({ categoryId }).modify({ categoryId: newParentId });
-                this.categories.where({ parentId: categoryId }).modify({ parentId: newParentId });
+                this.categories.where({ parentId: categoryId }).modify({ parentId: newCategory.parentId ?? newParentId });
             }
             this.categories.delete(categoryId);
         })
