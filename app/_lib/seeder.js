@@ -58,7 +58,7 @@ export function generateBudgets(count) {
 
         const amount = randomBetween(100000, 5000000);
         const categoryId = randomBetween(1, 12);
-        const repeat = isInDateRange(new Date(), [start_date, end_date]); // only active budgets are set repeatable
+        const repeat = false;
 
         budgets.push({ amount, categoryId, start_date, end_date, repeat });
     }
