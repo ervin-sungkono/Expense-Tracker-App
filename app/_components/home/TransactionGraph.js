@@ -48,14 +48,17 @@ export default function TransactionGraph({ transactionType, transactionData = []
     }
 
     const handleDownloadReport = () => {
-        const sum = transactionData.reduce((sum, curr) => {
-            return sum += Number(curr.amount);
-        }, 0);
+        const transactionSum = Object.keys(transactionData).reduce((acc, key) => {
+            acc[key] = transactionData[key].reduce((sum, curr) => {
+                return sum += Number(curr.amount);
+            }, 0);
+            return acc;
+        }, {});
 
-        const data = [
+        const data = Object.entries(transactionData).map(([key, value]) => (
             {
-                sheet: `${transactionType} Transaction`,
-                columns: transactionType === 'Expense' ? [
+                sheet: key,
+                columns: key === 'Expense' ? [
                     { label: "Date", value: "date", format: "dd-mmm-yy" },
                     { label: "Category", value: "category" },
                     { label: "Amount", value: "amount", format: "Rp#.##0;-Rp#.##0" },
@@ -68,14 +71,14 @@ export default function TransactionGraph({ transactionType, transactionData = []
                     { label: "Notes", value: "remarks" }
                 ],
                 content: [
-                    ...transactionData.sort((a,b) => new Date(a.date).getTime() - new Date(b.date).getTime()),
-                    { date: '', category: 'Total', amount: sum, shop: '' }
+                    ...value.sort((a,b) => new Date(a.date).getTime() - new Date(b.date).getTime()),
+                    { date: '', category: 'Total', amount: transactionSum[key], shop: '' }
                 ]
             }
-        ]
+        ));
 
         const settings = {
-            fileName: `${transactionType}_Report-${title}`,
+            fileName: `Transaction_Report-${title}`,
             extraLength: 3,
             writeMode: 'writeFile'
         }
@@ -99,12 +102,12 @@ export default function TransactionGraph({ transactionType, transactionData = []
     }
 
     useEffect(() => {
-        if(labels && transactionData && transactionData.length > 0) {
+        if(labels && transactionData && transactionData[transactionType] && transactionData[transactionType].length > 0) {
             const labelsMap = {}
             labels.forEach(label => labelsMap[label] = 0);
             
             let totalTransaction = 0;
-            transactionData.forEach(transaction => {
+            transactionData[transactionType].forEach(transaction => {
                 const date = transaction.date;
                 const month = date.getMonth();
                 const year = date.getFullYear();
@@ -130,12 +133,12 @@ export default function TransactionGraph({ transactionType, transactionData = []
     }, [labels,  transactionData, type])
 
     useEffect(() => {
-        if(historyLabels && historyTransactionData && historyTransactionData.length > 0) {
+        if(historyLabels && historyTransactionData && historyTransactionData[transactionType] && historyTransactionData[transactionType].length > 0) {
             const historyLabelsMap = {};
             historyLabels.forEach(label => historyLabelsMap[label] = 0);
 
             let totalTransaction = 0;
-            historyTransactionData.forEach(transaction => {
+            historyTransactionData[transactionType].forEach(transaction => {
                 const date = transaction.date;
                 const month = date.getMonth();
                 const year = date.getFullYear();

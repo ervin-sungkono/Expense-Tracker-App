@@ -191,8 +191,8 @@ export default function TransactionReport() {
                 transactionType={selectedType}
                 labels={(weeks && weeks[selectedYear]?.[selectedWeek - 1]?.labels)}
                 historyLabels={(weeks && getPreviousWeek(selectedYear, selectedWeek)?.labels)} 
-                transactionData={weekMap && weekMap[getWeekKey(selectedYear, selectedWeek)]?.[selectedType]}
-                historyTransactionData={weekMap && weekMap[`${getPreviousWeekKey(selectedYear, selectedWeek)}`]?.[selectedType]}
+                transactionData={weekMap && weekMap[getWeekKey(selectedYear, selectedWeek)]}
+                historyTransactionData={weekMap && weekMap[`${getPreviousWeekKey(selectedYear, selectedWeek)}`]}
                 title={`WEEK_${selectedWeek}_${selectedYear}`}
             />
         },
@@ -237,8 +237,8 @@ export default function TransactionReport() {
                 transactionType={selectedType}
                 labels={getMonthlyLabels(selectedYear, selectedMonth)}
                 historyLabels={getMonthlyLabels(selectedYear, selectedMonth - 1)}
-                transactionData={monthMap && monthMap[getMonthKey(selectedYear, selectedMonth)]?.[selectedType]}
-                historyTransactionData={monthMap && monthMap[`${getPreviousMonthKey(selectedYear, selectedMonth)}`]?.[selectedType]}
+                transactionData={monthMap && monthMap[getMonthKey(selectedYear, selectedMonth)]}
+                historyTransactionData={monthMap && monthMap[`${getPreviousMonthKey(selectedYear, selectedMonth)}`]}
                 title={`${MONTHS[selectedMonth]}_${selectedYear}`}
             />
         },
@@ -271,8 +271,8 @@ export default function TransactionReport() {
                 transactionType={selectedType}
                 labels={MONTHS}
                 historyLabels={MONTHS}
-                transactionData={yearMap && yearMap[selectedYear]?.[selectedType]}
-                historyTransactionData={yearMap && yearMap[selectedYear - 1]?.[selectedType]} 
+                transactionData={yearMap && yearMap[selectedYear]}
+                historyTransactionData={yearMap && yearMap[selectedYear - 1]} 
                 title={`${selectedYear}`}
             />
         }
