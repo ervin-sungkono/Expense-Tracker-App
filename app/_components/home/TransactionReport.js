@@ -145,12 +145,28 @@ export default function TransactionReport() {
         }
     }, [transactions, categories, shops])
 
+    const typeOptions = [
+        { id: 'Expense', label: 'Expense' },
+        { id: 'Income', label: 'Income' }
+    ]
+
     const contents = [
         {
             id: 'weekly',
             label: 'Weekly',
             header: () => (
                 <div className="px-3 pt-2 grid grid-cols-2 gap-2">
+                    <div className="col-span-2 flex items-center border border-ocean-blue rounded-full text-sm md:text-base font-semibold text-center overflow-hidden">
+                        {typeOptions.map(type => (
+                            <div 
+                                key={type.id} 
+                                className={`cursor-pointer grow ${type.id === selectedType ? 'bg-ocean-blue' : 'bg-transparent'} py-2`}
+                                onClick={() => setSelectedType(type.id)}
+                            >
+                                {type.label}
+                            </div>
+                        ))}
+                    </div>
                     {weekOptions ? 
                     <SelectField
                         name={"week"}
@@ -172,6 +188,7 @@ export default function TransactionReport() {
             ),
             component: <TransactionGraph 
                 type="WEEKLY"
+                transactionType={selectedType}
                 labels={(weeks && weeks[selectedYear]?.[selectedWeek - 1]?.labels)}
                 historyLabels={(weeks && getPreviousWeek(selectedYear, selectedWeek)?.labels)} 
                 transactionData={weekMap && weekMap[getWeekKey(selectedYear, selectedWeek)]?.[selectedType]}
@@ -184,6 +201,17 @@ export default function TransactionReport() {
             label: 'Monthly',
             header: () => (
                 <div className="px-3 pt-2 grid grid-cols-2 gap-2">
+                    <div className="col-span-2 flex items-center border border-ocean-blue rounded-full text-sm md:text-base font-semibold text-center overflow-hidden">
+                        {typeOptions.map(type => (
+                            <div 
+                                key={type.id} 
+                                className={`cursor-pointer grow ${type.id === selectedType ? 'bg-ocean-blue' : 'bg-transparent'} py-2`}
+                                onClick={() => setSelectedType(type.id)}
+                            >
+                                {type.label}
+                            </div>
+                        ))}
+                    </div>
                     <SelectField
                         name={"month"}
                         placeholder={"Month"}
@@ -206,6 +234,7 @@ export default function TransactionReport() {
             ),
             component: <TransactionGraph 
                 type="MONTHLY" 
+                transactionType={selectedType}
                 labels={getMonthlyLabels(selectedYear, selectedMonth)}
                 historyLabels={getMonthlyLabels(selectedYear, selectedMonth - 1)}
                 transactionData={monthMap && monthMap[getMonthKey(selectedYear, selectedMonth)]?.[selectedType]}
@@ -217,7 +246,18 @@ export default function TransactionReport() {
             id: 'annual',
             label: 'Annual',
             header: () => (
-                <div className="px-3 pt-2">
+                <div className="px-3 pt-2 gap-2 grid grid-cols-1">
+                    <div className="flex items-center border border-ocean-blue rounded-full text-sm md:text-base font-semibold text-center overflow-hidden">
+                        {typeOptions.map(type => (
+                            <div 
+                                key={type.id} 
+                                className={`cursor-pointer grow ${type.id === selectedType ? 'bg-ocean-blue' : 'bg-transparent'} py-2`}
+                                onClick={() => setSelectedType(type.id)}
+                            >
+                                {type.label}
+                            </div>
+                        ))}
+                    </div>
                     {yearOptions && <SelectField 
                         name={"year"}
                         _selected={selectedYear}
@@ -228,6 +268,7 @@ export default function TransactionReport() {
             ),
             component: <TransactionGraph 
                 type="ANNUAL" 
+                transactionType={selectedType}
                 labels={MONTHS}
                 historyLabels={MONTHS}
                 transactionData={yearMap && yearMap[selectedYear]?.[selectedType]}
