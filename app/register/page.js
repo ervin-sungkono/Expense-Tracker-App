@@ -18,7 +18,7 @@ export default function Register() {
 
     useEffect(() => {
         if (username && router) {
-            router.replace('/home');
+            router.replace('/home', { scroll: false });
         } else {
             setLoading(false);
         }
