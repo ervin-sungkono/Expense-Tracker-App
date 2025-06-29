@@ -10,12 +10,12 @@ export default function Tab({ selected = null, contents = [] }) {
 
     if(contents.length > 0) return(
         <div className="w-full flex flex-col">
-            <div className="w-full flex justify-start gap-0.5">
+            <div className="w-full flex justify-start">
                 {contents.map(content => (
                     <div 
                         key={`tab-${content.id}`} 
                         onClick={() => setSelectedTab(content.id)}
-                        className={`cursor-pointer py-1.5 px-2.5 rounded-t-lg font-semibold text-dark dark:text-white border ${selectedTab === content.id ? 'text-white bg-basic-gradient border-transparent' : 'border-ocean-blue'}`}
+                        className={`cursor-pointer py-1.5 px-2.5 rounded-t-lg font-semibold text-dark dark:text-white border border-b-0 ${selectedTab === content.id ? 'text-white bg-basic-gradient border-transparent' : 'border-ocean-blue'}`}
                     >
                         {content.label}
                     </div>
