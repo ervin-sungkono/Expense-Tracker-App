@@ -54,12 +54,17 @@ export default function TransactionGraph({ transactionType, transactionData = []
 
         const data = [
             {
-                sheet: 'Transaction',
-                columns: [
+                sheet: `${transactionType} Transaction`,
+                columns: transactionType === 'Expense' ? [
                     { label: "Date", value: "date", format: "dd-mmm-yy" },
                     { label: "Category", value: "category" },
                     { label: "Amount", value: "amount", format: "Rp#.##0;-Rp#.##0" },
                     { label: "Shop", value: "shop" },
+                    { label: "Notes", value: "remarks" }
+                ] : [
+                    { label: "Date", value: "date", format: "dd-mmm-yy" },
+                    { label: "Category", value: "category" },
+                    { label: "Amount", value: "amount", format: "Rp#.##0;-Rp#.##0" },
                     { label: "Notes", value: "remarks" }
                 ],
                 content: [
@@ -70,7 +75,7 @@ export default function TransactionGraph({ transactionType, transactionData = []
         ]
 
         const settings = {
-            fileName: `transaction_report-${title}`,
+            fileName: `${transactionType}_Report-${title}`,
             extraLength: 3,
             writeMode: 'writeFile'
         }

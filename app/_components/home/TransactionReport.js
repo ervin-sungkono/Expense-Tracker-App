@@ -110,8 +110,8 @@ export default function TransactionReport() {
                 const weekKey = `${year}W${week}`;
                 const monthKey = `${year}-${month}`
 
-                transaction.category = categoriesMap.get(transaction.categoryId);
-                transaction.shop = transaction.shopId ? shopsMap.get(transaction.shopId) : '';
+                transaction.category = categoriesMap.get(String(transaction.categoryId));
+                transaction.shop = transaction.shopId ? shopsMap.get(String(transaction.shopId)) : '';
 
                 if(!newWeekMap[weekKey]) {
                     newWeekMap[weekKey] = {
