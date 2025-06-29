@@ -32,12 +32,20 @@ ChartJS.register(
     Filler
 );
 
-export default function TransactionGraph({ transactionData = [], historyTransactionData = [], labels, historyLabels, type = 'MONTHLY', title = '' }) {
+export default function TransactionGraph({ transactionType, transactionData = [], historyTransactionData = [], labels, historyLabels, type = 'MONTHLY', title = '' }) {
     const [data, setData] = useState(null);
     const [historyData, setHistoryData] = useState(null);
     const [chartData, setChartData] = useState(null);
     const [chartOptions, setChartOptions] = useState(null);
     const [totalTransaction, setTotalTransaction] = useState(0);
+    const [historyTotalTransaction, setHistoryTotalTransaction] = useState(null);
+
+    const transactionDiff = historyTotalTransaction != null ? (totalTransaction - historyTotalTransaction) / historyTotalTransaction * 100 : 0;
+
+    const getDatasetColor = () => {
+        if (transactionType === 'Expense') return '255, 99, 132';
+        else return '32, 154, 184';
+    }
 
     const handleDownloadReport = () => {
         const sum = transactionData.reduce((sum, curr) => {
@@ -121,6 +129,7 @@ export default function TransactionGraph({ transactionData = [], historyTransact
             const historyLabelsMap = {};
             historyLabels.forEach(label => historyLabelsMap[label] = 0);
 
+            let totalTransaction = 0;
             historyTransactionData.forEach(transaction => {
                 const date = transaction.date;
                 const month = date.getMonth();
@@ -133,13 +142,17 @@ export default function TransactionGraph({ transactionData = [], historyTransact
                 } else if(type === 'ALLTIME') {
                     historyLabelsMap[year] += transaction.amount;
                 }
+
+                totalTransaction += transaction.amount;
             })
 
             setHistoryData(Object.values(historyLabelsMap));
+            setHistoryTotalTransaction(totalTransaction);
         }
 
         return () => {
             setHistoryData(null);
+            setHistoryTotalTransaction(null);
         }
     }, [historyLabels, historyTransactionData, type])
 
@@ -150,8 +163,8 @@ export default function TransactionGraph({ transactionData = [], historyTransact
                 datasets: [{
                     label: getDatasetLabels()[0],
                     data,
-                    borderColor: 'rgb(255, 99, 132)',
-                    backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                    borderColor: `rgb(${getDatasetColor()})`,
+                    backgroundColor: `rgba(${getDatasetColor()}, 0.2)`,
                     fill: 'start',
                     tension: 0.1
                 },
@@ -211,7 +224,7 @@ export default function TransactionGraph({ transactionData = [], historyTransact
                 }
             }); 
         }
-    }, [labels, data, historyData, type])
+    }, [labels, data, historyData, type, transactionType])
 
     if(transactionData && transactionData.length === 0) return (
         <div className="flex justify-center items-center h-48 xs:h-64 px-3 py-4">
@@ -220,7 +233,10 @@ export default function TransactionGraph({ transactionData = [], historyTransact
     )
     return(
         <div className="flex flex-col justify-center items-start min-h-48 xs:min-h-64">
-            <p className="w-full text-center mt-4 font-semibold text-sm md:text-base">Total: {formatCurrency(totalTransaction)}</p>
+            <p className="w-full text-center mt-4 font-semibold text-sm md:text-base">
+                Total: {formatCurrency(totalTransaction)}
+                <span className={`ml-2 ${transactionDiff >= 0 ? 'text-ocean-blue' : 'text-red-400'}`}>{transactionDiff < 0 ? '-' : '+'}{Math.abs(transactionDiff).toFixed(2)}%</span>
+            </p>
             {
                 (chartData && chartOptions) ? 
                 <Line
@@ -231,9 +247,9 @@ export default function TransactionGraph({ transactionData = [], historyTransact
                     <div className="w-full h-full rounded-lg bg-neutral-300 dark:bg-neutral-800 animate-pulse"></div>
                 </div>
             }
-            {/* <div className="w-full px-4 mt-2 pb-4">
+            <div className="w-full px-4 my-1 pb-4">
                 <Button label={"Download Report"} onClick={handleDownloadReport}/>
-            </div> */}
+            </div>
         </div>
     )
 }
