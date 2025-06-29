@@ -1,5 +1,5 @@
 'use client'
-
+import { db } from "@/app/_lib/db";
 import { useLocalStorage } from "@/app/_lib/hooks"
 import { getDayDifference } from "@/app/_lib/utils";
 import { useEffect } from "react";
@@ -12,10 +12,11 @@ export default function BudgetRepeatUpdate() {
         const storedDate = lastUpdate ? new Date(lastUpdate) : null;
         const date = new Date();
 
+        // TODO: make repeat budget function
         // If date not stored or the day difference between stored date and current date is 1
         if(!storedDate || getDayDifference(storedDate, date) > 1) {
             // Execute function
-            console.log('LAST UPDATED', date.toISOString());
+            db.updateRepeatableBudgets()
             setLastUpdate(date.toISOString());
         }
     }, [lastUpdate])

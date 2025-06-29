@@ -304,6 +304,11 @@ class ExpenseDB extends Dexie {
         return this.budgets.update(budgetId, { amount, categoryId, start_date, end_date, repeat });
     }
 
+    // TODO: make update repeat budget function on db instance
+    updateRepeatableBudgets() {
+
+    }
+
     deleteTransaction(transactionId) {
         this.transactions.delete(transactionId);
     }
