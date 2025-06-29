@@ -16,7 +16,7 @@ export default function Onboarding() {
 
     useEffect(() => {
       if(username && router) {
-        router.replace('/home');
+        router.replace('/home', { scroll: false });
       } else {
         setLoading(false);
       }
