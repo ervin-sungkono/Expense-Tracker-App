@@ -1,4 +1,5 @@
 'use client'
+import dynamic from "next/dynamic";
 import InputField from "../common/InputField";
 import SelectField from "../common/SelectField";
 import TextField from "../common/TextField";
@@ -9,7 +10,11 @@ import Button from "../common/Button";
 import { DateValidator, NumberValidator, StringValidator } from "@/app/_lib/validator";
 import Image from "next/image";
 import { dateToLocalInput, getOwnerLabel } from "@/app/_lib/utils";
-import SelectCategoryPage from "../common/page/SelectCategoryPage";
+import { MdFileUpload as UploadIcon } from "react-icons/md";
+import Dialog from "../common/Dialog";
+
+const SelectCategoryPage = dynamic(() => import('../common/page/SelectCategoryPage'));
+const UploadTransactionImage = dynamic(() => import('./UploadTransactionImage'));
 
 export default function AddTransactionForm({ transaction = {}, onSubmit }) {
     const categories = useLiveQuery(() => db.getAllCategories());
@@ -17,6 +22,7 @@ export default function AddTransactionForm({ transaction = {}, onSubmit }) {
     const [errorMessage, setErrorMessage] = useState({});
     const [selectedCategory, setSelectedCategory] = useState(transaction.category); 
     const [selectCategory, setSelectCategory] = useState(false);
+    const [showUpload, setShowUpload] = useState(false);
 
     const validateDate = (date) => {
         return new DateValidator("Date", date)
@@ -116,9 +122,18 @@ export default function AddTransactionForm({ transaction = {}, onSubmit }) {
         return transaction.id ? 'Edit Transaction' : 'Add Transaction';
     }
 
+    const handleImageExtract = (file) => {
+        console.log(file);
+    }
+
     return (
         <div className="flex flex-col gap-4">
-            <div className="text-xl font-bold">{getDialogAction()}</div>
+            <div className="flex justify-between items-center">
+                <div className="text-xl font-bold grow">{getDialogAction()}</div>
+                <div onClick={() => setShowUpload(true)} className="p-2 rounded-full active:bg-neutral-300/30 dark:active:bg-neutral-700/30 transition-colors ease-in-out">
+                    <UploadIcon size={20}/>
+                </div>
+            </div>
             <form onSubmit={handleSubmit}>
                 <div className="flex flex-col gap-4 mb-6">
                     <InputField 
@@ -187,6 +202,12 @@ export default function AddTransactionForm({ transaction = {}, onSubmit }) {
                 onCancelSelection={handleCancelSelection}
                 defaultType="Expense"
             />
+            <Dialog
+                show={showUpload}
+                hideFn={() => setShowUpload(false)}
+            >
+                <UploadTransactionImage onImageSubmit={handleImageExtract}/>
+            </Dialog>
         </div>
     )
 }
