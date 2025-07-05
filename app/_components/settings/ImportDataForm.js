@@ -40,6 +40,9 @@ export default function ImportDataForm({ onFinishImport }) {
                     <FileUploader
                         label={"Database File"}
                         name={"import-file"}
+                        dropzoneOptions={{
+                            accept: { 'application/json': [] }
+                        }}
                     />
                     <div className="flex flex-col gap-2 text-dark dark:text-white">
                         <p className="text-xs md:text-sm font-semibold">Replace existing data</p>

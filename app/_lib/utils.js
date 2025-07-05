@@ -389,3 +389,23 @@ export function getDateRange(type, date = new Date()) {
 
   return [start, end];
 }
+
+const imageSignatures = {
+  R0lGODdh: 'image/gif',
+  iVBORw0KGgo: 'image/png',
+  '/9j/': 'image/jpg',
+  Qk02U: 'image/bmp',
+  UklGR: 'image/webp'
+};
+
+export function detectMimeType(base64 = '') {
+  let mimeType;
+
+  Object.entries(imageSignatures).some(([signature, type]) => {
+    const signatureWasFound = base64.startsWith(signature);
+    if (signatureWasFound) mimeType = type;
+    return signatureWasFound;
+  });
+
+  return mimeType;
+}

@@ -12,6 +12,7 @@
   "dependencies": {
     "@ducanh2912/next-pwa": "^10.2.9",
     "@formatjs/intl-enumerator": "^1.8.10",
+    "@google/genai": "^1.7.0",
     "@next/third-parties": "^15.3.2",
     "browser-image-compression": "^2.0.2",
     "chart.js": "^4.4.9",
@@ -32,6 +33,7 @@
     "react-virtualized-auto-sizer": "^1.0.26",
     "react-window": "^1.8.11",
     "react-window-infinite-loader": "^1.0.10",
+    "remove-markdown": "^0.6.2",
     "swiper": "^11.2.6",
     "use-long-press": "^3.3.0"
   },
