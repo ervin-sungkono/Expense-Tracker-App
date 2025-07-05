@@ -5,7 +5,6 @@ import { useDropzone } from "react-dropzone";
 export default function FileUploader({ label, name, dropzoneOptions = {}, onFileUploaded }) {
     const { acceptedFiles, getRootProps, getInputProps, fileRejections } = useDropzone({
         ...dropzoneOptions,
-        accept: { 'application/json': [] },
         multiple: false,
         maxFiles: 1
     });

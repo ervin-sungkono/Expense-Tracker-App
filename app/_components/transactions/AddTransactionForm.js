@@ -1,4 +1,5 @@
 'use client'
+import dynamic from "next/dynamic";
 import InputField from "../common/InputField";
 import SelectField from "../common/SelectField";
 import TextField from "../common/TextField";
@@ -9,14 +10,23 @@ import Button from "../common/Button";
 import { DateValidator, NumberValidator, StringValidator } from "@/app/_lib/validator";
 import Image from "next/image";
 import { dateToLocalInput, getOwnerLabel } from "@/app/_lib/utils";
-import SelectCategoryPage from "../common/page/SelectCategoryPage";
+import { MdFileUpload as UploadIcon } from "react-icons/md";
+import Dialog from "../common/Dialog";
+import removeMd from "remove-markdown";
+import LoadingOverlay from "../common/LoadingOverlay";
+
+const SelectCategoryPage = dynamic(() => import('../common/page/SelectCategoryPage'));
+const UploadTransactionImage = dynamic(() => import('./UploadTransactionImage'));
 
 export default function AddTransactionForm({ transaction = {}, onSubmit }) {
     const categories = useLiveQuery(() => db.getAllCategories());
     const shops = useLiveQuery(() => db.getAllShops());
+    const [transactionData, setTransactionData] = useState(transaction);
     const [errorMessage, setErrorMessage] = useState({});
-    const [selectedCategory, setSelectedCategory] = useState(transaction.category); 
+    const [selectedCategory, setSelectedCategory] = useState(transactionData.category); 
     const [selectCategory, setSelectCategory] = useState(false);
+    const [showUpload, setShowUpload] = useState(false);
+    const [loading, setLoading] = useState(false);
 
     const validateDate = (date) => {
         return new DateValidator("Date", date)
@@ -84,8 +94,8 @@ export default function AddTransactionForm({ transaction = {}, onSubmit }) {
 
             payload.amount = Number(payload.amount); // ensure that value stored is Number type
             payload.date = new Date(payload.date);
-            if(transaction.id) {
-                db.updateTransaction(transaction.id, payload);
+            if(transactionData.id) {
+                db.updateTransaction(transactionData.id, payload);
             } else {
                 db.addTransaction(payload);
             }
@@ -113,12 +123,49 @@ export default function AddTransactionForm({ transaction = {}, onSubmit }) {
     }
 
     const getDialogAction = () => {
-        return transaction.id ? 'Edit Transaction' : 'Add Transaction';
+        return transactionData.id ? 'Edit Transaction' : 'Add Transaction';
+    }
+
+    const handleImageExtract = ({ imageBase64, mimeType }) => {
+        setLoading(true);
+        fetch('api/image-extract', {
+            method: 'POST',
+            headers: {
+                'accept': 'application/json'
+            },
+            body: JSON.stringify({
+                mimeType,
+                imageBase64
+            })
+        })
+        .then(res => res.ok ? res.json() : null)
+        .then(({ data }) => {
+            if (data) {
+                const rawText = removeMd(data?.content?.parts?.[0]?.text);
+                const jsonResult = JSON.parse(rawText);
+                setTransactionData((prevData) => ({
+                    ...prevData,
+                    date: jsonResult.date ? new Date(jsonResult.date) : prevData.date,
+                    amount: jsonResult.amount ? Number(jsonResult.amount) : prevData.amount,
+                    remarks: jsonResult.notes ? jsonResult.notes : prevData.remarks
+                }))
+            }
+        })
+        .catch(err => console.log(err))
+        .finally(() => {
+            setLoading(false);
+            setShowUpload(false);
+        })
     }
 
     return (
         <div className="flex flex-col gap-4">
-            <div className="text-xl font-bold">{getDialogAction()}</div>
+            <div className="flex justify-between items-center">
+                <div className="text-xl font-bold grow">{getDialogAction()}</div>
+                <div onClick={() => setShowUpload(true)} className="p-2 rounded-full active:bg-neutral-300/30 dark:active:bg-neutral-700/30 transition-colors ease-in-out">
+                    <UploadIcon size={20}/>
+                </div>
+            </div>
             <form onSubmit={handleSubmit}>
                 <div className="flex flex-col gap-4 mb-6">
                     <InputField 
@@ -126,7 +173,7 @@ export default function AddTransactionForm({ transaction = {}, onSubmit }) {
                         name={"date"} 
                         label={"Date"} 
                         type={"datetime-local"}
-                        defaultValue={transaction.date ? dateToLocalInput(transaction.date) : dateToLocalInput()}
+                        defaultValue={transactionData.date ? dateToLocalInput(transactionData.date) : dateToLocalInput()}
                         errorMessage={errorMessage?.date}
                     />
                     <InputField 
@@ -135,7 +182,7 @@ export default function AddTransactionForm({ transaction = {}, onSubmit }) {
                         label={"Amount"} 
                         placeholder={"Enter amount"}
                         type={"number"}
-                        defaultValue={transaction.amount}
+                        defaultValue={transactionData.amount}
                         errorMessage={errorMessage?.amount}
                     />
                     {categories && <SelectField
@@ -150,7 +197,7 @@ export default function AddTransactionForm({ transaction = {}, onSubmit }) {
                     <SelectField
                         label={"Shop"}
                         name="shopId"
-                        _selected={transaction.shopId}
+                        _selected={transactionData.shopId}
                         _options={shops.map(shop => ({
                             id: shop.id,
                             label: shop.name
@@ -162,7 +209,7 @@ export default function AddTransactionForm({ transaction = {}, onSubmit }) {
                         name={"owner"} 
                         label={getOwnerLabel(selectedCategory.name)} 
                         placeholder={selectedCategory.name === 'Loan' ? 'Enter Borrower\'s name' : 'Enter Lender\s name'}
-                        defaultValue={transaction.owner ?? 'someone'}
+                        defaultValue={transactionData.owner ?? 'someone'}
                         errorMessage={errorMessage?.owner}
                     />}
                     <TextField
@@ -171,7 +218,7 @@ export default function AddTransactionForm({ transaction = {}, onSubmit }) {
                         placeholder={"Enter notes"}
                         rows={4}
                         maxLength={120}
-                        defaultValue={transaction.remarks}
+                        defaultValue={transactionData.remarks}
                         errorMessage={errorMessage?.remarks}
                     />
                 </div>
@@ -187,6 +234,13 @@ export default function AddTransactionForm({ transaction = {}, onSubmit }) {
                 onCancelSelection={handleCancelSelection}
                 defaultType="Expense"
             />
+            <Dialog
+                show={showUpload}
+                hideFn={() => setShowUpload(false)}
+            >
+                <UploadTransactionImage onImageSubmit={handleImageExtract}/>
+            </Dialog>
+            {loading && <LoadingOverlay/>}
         </div>
     )
 }
