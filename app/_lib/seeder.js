@@ -1,5 +1,4 @@
-import { getDebtLoanType, isInDateRange } from "./utils";
-import { icons } from "./const/icons";
+import { getDebtLoanType } from "./utils";
 
 function getRandomDate(start, end) {
     const startDate = start.getTime();
@@ -68,24 +67,21 @@ export function generateBudgets(count) {
 
 export function getCategories() {
     const categories = [
-        { id: 1, name: "Food", type: "Expense", parentId: null, mutable: true },
-        { id: 2, name: "Transportation", type: "Expense", parentId: null, mutable: true },
-        { id: 3, name: "Entertainment", type: "Expense", parentId: null, mutable: true },
-        { id: 4, name: "Salary", type: "Income", parentId: null, mutable: true },
-        { id: 5, name: "Debt", type: "DebtLoan", parentId: null, mutable: false },
-        { id: 6, name: "Debt Collection", type: "DebtLoan", parentId: null, mutable: false },
-        { id: 7, name: "Loan", type: "DebtLoan", parentId: null, mutable: false },
-        { id: 8, name: "Repayment", type: "DebtLoan", parentId: null, mutable: false },
-        { id: 9, name: "Beverage", type: "Expense", parentId: 1, mutable: true },
-        { id: 10, name: "Snacks", type: "Expense", parentId: 1, mutable: true },
-        { id: 11, name: "Bus", type: "Expense", parentId: 2, mutable: true },
-        { id: 12, name: "Motorcycle", type: "Expense", parentId: 2, mutable: true }
+        { id: 1, name: "Food", type: "Expense", parentId: null, mutable: true, icon: 'food-asian_bento_box.svg' },
+        { id: 2, name: "Transportation", type: "Expense", parentId: null, mutable: true, icon: 'transport-ground_automobile.svg' },
+        { id: 3, name: "Entertainment", type: "Expense", parentId: null, mutable: true, icon: 'game_video_game.svg' },
+        { id: 4, name: "Salary", type: "Income", parentId: null, mutable: true, icon: 'money_dollar_banknote.svg' },
+        { id: 5, name: "Debt", type: "DebtLoan", parentId: null, mutable: false, icon: 'money_dollar_banknote_debt.svg' },
+        { id: 6, name: "Debt Collection", type: "DebtLoan", parentId: null, mutable: false, icon: 'money_dollar_banknote_debt_collection.svg' },
+        { id: 7, name: "Loan", type: "DebtLoan", parentId: null, mutable: false, icon: 'money_dollar_banknote_loan.svg' },
+        { id: 8, name: "Repayment", type: "DebtLoan", parentId: null, mutable: false, icon: 'money_money_bag.svg' },
+        { id: 9, name: "Beverage", type: "Expense", parentId: 1, mutable: true, icon: 'drink_cocktail_glass.svg' },
+        { id: 10, name: "Snacks", type: "Expense", parentId: 1, mutable: true, icon: 'food-sweet_chocolate_bar.svg'},
+        { id: 11, name: "Bus", type: "Expense", parentId: 2, mutable: true, icon: 'transport-ground_trolleybus.svg' },
+        { id: 12, name: "Motorcycle", type: "Expense", parentId: 2, mutable: true, icon: 'transport-ground_motorcycle.svg' }
     ]
 
-    return categories.map(category => ({
-        ...category,
-        icon: icons[randomBetween(0, icons.length - 1)]
-    }))
+    return categories;
 }
 
 export function getShops() {
