@@ -194,7 +194,7 @@ export default function AddTransactionForm({ transaction = {}, onSubmit }) {
                         customSelected={renderCategorySelected()}
                     />}
                     {shops && selectedCategory?.type === 'Expense' && 
-                    <SelectField
+                    <SelectField // TODO: Make shop select from page
                         label={"Shop"}
                         name="shopId"
                         _selected={transactionData.shopId}

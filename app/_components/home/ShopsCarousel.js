@@ -60,7 +60,7 @@ export default function ShopsCarousel() {
                     component: <ShopCard {...shop}/>
                 }))}
             /> :
-            <div className="h-40 flex flex-col justify-center items-center gap-4 w-full bg-neutral-200 dark:bg-neutral-800 rounded-lg py-6 px-4">
+            <div className="h-40 flex flex-col justify-center items-center gap-4 w-full bg-light dark:bg-neutral-800 rounded-lg py-6 px-4">
                 <p className="text-sm md:text-base text-center font-medium text-dark/80 dark:text-white/80">No shop found, please create a new shop</p>
                 <LinkButton href="/shops" label="Add New Shop" contained/>
             </div>}

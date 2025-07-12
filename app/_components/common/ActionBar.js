@@ -11,7 +11,7 @@ export default function ActionBar() {
     const [showMenu, setShowMenu] = useState(false);
     const [showCategory, setShowCategory] = useState(false);
     const [showBudget, setShowBudget] = useState(false);
-    const [showReport, setShowReport] = useState(false);
+    // const [showReport, setShowReport] = useState(false); TODO: make report page
     const [showAbout, setShowAbout] = useState(false);
 
     const items = [
@@ -23,10 +23,10 @@ export default function ActionBar() {
             label: 'Budgets',
             onClick: () => setShowBudget(true)
         },
-        {
-            label: 'Reports',
-            onClick: () => setShowReport(true)
-        },
+        // {
+        //     label: 'Reports',
+        //     onClick: () => setShowReport(true)
+        // },
         {
             label: 'About',
             onClick: () => setShowAbout(true)
