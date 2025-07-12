@@ -160,7 +160,7 @@ export default function TransactionReport() {
                         {typeOptions.map(type => (
                             <div 
                                 key={type.id} 
-                                className={`cursor-pointer grow ${type.id === selectedType ? 'bg-ocean-blue' : 'bg-transparent'} py-2`}
+                                className={`cursor-pointer grow ${type.id === selectedType ? 'bg-ocean-blue text-white' : 'bg-transparent'} py-2`}
                                 onClick={() => setSelectedType(type.id)}
                             >
                                 {type.label}

@@ -37,7 +37,7 @@ export default function RecentTransactions() {
                 transactionData.map(transaction => (
                     <TransactionCard key={transaction.id} transaction={transaction}/>
                 )) :
-                <div className="h-48 flex justify-center items-center bg-neutral-200 dark:bg-neutral-800 rounded-lg py-2">
+                <div className="h-48 flex justify-center items-center rounded-lg py-2">
                     <p className="text-center text-sm md:text-base text-dark/80 dark:text-white/80">No recent transactions found.</p>
                 </div>}
             </div>
