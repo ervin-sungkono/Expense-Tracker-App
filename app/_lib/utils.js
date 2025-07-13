@@ -1,3 +1,5 @@
+import { MONTHS } from "./const";
+
 export function extractText(text) {
     const regex = /\[(.*?)\]/g;
 
@@ -104,7 +106,7 @@ export function getWeeklyLabels(weekRange) {
     if(!weekRange) return [];
 
     const result = [];
-    for(let date = weekRange.start; date <= weekRange.end; date.setDate(date.getDate() + 1)) {
+    for(let date = new Date(weekRange.start); date <= weekRange.end; date.setDate(date.getDate() + 1)) {
         result.push(formatDateString(date));
     }
 
@@ -137,13 +139,14 @@ export function formatDate(date, format = 'DD/MM/YYYY') {
   const map = {
     DD: String(date.getDate()).padStart(2, '0'),
     D: date.getDate(),
+    MMM: MONTHS[date.getMonth()].slice(0, 3),
     MM: String(date.getMonth() + 1).padStart(2, '0'),
     M: date.getMonth() + 1,
     YYYY: date.getFullYear(),
     YY: String(date.getFullYear()).slice(-2),
   };
 
-  return format.replace(/YYYY|YY|MM|M|DD|D/g, match => map[match]);
+  return format.replace(/YYYY|YY|MMM|MM|M|DD|D/g, match => map[match]);
 }
 
 /**

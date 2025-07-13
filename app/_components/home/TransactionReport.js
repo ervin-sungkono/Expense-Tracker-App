@@ -6,7 +6,7 @@ import { db } from "@lib/db";
 import { useEffect, useState } from "react";
 import SelectField from "../common/SelectField";
 import { MONTHS } from "@lib/const";
-import { getMonthlyLabels, getWeeklyLabels, getWeekNumber, getWeekRanges } from "@lib/utils";
+import { formatDate, formatDateString, getMonthlyLabels, getWeeklyLabels, getWeekNumber, getWeekRanges } from "@lib/utils";
 
 export default function TransactionReport() {
     const transactions = useLiveQuery(() => db.getAllTransactions());
@@ -19,6 +19,8 @@ export default function TransactionReport() {
     const [weeks, setWeeks] = useState(null);
     const [weekOptions, setWeekOptions] = useState(null);
     const [yearOptions, setYearOptions] = useState(null);
+
+    console.log(weeks);
 
     const [weekMap, setWeekMap] = useState(null);
     const [monthMap, setMonthMap] = useState(null);
@@ -190,6 +192,13 @@ export default function TransactionReport() {
                         onChange={(val) => setSelectedYear(val)}
                     /> :
                     <div className="w-full h-9 md:h-10 rounded-md bg-neutral-300 dark:bg-neutral-800 animate-pulse"></div>}
+                    {weeks ?
+                    <div className="col-span-2 text-center font-semibold mt-2">
+                        <span>{formatDate(weeks[selectedYear]?.[selectedWeek - 1].start, 'DD MMM YYYY')}</span>
+                        <span> - </span>
+                        <span>{formatDate(weeks[selectedYear]?.[selectedWeek - 1].end, 'DD MMM YYYY')}</span>
+                    </div> :
+                    <div className="col-span-2 mt-2 h-6 bg-neutral-300 dark:bg-neutral-800 animate-pulse rounded-md"></div>}
                 </div>
             ),
             component: <TransactionGraph 
@@ -206,12 +215,12 @@ export default function TransactionReport() {
             id: 'monthly',
             label: 'Monthly',
             header: () => (
-                <div className="px-3 pt-2 grid grid-cols-2 gap-2">
+                <div className="px-3 pt-2 grid grid-cols-2 gap-2 mb-4">
                     <div className="col-span-2 flex items-center border border-ocean-blue rounded-full text-sm md:text-base font-semibold text-center overflow-hidden">
                         {typeOptions.map(type => (
                             <div 
                                 key={type.id} 
-                                className={`cursor-pointer grow ${type.id === selectedType ? 'bg-ocean-blue' : 'bg-transparent'} py-2`}
+                                className={`cursor-pointer grow ${type.id === selectedType ? 'bg-ocean-blue text-white' : 'bg-transparent'} py-2`}
                                 onClick={() => setSelectedType(type.id)}
                             >
                                 {type.label}
@@ -252,12 +261,13 @@ export default function TransactionReport() {
             id: 'annual',
             label: 'Annual',
             header: () => (
-                <div className="px-3 pt-2 gap-2 grid grid-cols-1">
+                <div className="px-3 pt-2 gap-2 grid grid-cols-1 mb-4">
+                    {/* TODO: refactor this into a component */}
                     <div className="flex items-center border border-ocean-blue rounded-full text-sm md:text-base font-semibold text-center overflow-hidden">
                         {typeOptions.map(type => (
                             <div 
                                 key={type.id} 
-                                className={`cursor-pointer grow ${type.id === selectedType ? 'bg-ocean-blue' : 'bg-transparent'} py-2`}
+                                className={`cursor-pointer grow ${type.id === selectedType ? 'bg-ocean-blue text-white' : 'bg-transparent'} py-2`}
                                 onClick={() => setSelectedType(type.id)}
                             >
                                 {type.label}

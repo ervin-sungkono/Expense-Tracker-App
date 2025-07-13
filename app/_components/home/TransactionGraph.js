@@ -241,10 +241,14 @@ export default function TransactionGraph({ transactionType, transactionData = []
     )
     return(
         <div className="flex flex-col justify-center items-start min-h-48 xs:min-h-64">
-            <p className="w-full text-center mt-4 font-semibold text-sm md:text-base">
+            {(chartData && chartOptions) ?
+            <p className="w-full text-center mt-1.5 font-semibold text-sm md:text-base">
                 Total: {formatCurrency(totalTransaction)}
                 <span className={`ml-2 ${transactionDiff >= 0 ? 'text-ocean-blue' : 'text-red-400'}`}>{transactionDiff < 0 ? '-' : '+'}{Math.abs(transactionDiff).toFixed(2)}%</span>
-            </p>
+            </p> :
+            <div className="px-3 w-full">
+                <div className="w-full h-5 mt-1.5 bg-neutral-300 dark:bg-neutral-800 animate-pulse rounded-md"></div>
+            </div>}
             {
                 (chartData && chartOptions) ? 
                 <Line

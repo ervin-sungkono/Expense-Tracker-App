@@ -52,7 +52,7 @@ export default function Shops() {
                         </div>
                     </div>
                 </div>
-                <div className="flex grow">
+                <div className="flex grow mb-2">
                     <VirtualizedShopList
                         items={shops}
                         loadMore={fetchMoreData}
