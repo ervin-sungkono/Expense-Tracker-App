@@ -4,6 +4,7 @@ import { useState } from "react";
 import Button from "../common/Button";
 import { StringValidator } from "@lib/validator";
 import { useLocalStorage } from "@lib/hooks";
+import { toast } from "react-toastify";
 
 export default function ChangeUsernameForm({ onSubmit }) {
     const [errorMessage, setErrorMessage] = useState({});
@@ -43,8 +44,10 @@ export default function ChangeUsernameForm({ onSubmit }) {
 
             setUsername(name)
             onSubmit && onSubmit();
+            toast.success("Username changed");
         } catch(e) {
             console.log(e);
+            toast.error("Fail to change username");
         }
     }
 

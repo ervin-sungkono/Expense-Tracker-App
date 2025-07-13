@@ -5,6 +5,7 @@ import Button from "../common/Button";
 import { useLiveQuery } from "dexie-react-hooks";
 import { useState } from "react";
 import Dialog from "../common/Dialog";
+import { toast } from "react-toastify";
 const MergeCategoryForm = dynamic(() => import("./MergeCategoryForm"));
 
 export default function DeleteCategoryForm({ categoryId, categoryName, onDelete }) {
@@ -14,6 +15,7 @@ export default function DeleteCategoryForm({ categoryId, categoryName, onDelete 
 
     const handleDeleteCategory = () => {
         db.deleteCategory(categoryId);
+        toast.success('Category deleted');
         onDelete && onDelete();
     }
 

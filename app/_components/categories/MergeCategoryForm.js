@@ -7,6 +7,7 @@ import { useState } from "react";
 import { useLiveQuery } from "dexie-react-hooks";
 import { db } from "@lib/db";
 import { StringValidator } from "@lib/validator";
+import { toast } from "react-toastify";
 
 export default function MergeCategoryForm({ categoryId, onMergeCategory }) {
     const [selectedCategory, setSelectedCategory] = useState(null);
@@ -60,9 +61,11 @@ export default function MergeCategoryForm({ categoryId, onMergeCategory }) {
                 return;
             }
             
+            toast.success('Category merged');
             onMergeCategory && onMergeCategory(categoryId);
         } catch(e) {
             console.log(e);
+            toast.error('Fail to merge category');
         }
     }
 
