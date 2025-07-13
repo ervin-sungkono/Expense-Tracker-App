@@ -1,8 +1,12 @@
 'use client'
-import { useState } from "react"
+import { useState, useEffect } from "react"
 
 export default function TextField({ name, required = false, label, placeholder, rows = 1, maxLength, defaultValue = '', errorMessage = '', ref = null, onChange }) {
-    const [value, setValue] = useState(defaultValue)
+    const [value, setValue] = useState('');
+
+    useEffect(() => {
+        setValue(defaultValue);
+    }, [defaultValue])
     
     return(
         <div className="flex flex-col gap-2">
