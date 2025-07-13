@@ -2,6 +2,7 @@ import { db } from "@lib/db";
 import { useRouter } from "next/navigation";
 import Button from "../common/Button";
 import { useLocalStorage } from "@lib/hooks";
+import { toast } from "react-toastify";
 
 export default function DeleteAccountForm({ onCancel }) {
     const router = useRouter();
@@ -11,6 +12,7 @@ export default function DeleteAccountForm({ onCancel }) {
         // Delete account and reset DB
         setUsername(null);
         await db.resetDB();
+        toast.success('Account deleted');
         
         router.replace('/');
     }

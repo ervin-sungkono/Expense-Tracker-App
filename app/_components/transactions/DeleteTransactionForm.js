@@ -1,9 +1,11 @@
 import { db } from "@lib/db";
 import Button from "../common/Button";
+import { toast } from "react-toastify";
 
 export default function DeleteTransactionForm({ transactionId, onDelete, onCancel }) {
     const handleDeleteTransaction = () => {
         db.deleteTransaction(transactionId);
+        toast.success('Transaction deleted');
         onDelete && onDelete();
     }
 

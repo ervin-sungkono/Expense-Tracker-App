@@ -14,6 +14,7 @@ import { MdFileUpload as UploadIcon } from "react-icons/md";
 import Dialog from "../common/Dialog";
 import removeMd from "remove-markdown";
 import LoadingOverlay from "../common/LoadingOverlay";
+import { toast } from "react-toastify";
 
 const SelectCategoryPage = dynamic(() => import('../common/page/SelectCategoryPage'));
 const UploadTransactionImage = dynamic(() => import('./UploadTransactionImage'));
@@ -96,13 +97,20 @@ export default function AddTransactionForm({ transaction = {}, onSubmit }) {
             payload.date = new Date(payload.date);
             if(transactionData.id) {
                 db.updateTransaction(transactionData.id, payload);
+                toast.success("Transaction updated");
             } else {
                 db.addTransaction(payload);
+                toast.success("Transaction added");
             }
             
             onSubmit && onSubmit();
         } catch(e) {
             console.log(e);
+            if(transactionData.id) {
+                toast.error("Fail to update transaction");
+            } else {
+                toast.error("Fail to add transaction");
+            }
         }
     }
 
@@ -149,9 +157,14 @@ export default function AddTransactionForm({ transaction = {}, onSubmit }) {
                     amount: jsonResult.amount ? Number(jsonResult.amount) : prevData.amount,
                     remarks: jsonResult.notes ? jsonResult.notes : prevData.remarks
                 }))
+
+                toast.info("Transaction data loaded from image");
             }
         })
-        .catch(err => console.log(err))
+        .catch(err => {
+            console.log(err);
+            toast.info("Fail to load data from image");
+        })
         .finally(() => {
             setLoading(false);
             setShowUpload(false);

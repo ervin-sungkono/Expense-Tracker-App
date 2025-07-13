@@ -1,9 +1,11 @@
 import { db } from "@lib/db";
 import Button from "../common/Button";
+import { toast } from "react-toastify";
 
 export default function DeleteBudgetForm({ budgetId, onDelete, onCancel }) {
     const handleDeleteBudget = () => {
         db.deleteBudget(budgetId);
+        toast.success('Budget deleted');
         onDelete && onDelete();
     }
 

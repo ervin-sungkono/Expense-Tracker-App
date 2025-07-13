@@ -7,6 +7,7 @@ import { useState } from "react";
 import ImageUploader from "../common/ImageUploader";
 import { StringValidator } from "@lib/validator";
 import DeleteShopForm from "./DeleteShopForm";
+import { toast } from "react-toastify";
 
 export default function InfoShopForm({ shop, hideFn }) {
     const [errorMessage, setErrorMessage] = useState({});
@@ -60,13 +61,20 @@ export default function InfoShopForm({ shop, hideFn }) {
 
             if(shop) {
                 db.updateShop(shop.id, payload);
+                toast.success("Shop updated");
             } else {
                 db.addShop(payload);
+                toast.success("Shop added");
             }
             
             hideFn && hideFn();
         } catch(e) {
             console.log(e);
+            if(shop) {
+                toast.error("Fail to update shop");
+            } else {
+                toast.error("Fail to add shop");
+            }
             return;
         }
     }

@@ -10,6 +10,7 @@ import { DateValidator, NumberValidator, StringValidator } from "@lib/validator"
 import Image from "next/image";
 import SelectCategoryPage from "../common/page/SelectCategoryPage";
 import { dateToInputValue, getDateRange } from "@lib/utils";
+import { toast } from "react-toastify";
 
 export default function AddBudgetForm({ budget = {}, onSubmit }) {
     const categories = useLiveQuery(() => db.getAllCategories());
@@ -127,13 +128,20 @@ export default function AddBudgetForm({ budget = {}, onSubmit }) {
 
             if(budget.id) {
                 db.updateBudget(budget.id, payload);
+                toast.success('Budget updated');
             } else {
                 db.addBudget(payload);
+                toast.success('Budget added');
             }
             
             onSubmit && onSubmit();
         } catch(e) {
             console.log(e);
+            if(budget.id) {
+                toast.error('Fail to update budget');
+            } else {
+                toast.error('Fail to add budget');
+            }
         }
     }
 

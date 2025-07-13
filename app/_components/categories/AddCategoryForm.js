@@ -8,6 +8,7 @@ import { useEffect, useState } from "react";
 import Button from "../common/Button";
 import { StringValidator } from "@lib/validator";
 import { useLiveQuery } from "dexie-react-hooks";
+import { toast } from "react-toastify";
 const SelectIconPage = dynamic(() => import("../common/page/SelectIconPage"));
 const SelectCategoryPage = dynamic(() => import("../common/page/SelectCategoryPage"));
 
@@ -85,13 +86,19 @@ export default function AddCategoryForm({ category = {}, onSubmit }) {
 
             if(category.id) {
                 db.updateCategory(category.id, payload);
+                toast.success('Category updated');
             } else {
                 db.addCategory(payload);
+                toast.success('Category added');
             }
-            
             onSubmit && onSubmit();
         } catch(e) {
             console.log(e);
+            if(category.id) {
+                toast.error('Fail to update category');
+            } else {
+                toast.error('Fail to add category');
+            }
         }
     }
 

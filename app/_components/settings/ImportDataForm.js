@@ -3,6 +3,7 @@ import Button from "../common/Button";
 import ToggleSwitch from "../common/ToggleSwitch";
 import { db } from "@lib/db";
 import { useState } from "react";
+import { toast } from "react-toastify";
 
 export default function ImportDataForm({ onFinishImport }) {
     const [replaceData, setReplaceData] = useState(false);
@@ -23,9 +24,11 @@ export default function ImportDataForm({ onFinishImport }) {
         try {
             setIsImporting(true);
             await db.importDB({ file, clearTablesBeforeImport: clearData, overwriteValues: replaceData });
+            toast.success("Import data success");
             onFinishImport && onFinishImport();
         } catch(error) {
             setErrorMessage(String(error));
+            toast.error("Failed to import data");
             console.log(error);
         } finally {
             setIsImporting(false);
