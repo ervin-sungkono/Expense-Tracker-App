@@ -393,7 +393,7 @@ export function getDateRange(type, date = new Date()) {
 const imageSignatures = {
   R0lGODdh: 'image/gif',
   iVBORw0KGgo: 'image/png',
-  '/9j/': 'image/jpg',
+  '/9j/': 'image/jpeg',
   Qk02U: 'image/bmp',
   UklGR: 'image/webp'
 };
