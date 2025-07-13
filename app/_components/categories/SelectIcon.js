@@ -2,7 +2,7 @@
 import { useState } from "react";
 import SearchBar from "../common/Searchbar";
 import VirtualizedIconList from "./VirtualizedIconList";
-import { icons } from "@/app/_lib/const/icons";
+import { icons } from "@lib/const/icons";
 
 export default function SelectIcon({ onIconSelected }) {
     const [searchText, setSearchText] = useState('');

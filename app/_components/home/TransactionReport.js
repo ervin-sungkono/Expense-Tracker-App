@@ -2,11 +2,11 @@
 import { useLiveQuery } from "dexie-react-hooks";
 import Tab from "../common/Tab";
 import TransactionGraph from "./TransactionGraph";
-import { db } from "@/app/_lib/db";
+import { db } from "@lib/db";
 import { useEffect, useState } from "react";
 import SelectField from "../common/SelectField";
-import { MONTHS } from "@/app/_lib/const";
-import { getMonthlyLabels, getWeeklyLabels, getWeekNumber, getWeekRanges } from "@/app/_lib/utils";
+import { MONTHS } from "@lib/const";
+import { getMonthlyLabels, getWeeklyLabels, getWeekNumber, getWeekRanges } from "@lib/utils";
 
 export default function TransactionReport() {
     const transactions = useLiveQuery(() => db.getAllTransactions());

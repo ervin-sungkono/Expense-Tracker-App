@@ -1,7 +1,7 @@
-import { db } from "@/app/_lib/db";
+import { db } from "@lib/db";
 import { useRouter } from "next/navigation";
 import Button from "../common/Button";
-import { useLocalStorage } from "@/app/_lib/hooks";
+import { useLocalStorage } from "@lib/hooks";
 
 export default function DeleteAccountForm({ onCancel }) {
     const router = useRouter();

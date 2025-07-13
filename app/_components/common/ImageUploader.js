@@ -1,7 +1,7 @@
 'use client'
 import { useEffect, useState } from "react";
 import { useDropzone } from "react-dropzone";
-import { getBase64 } from "@/app/_lib/utils";
+import { getBase64 } from "@lib/utils";
 import { IoMdClose as CloseIcon } from "react-icons/io";
 import imageCompression from "browser-image-compression";
 import Image from "next/image";

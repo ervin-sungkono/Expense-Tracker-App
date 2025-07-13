@@ -1,4 +1,4 @@
-import { formatCurrency, getDebtLoanType } from "@/app/_lib/utils";
+import { formatCurrency, getDebtLoanType } from "@lib/utils";
 import { IoChevronForward as RightIcon } from "react-icons/io5";
 import Link from "next/link";
 import { memo } from "react";

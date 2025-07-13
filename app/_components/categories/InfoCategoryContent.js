@@ -1,6 +1,6 @@
 'use client'
-import { formatCurrency, getDebtLoanType } from "@/app/_lib/utils";
-import { db } from "@/app/_lib/db";
+import { formatCurrency, getDebtLoanType } from "@lib/utils";
+import { db } from "@lib/db";
 import { useLiveQuery } from "dexie-react-hooks";
 import Image from "next/image";
 import { useEffect, useState } from "react";

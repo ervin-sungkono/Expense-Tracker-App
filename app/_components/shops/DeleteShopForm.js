@@ -1,4 +1,4 @@
-import { db } from "@/app/_lib/db";
+import { db } from "@lib/db";
 import Button from "../common/Button";
 
 export default function DeleteShopForm({ shopId, onDelete, onCancel }) {

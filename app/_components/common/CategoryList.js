@@ -4,7 +4,7 @@ import VirtualizedCategoryList from "../categories/VirtualizedCategoryList";
 import Button from "./Button";
 import CategoryTab from "../categories/CategoryTab";
 import { useLiveQuery } from "dexie-react-hooks";
-import { db } from "@/app/_lib/db";
+import { db } from "@lib/db";
 import dynamic from "next/dynamic";
 import Dialog from "./Dialog";
 

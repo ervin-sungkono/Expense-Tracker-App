@@ -3,7 +3,7 @@ import dynamic from "next/dynamic";
 import List from "../common/List"
 import { useEffect, useRef, useState } from "react";
 import Button from "../common/Button";
-import { db } from "@/app/_lib/db";
+import { db } from "@lib/db";
 import { saveAs } from "file-saver";
 import ThemeSwitch from "../common/ThemeSwitch";
 import Dialog from "../common/Dialog";

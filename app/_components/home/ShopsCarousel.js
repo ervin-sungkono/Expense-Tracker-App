@@ -2,7 +2,7 @@
 import { useLiveQuery } from "dexie-react-hooks"
 import SwiperContainer from "../common/SwiperContainer"
 import SubHeader from "./SubHeader"
-import { db } from "@/app/_lib/db"
+import { db } from "@lib/db"
 import { useEffect, useState } from "react"
 import ShopCard from "./ShopCard"
 import LinkButton from "../common/LinkButton"

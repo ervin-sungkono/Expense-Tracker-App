@@ -1,13 +1,13 @@
 'use client'
-import Layout from "../_components/layout/Layout";
-import TextContent from "../_components/common/TextContent";
-import Button from "../_components/common/Button";
-import InputField from "../_components/common/InputField";
+import Layout from "@components/layout/Layout";
+import TextContent from "@components/common/TextContent";
+import Button from "@components/common/Button";
+import InputField from "@components/common/InputField";
 import { useRef, useEffect, useState } from "react";
-import { useLocalStorage } from "../_lib/hooks";
+import { useLocalStorage } from "@lib/hooks";
 import { useRouter } from "next/navigation";
-import Loading from "../_components/layout/Loading";
-import { StringValidator } from "../_lib/validator";
+import Loading from "@components/layout/Loading";
+import { StringValidator } from "@lib/validator";
 
 export default function Register() {
     const [username, setUsername] = useLocalStorage('username');

@@ -2,14 +2,14 @@
 import InputField from "../common/InputField";
 import SelectField from "../common/SelectField";
 import ToggleSwitch from "../common/ToggleSwitch";
-import { db } from "@/app/_lib/db";
+import { db } from "@lib/db";
 import { useLiveQuery } from "dexie-react-hooks";
 import { useEffect, useState } from "react";
 import Button from "../common/Button";
-import { DateValidator, NumberValidator, StringValidator } from "@/app/_lib/validator";
+import { DateValidator, NumberValidator, StringValidator } from "@lib/validator";
 import Image from "next/image";
 import SelectCategoryPage from "../common/page/SelectCategoryPage";
-import { dateToInputValue, getDateRange } from "@/app/_lib/utils";
+import { dateToInputValue, getDateRange } from "@lib/utils";
 
 export default function AddBudgetForm({ budget = {}, onSubmit }) {
     const categories = useLiveQuery(() => db.getAllCategories());

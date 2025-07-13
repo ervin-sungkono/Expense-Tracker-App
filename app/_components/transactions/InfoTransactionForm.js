@@ -2,7 +2,7 @@
 import { useState } from "react";
 import Dialog from "../common/Dialog";
 import Button from "../common/Button";
-import { formatCurrency, formatDateString, getOwnerLabel } from "@/app/_lib/utils";
+import { formatCurrency, formatDateString, getOwnerLabel } from "@lib/utils";
 import AddTransactionForm from "./AddTransactionForm";
 import DeleteTransactionForm from "./DeleteTransactionForm";
 

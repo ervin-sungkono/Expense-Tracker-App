@@ -2,8 +2,8 @@
 import InputField from "../common/InputField";
 import { useState } from "react";
 import Button from "../common/Button";
-import { StringValidator } from "@/app/_lib/validator";
-import { useLocalStorage } from "@/app/_lib/hooks";
+import { StringValidator } from "@lib/validator";
+import { useLocalStorage } from "@lib/hooks";
 
 export default function ChangeUsernameForm({ onSubmit }) {
     const [errorMessage, setErrorMessage] = useState({});

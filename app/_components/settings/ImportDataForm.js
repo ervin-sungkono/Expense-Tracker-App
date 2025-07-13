@@ -1,7 +1,7 @@
 import FileUploader from "../common/FileUploader";
 import Button from "../common/Button";
 import ToggleSwitch from "../common/ToggleSwitch";
-import { db } from "@/app/_lib/db";
+import { db } from "@lib/db";
 import { useState } from "react";
 
 export default function ImportDataForm({ onFinishImport }) {

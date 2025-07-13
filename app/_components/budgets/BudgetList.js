@@ -3,7 +3,7 @@ import { useRef, useState } from "react";
 import Button from "../common/Button";
 import VirtualizedBudgetList from "./VirtualizedBudgetList"
 import { useLiveQuery } from "dexie-react-hooks";
-import { db } from "@/app/_lib/db";
+import { db } from "@lib/db";
 import Dialog from "../common/Dialog";
 import AddBudgetForm from "./AddBudgetForm";
 import BudgetTab from "./BudgetTab";

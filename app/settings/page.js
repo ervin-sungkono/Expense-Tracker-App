@@ -1,6 +1,6 @@
-import Layout from "../_components/layout/Layout";
-import Header from "../_components/common/Header";
-import SettingsList from "../_components/settings/SettingsList";
+import Layout from "@components/layout/Layout";
+import Header from "@components/common/Header";
+import SettingsList from "@components/settings/SettingsList";
 
 export default function Settings() {
     return(
