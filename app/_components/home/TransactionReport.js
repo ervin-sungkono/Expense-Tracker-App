@@ -64,13 +64,19 @@ export default function TransactionReport() {
     useEffect(() => {
         if(yearMap) {
             const yearList = Object.keys(yearMap);
-            const years = yearList.length > 0 ? yearList : [`${new Date().getFullYear()}`];
-            setYearOptions(years.map(year => ({
+            const currentYear = new Date().getFullYear().toString();
+
+            if (!yearList.includes(currentYear)) {
+                yearList.push(currentYear);
+                yearList.sort((a, b) => Number(a) - Number(b));
+            }
+
+            setYearOptions(yearList.map(year => ({
                 id: Number(year),
                 label: year
             })))
             
-            const newWeeks = years.reduce(
+            const newWeeks = yearList.reduce(
                 (acc, year) => {
                     acc[year] = getWeekRanges(Number(year)).map(weekRange => ({
                         labels: getWeeklyLabels(weekRange),
