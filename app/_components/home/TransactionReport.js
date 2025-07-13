@@ -20,8 +20,6 @@ export default function TransactionReport() {
     const [weekOptions, setWeekOptions] = useState(null);
     const [yearOptions, setYearOptions] = useState(null);
 
-    console.log(weeks);
-
     const [weekMap, setWeekMap] = useState(null);
     const [monthMap, setMonthMap] = useState(null);
     const [yearMap, setYearMap] = useState(null);

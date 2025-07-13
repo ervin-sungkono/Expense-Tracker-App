@@ -130,7 +130,7 @@ export default function TransactionGraph({ transactionType, transactionData = []
         return () => {
             setData(null);
         }
-    }, [labels,  transactionData, type])
+    }, [labels,  transactionData, transactionType, type])
 
     useEffect(() => {
         if(historyLabels && historyTransactionData && historyTransactionData[transactionType] && historyTransactionData[transactionType].length > 0) {
@@ -162,7 +162,7 @@ export default function TransactionGraph({ transactionType, transactionData = []
             setHistoryData(null);
             setHistoryTotalTransaction(null);
         }
-    }, [historyLabels, historyTransactionData, type])
+    }, [historyLabels, historyTransactionData, transactionType, type])
 
     useEffect(() => {
         if(labels && data) {
