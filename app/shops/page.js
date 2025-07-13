@@ -48,7 +48,7 @@ export default function Shops() {
                             onSearch={(value) => setSearchText(value.toLowerCase())}
                         />
                         <div className="relative z-0">
-                            <IconButton icon={<PlusIcon size={20}/>} contained onClick={handleShopAdd}/>
+                            <IconButton icon={<PlusIcon size={20}/>} contained onClick={() => handleShopAdd()}/>
                         </div>
                     </div>
                 </div>
