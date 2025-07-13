@@ -9,7 +9,7 @@ export default function Layout({ children, hideNavbar = false, hideActionBar = f
             {/* <BudgetRepeatUpdate/> */}
             { !hideActionBar && <ActionBar/> }
             { !hideNavbar && <Navbar items={NAV_ITEMS} pathname={pathname}/> }
-            <main className={`relative w-full h-full overflow-x-hidden overflow-y-auto max-w-2xl px-6 ${hideActionBar ? 'pt-6' : 'pt-4'} ${hideNavbar ? 'pb-8' : 'mb-22'} mx-auto`}>
+            <main className={`relative w-full h-full overflow-x-hidden overflow-y-auto max-w-3xl px-6 ${hideActionBar ? 'pt-6' : 'pt-4'} ${hideNavbar ? 'pb-8' : 'mb-22'} mx-auto`}>
                 {children}
             </main>
         </div>
