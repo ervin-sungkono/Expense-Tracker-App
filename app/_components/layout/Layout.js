@@ -1,7 +1,7 @@
 import Navbar from "../common/navbar/Navbar";
 import ActionBar from "../common/ActionBar";
 // import BudgetRepeatUpdate from "../budgets/BudgetRepeatUpdate";
-import { NAV_ITEMS } from "@/app/_lib/const";
+import { NAV_ITEMS } from "@lib/const";
 
 export default function Layout({ children, hideNavbar = false, hideActionBar = false, pathname }) {
     return(

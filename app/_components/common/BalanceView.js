@@ -1,7 +1,7 @@
 'use client'
-import { db } from "@/app/_lib/db"
-import { useLocalStorage } from "@/app/_lib/hooks";
-import { formatCurrency, generateAsterisks } from "@/app/_lib/utils";
+import { db } from "@lib/db"
+import { useLocalStorage } from "@lib/hooks";
+import { formatCurrency, generateAsterisks } from "@lib/utils";
 import { useLiveQuery } from "dexie-react-hooks"
 import { useEffect, useState } from "react";
 import { IoMdEye as ShowIcon, IoMdEyeOff as HideIcon } from "react-icons/io";

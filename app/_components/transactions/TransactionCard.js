@@ -1,6 +1,6 @@
 'use client'
 import dynamic from "next/dynamic";
-import { formatCurrency } from "@/app/_lib/utils";
+import { formatCurrency } from "@lib/utils";
 import { memo, useState } from "react";
 import { useLongPress } from "use-long-press";
 import ContextMenu from "../common/ContextMenu";

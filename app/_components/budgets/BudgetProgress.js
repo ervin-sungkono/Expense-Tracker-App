@@ -1,4 +1,4 @@
-import { formatDate, formatCurrency } from "@/app/_lib/utils";
+import { formatDate, formatCurrency } from "@lib/utils";
 
 export default function BudgetProgress({ dateRange, daysSinceStart, remainingDays, remainingBudget, budgetAmount }) {
     return(

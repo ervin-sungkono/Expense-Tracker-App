@@ -1,11 +1,11 @@
 'use client'
 import Dialog from "../common/Dialog";
-import { db } from "@/app/_lib/db";
+import { db } from "@lib/db";
 import InputField from "../common/InputField";
 import Button from "../common/Button";
 import { useState } from "react";
 import ImageUploader from "../common/ImageUploader";
-import { StringValidator } from "@/app/_lib/validator";
+import { StringValidator } from "@lib/validator";
 import DeleteShopForm from "./DeleteShopForm";
 
 export default function InfoShopForm({ shop, hideFn }) {

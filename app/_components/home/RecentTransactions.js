@@ -1,6 +1,6 @@
 'use client'
 import { useLiveQuery } from "dexie-react-hooks";
-import { db } from "@/app/_lib/db";
+import { db } from "@lib/db";
 import SubHeader from "./SubHeader";
 import TransactionCard from "../transactions/TransactionCard";
 import { useEffect, useState } from "react";

@@ -1,7 +1,7 @@
 'use client'
-import { db } from "@/app/_lib/db";
-import { useLocalStorage } from "@/app/_lib/hooks"
-import { getDayDifference } from "@/app/_lib/utils";
+import { db } from "@lib/db";
+import { useLocalStorage } from "@lib/hooks"
+import { getDayDifference } from "@lib/utils";
 import { useEffect } from "react";
 
 export default function BudgetRepeatUpdate() {

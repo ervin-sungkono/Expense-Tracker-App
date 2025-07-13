@@ -3,7 +3,7 @@ import Link from "next/link"
 import Image from "next/image"
 import { IoLocationSharp as LocationIcon } from "react-icons/io5";
 import { IoMdPricetags as PriceIcon } from "react-icons/io";
-import { formatCurrency } from "@/app/_lib/utils";
+import { formatCurrency } from "@lib/utils";
 
 export default function ShopCard({ name, image, location, totalVisit, averageTransaction }) {    
     const showTotalVisit = () => {

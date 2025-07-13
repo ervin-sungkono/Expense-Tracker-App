@@ -12,8 +12,8 @@ import {
 } from "chart.js";
 import { Line } from "react-chartjs-2";
 import { useEffect, useState } from "react";
-import { formatCurrency, formatDateString, nFormatter } from "@/app/_lib/utils";
-import { MONTHS } from "@/app/_lib/const";
+import { formatCurrency, formatDateString, nFormatter } from "@lib/utils";
+import { MONTHS } from "@lib/const";
 import Button from "../common/Button";
 import xlsx from "json-as-xlsx";
 

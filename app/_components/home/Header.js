@@ -1,5 +1,5 @@
 'use client'
-import { useLocalStorage } from "@/app/_lib/hooks"
+import { useLocalStorage } from "@lib/hooks"
 import { useEffect, useState } from "react";
 
 export default function Header() {

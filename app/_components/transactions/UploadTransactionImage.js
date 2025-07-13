@@ -2,7 +2,7 @@
 import ImageUploader from "../common/ImageUploader";
 import Button from "../common/Button";
 import { useState } from "react";
-import { detectMimeType } from "@/app/_lib/utils";
+import { detectMimeType } from "@lib/utils";
 
 export default function UploadTransactionImage({ onImageSubmit }) {
     const [errorMessage, setErrorMessage] = useState({});

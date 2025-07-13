@@ -2,12 +2,12 @@
 import { useLiveQuery } from "dexie-react-hooks";
 import Tab from "../common/Tab";
 import TransactionChart from "./TransactionChart";
-import { db } from "@/app/_lib/db";
+import { db } from "@lib/db";
 import { useEffect, useState } from "react";
 import SubHeader from "./SubHeader";
 import SelectField from "../common/SelectField";
 import InputField from "../common/InputField";
-import { MONTHS } from "@/app/_lib/const";
+import { MONTHS } from "@lib/const";
 
 export default function TransactionData() {
     const transactions = useLiveQuery(() => db.getAllTransactions());

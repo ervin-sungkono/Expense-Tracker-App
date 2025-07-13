@@ -1,13 +1,13 @@
 'use client'
-import Layout from "./_components/layout/Layout";
-import AppLogo from "./_components/common/AppLogo";
-import SplashImage from "./_components/onboarding/SplashImage";
-import TextContent from "./_components/common/TextContent";
-import LinkButton from "./_components/common/LinkButton";
+import Layout from "@components/layout/Layout";
+import AppLogo from "@components/common/AppLogo";
+import SplashImage from "@components/onboarding/SplashImage";
+import TextContent from "@components/common/TextContent";
+import LinkButton from "@components/common/LinkButton";
 import { useEffect, useState } from "react";
-import { useLocalStorage } from "./_lib/hooks";
+import { useLocalStorage } from "@lib/hooks";
 import { useRouter } from "next/navigation";
-import Loading from "./_components/layout/Loading";
+import Loading from "@components/layout/Loading";
 
 export default function Onboarding() {
     const [loading, setLoading] = useState(true);

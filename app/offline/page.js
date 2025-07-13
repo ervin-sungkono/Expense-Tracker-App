@@ -1,4 +1,4 @@
-import Layout from "../_components/layout/Layout";
+import Layout from "@components/layout/Layout";
 import { MdOutlineWifiOff as OfflineIcon } from "react-icons/md";
 
 export default function Offline() {

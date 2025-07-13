@@ -1,6 +1,6 @@
 'use client'
-import { db } from "@/app/_lib/db";
-import { formatCurrency, getDayDifference } from "@/app/_lib/utils";
+import { db } from "@lib/db";
+import { formatCurrency, getDayDifference } from "@lib/utils";
 import { useLiveQuery } from "dexie-react-hooks";
 import Image from "next/image";
 import { memo, useEffect, useState } from "react"

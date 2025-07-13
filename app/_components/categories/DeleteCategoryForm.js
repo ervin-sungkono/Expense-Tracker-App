@@ -1,6 +1,6 @@
 'use client'
 import dynamic from "next/dynamic";
-import { db } from "@/app/_lib/db";
+import { db } from "@lib/db";
 import Button from "../common/Button";
 import { useLiveQuery } from "dexie-react-hooks";
 import { useState } from "react";

@@ -3,8 +3,8 @@ import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
 import { useEffect, useState } from "react";
 import { Doughnut } from "react-chartjs-2";
 import { useLiveQuery } from "dexie-react-hooks";
-import { db } from "@/app/_lib/db";
-import { generateRandomDistinctColors } from "@/app/_lib/utils";
+import { db } from "@lib/db";
+import { generateRandomDistinctColors } from "@lib/utils";
 
 ChartJS.defaults.font.family = "'Inter', sans-serif"
 ChartJS.defaults.font.size = 14;

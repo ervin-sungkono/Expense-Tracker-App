@@ -5,8 +5,8 @@ import InfiniteLoader from 'react-window-infinite-loader';
 import TransactionCard from './TransactionCard';
 import LoadingSpinner from '../common/LoadingSpinner';
 import Image from 'next/image';
-import { formatCurrency, formatDateString } from '@/app/_lib/utils';
-import { useDynamicItemSize } from '@/app/_lib/hooks';
+import { formatCurrency, formatDateString } from '@lib/utils';
+import { useDynamicItemSize } from '@lib/hooks';
 import DynamicRow from '../common/DynamicRow';
 
 const renderItem = (item) => {

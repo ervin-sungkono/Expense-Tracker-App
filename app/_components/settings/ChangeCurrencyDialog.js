@@ -3,9 +3,9 @@ import Dialog from "../common/Dialog";
 import SelectField from "../common/SelectField";
 import { useEffect, useState } from "react";
 import Button from "../common/Button";
-import { StringValidator } from "@/app/_lib/validator";
-import { useLocalStorage } from "@/app/_lib/hooks";
-import { getSupportedCurrencies } from "@/app/_lib/currency";
+import { StringValidator } from "@lib/validator";
+import { useLocalStorage } from "@lib/hooks";
+import { getSupportedCurrencies } from "@lib/currency";
 
 export default function ChangeCurrencyDialog({ show, hideFn }) {
     const [errorMessage, setErrorMessage] = useState({});

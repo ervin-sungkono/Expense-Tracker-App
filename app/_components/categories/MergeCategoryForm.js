@@ -5,8 +5,8 @@ import Image from "next/image";
 import SelectCategoryPage from "../common/page/SelectCategoryPage";
 import { useState } from "react";
 import { useLiveQuery } from "dexie-react-hooks";
-import { db } from "@/app/_lib/db";
-import { StringValidator } from "@/app/_lib/validator";
+import { db } from "@lib/db";
+import { StringValidator } from "@lib/validator";
 
 export default function MergeCategoryForm({ categoryId, onMergeCategory }) {
     const [selectedCategory, setSelectedCategory] = useState(null);

@@ -1,6 +1,6 @@
 'use client'
 import dynamic from "next/dynamic";
-import { formatCurrency, formatDateString, getDayDifference, isInDateRange } from "@/app/_lib/utils";
+import { formatCurrency, formatDateString, getDayDifference, isInDateRange } from "@lib/utils";
 import Button from "../common/Button";
 import BudgetProgress from "./BudgetProgress";
 import { useState } from "react";

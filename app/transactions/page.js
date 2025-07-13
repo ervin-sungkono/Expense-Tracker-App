@@ -1,15 +1,15 @@
 'use client'
-import Layout from "../_components/layout/Layout";
-import VirtualizedTransactionList from "../_components/transactions/VirtualizedTransactionList";
+import Layout from "@components/layout/Layout";
+import VirtualizedTransactionList from "@components/transactions/VirtualizedTransactionList";
 import { useEffect, useState, Suspense, useRef } from "react";
-import { db } from "../_lib/db";
+import { db } from "@lib/db";
 import { useLiveQuery } from "dexie-react-hooks";
-import SearchBar from "../_components/common/Searchbar";
-import Header from "../_components/common/Header";
-import IconButton from "../_components/common/IconButton";
+import SearchBar from "@components/common/Searchbar";
+import Header from "@components/common/Header";
+import IconButton from "@components/common/IconButton";
 import { IoFilter as FilterIcon } from "react-icons/io5";
-import Dialog from "../_components/common/Dialog";
-import FilterTransaction from "../_components/transactions/FilterTransaction";
+import Dialog from "@components/common/Dialog";
+import FilterTransaction from "@components/transactions/FilterTransaction";
 import { useSearchParams } from "next/navigation";
 
 const UpdateFilter = ({ onSearchParamResult }) => {

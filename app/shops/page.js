@@ -1,15 +1,15 @@
 'use client'
-import Layout from "../_components/layout/Layout";
-import VirtualizedShopList from "../_components/shops/VirtualizedShopList";
+import Layout from "@components/layout/Layout";
+import VirtualizedShopList from "@components/shops/VirtualizedShopList";
 import { useEffect, useState } from "react";
-import { db } from "../_lib/db";
-import SearchBar from "../_components/common/Searchbar";
-import Header from "../_components/common/Header";
-import IconButton from "../_components/common/IconButton";
+import { db } from "@lib/db";
+import SearchBar from "@components/common/Searchbar";
+import Header from "@components/common/Header";
+import IconButton from "@components/common/IconButton";
 import { IoMdAdd as PlusIcon } from "react-icons/io";
 import { useLiveQuery } from "dexie-react-hooks";
-import Dialog from "../_components/common/Dialog";
-import InfoShopForm from "../_components/shops/InfoShopForm";
+import Dialog from "@components/common/Dialog";
+import InfoShopForm from "@components/shops/InfoShopForm";
 
 export default function Shops() {
     const PAGE_SIZE = 10;

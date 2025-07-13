@@ -1,4 +1,4 @@
-import { extractText } from "@/app/_lib/utils"
+import { extractText } from "@lib/utils"
 
 export default function TextContent({ title, description }) {
     const titleContent = extractText(title)

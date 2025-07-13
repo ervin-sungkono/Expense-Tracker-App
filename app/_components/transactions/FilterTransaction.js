@@ -1,7 +1,7 @@
 import SelectField from "../common/SelectField";
 import Button from "../common/Button";
 import { useLiveQuery } from "dexie-react-hooks";
-import { db } from "@/app/_lib/db";
+import { db } from "@lib/db";
 import InputField from "../common/InputField";
 import { useState } from "react";
 
