@@ -34,7 +34,7 @@ export default function ActionBar() {
     ]
 
     return(
-        <div className="max-w-2xl w-full px-6 py-1.5 mx-auto bg-ocean-blue ">
+        <div className="max-w-3xl w-full px-6 py-1.5 mx-auto bg-ocean-blue ">
             <div className="relative w-full flex items-center">
                 <BalanceView/>
                 <div onClick={() => setShowMenu(true)} className="text-white cursor-pointer p-1.5 rounded-ful active:bg-light/20 rounded-full transition-colors duration-150 ease-in-out">
