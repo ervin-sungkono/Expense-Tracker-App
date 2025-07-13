@@ -1,0 +1,18 @@
+/* Overriding react-toastify theme */
+
+.Toastify__toast {
+    background: var(--toastify-color-light) !important;
+    color: var(--toastify-text-color-light) !important;
+}
+
+[data-theme='dark'] {
+    .Toastify__toast {
+        background: var(--toastify-color-dark) !important;
+        color: var(--toastify-text-color-dark) !important;
+    }
+
+    .Toastify__close-button {
+        color: #FFF;
+    }
+}
+
