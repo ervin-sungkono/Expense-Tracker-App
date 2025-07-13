@@ -8,6 +8,7 @@ import { useLocalStorage } from "@lib/hooks";
 import { useRouter } from "next/navigation";
 import Loading from "@components/layout/Loading";
 import { StringValidator } from "@lib/validator";
+import { toast } from "react-toastify";
 
 export default function Register() {
     const [username, setUsername] = useLocalStorage('username');
@@ -35,8 +36,7 @@ export default function Register() {
             return;
         }
 
-        // TODO: replace alert with dialog
-        alert('Registration success');
+        toast.success('Registration complete!')
         setUsername(input.value);
     }
 
