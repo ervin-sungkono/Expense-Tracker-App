@@ -20,11 +20,11 @@ function BudgetCard({ budget, style }) {
     const totalDays = getDayDifference(start_date, end_date);
     const remainingDays = Math.max(0, Math.min(getDayDifference(todayDate, end_date), totalDays));
 
-    const category = useLiveQuery(() => db.getCategoryById(categoryId));
-    const transactions = useLiveQuery(() => db.getTransactionsRange(start_date, end_date, categoryId));
+    const category = useLiveQuery(() => db.getCategoryById(categoryId), [categoryId]);
+    const transactions = useLiveQuery(() => db.getTransactionsRange(start_date, end_date, categoryId), [categoryId]);
 
     useEffect(() => {
-        if(transactions && transactions.length > 0) {
+        if (transactions && transactions.length > 0) {
             const sum = transactions.reduce((acc, transaction) => {
                 return acc += transaction.amount;
             }, 0);
@@ -33,11 +33,11 @@ function BudgetCard({ budget, style }) {
         }
     }, [transactions]);
 
-    if(!transactions || !category) {
+    if (!transactions || !category) {
         return (
             <div style={style} className="pb-3">
                 <div className="flex justify-center items-center w-full h-full rounded-lg bg-light dark:bg-neutral-800">
-                    <LoadingSpinner size="medium"/>
+                    <LoadingSpinner size="medium" />
                 </div>
             </div>
         )
@@ -46,7 +46,7 @@ function BudgetCard({ budget, style }) {
         <div style={style} className="pb-3">
             <div onClick={() => setShowInfo(true)} className="cursor-pointer flex gap-2 md:gap-4 px-4 py-4 rounded-lg bg-light dark:bg-neutral-800 active:scale-95 transition-transform duration-150 ease-in-out">
                 <div className="relative w-8 h-8 md:w-10 md:h-10 flex shrink-0 justify-center items-center bg-ocean-blue rounded-full">
-                    <Image className="object-contain p-1.5 md:p-2" src={`./category_icons/${category.icon}`} alt="" fill/>
+                    <Image className="object-contain p-1.5 md:p-2" src={`./category_icons/${category.icon}`} alt="" fill />
                 </div>
                 <div className="grow">
                     <div className="flex items-center gap-2">
@@ -60,20 +60,20 @@ function BudgetCard({ budget, style }) {
                         remainingBudget={remainingBudget}
                         budgetAmount={amount}
                     />
-                </div> 
+                </div>
             </div>
             <Dialog
                 show={showInfo}
                 hideFn={() => setShowInfo(false)}
             >
-                <InfoBudgetContent 
-                    budget={{ 
-                        ...budget, 
-                        totalTransaction, 
-                        remainingBudget, 
-                        remainingDays, 
-                        category 
-                    }} 
+                <InfoBudgetContent
+                    budget={{
+                        ...budget,
+                        totalTransaction,
+                        remainingBudget,
+                        remainingDays,
+                        category
+                    }}
                     hideFn={() => setShowInfo(false)}
                 />
             </Dialog>

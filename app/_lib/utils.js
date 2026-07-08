@@ -1,81 +1,81 @@
 import { MONTHS } from "./const";
 
 export function extractText(text) {
-    const regex = /\[(.*?)\]/g;
+  const regex = /\[(.*?)\]/g;
 
-    const result = [];
-    let lastIndex = 0;
-    let match;
+  const result = [];
+  let lastIndex = 0;
+  let match;
 
-    while ((match = regex.exec(text)) !== null) {
-        // Push the text before the match
-        if (match.index > lastIndex) {
-            result.push({
-                type: 'text',
-                value: text.slice(lastIndex, match.index)
-            });
-        }
-
-        // Push the matched pattern
-        result.push({
-            type: 'tag',
-            value: match[1]
-        });
-
-        lastIndex = regex.lastIndex;
+  while ((match = regex.exec(text)) !== null) {
+    // Push the text before the match
+    if (match.index > lastIndex) {
+      result.push({
+        type: 'text',
+        value: text.slice(lastIndex, match.index)
+      });
     }
 
-    // Push any remaining text after the last match
-    if (lastIndex < text.length) {
-        result.push({
-            type: 'text',
-            value: text.slice(lastIndex)
-        });
-    }
+    // Push the matched pattern
+    result.push({
+      type: 'tag',
+      value: match[1]
+    });
 
-    return result;
+    lastIndex = regex.lastIndex;
+  }
+
+  // Push any remaining text after the last match
+  if (lastIndex < text.length) {
+    result.push({
+      type: 'text',
+      value: text.slice(lastIndex)
+    });
+  }
+
+  return result;
 }
 
 function selectColor(number) {
-    const hue = number * 137.508; // use golden angle approximation
-    return `hsl(${hue},70%,75%)`;
+  const hue = number * 137.508; // use golden angle approximation
+  return `hsl(${hue},70%,75%)`;
 }
 
 export function generateRandomDistinctColors(amount) {
-    const res = [];
-    for(let i = 1; i <= amount; i++) {
-        res.push(selectColor(i));
-    }
+  const res = [];
+  for (let i = 1; i <= amount; i++) {
+    res.push(selectColor(i));
+  }
 
-    return res;
+  return res;
 }
 
 export function generateRangeOptions(start, end) {
-    const range = []
-    for(let i = start; i <= end; i++) {
-        range.push(i);
-    }
+  const range = []
+  for (let i = start; i <= end; i++) {
+    range.push(i);
+  }
 
-    return range;
+  return range;
 }
 
 export function generateAsterisks(length) {
-    let res = '';
+  let res = '';
 
-    for(let i = 0; i < length; i++) {
-        res += '*';
-    }
+  for (let i = 0; i < length; i++) {
+    res += '*';
+  }
 
-    return res;
+  return res;
 }
 
 export function formatCurrency(value, locale = 'id-ID', currency = 'IDR') {
-    const formatter = new Intl.NumberFormat(locale, { style: 'currency', currency, minimumFractionDigits: 0 });
-    return formatter.format(value);
+  const formatter = new Intl.NumberFormat(locale, { style: 'currency', currency, minimumFractionDigits: 0 });
+  return formatter.format(value);
 }
 
 export function formatDateString(date, locale = 'en-US') {
-    return new Date(date).toLocaleDateString(locale, { day: 'numeric', month: 'long', year: 'numeric' })
+  return new Date(date).toLocaleDateString(locale, { day: 'numeric', month: 'long', year: 'numeric' })
 }
 
 export function getBase64(file) {
@@ -88,14 +88,14 @@ export function getBase64(file) {
 }
 
 export function getMonthlyLabels(year, month) {
-    const daysInMonth = new Date(year, month + 1, 0).getDate();
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
 
-    const result = [];
-    for(let date = 1; date <= daysInMonth; date++) {
-        result.push(formatDateString(new Date(year, month, date)));
-    }
+  const result = [];
+  for (let date = 1; date <= daysInMonth; date++) {
+    result.push(formatDateString(new Date(year, month, date)));
+  }
 
-    return result;
+  return result;
 }
 
 /**
@@ -103,14 +103,14 @@ export function getMonthlyLabels(year, month) {
  * @param {WeekRange} weekRange 
  */
 export function getWeeklyLabels(weekRange) {
-    if(!weekRange) return [];
+  if (!weekRange) return [];
 
-    const result = [];
-    for(let date = new Date(weekRange.start); date <= weekRange.end; date.setDate(date.getDate() + 1)) {
-        result.push(formatDateString(date));
-    }
+  const result = [];
+  for (let date = new Date(weekRange.start); date <= weekRange.end; date.setDate(date.getDate() + 1)) {
+    result.push(formatDateString(date));
+  }
 
-    return result;
+  return result;
 }
 
 export function nFormatter(num, digits) {
@@ -156,21 +156,21 @@ export function formatDate(date, format = 'DD/MM/YYYY') {
  * @returns 
  */
 export function getDayDifference(date1, date2) {
-    const msPerDay = 1000 * 60 * 60 * 24;
-    
-    // Normalize both dates to midnight UTC to avoid daylight saving shifts
-    const utc1 = Date.UTC(date1.getFullYear(), date1.getMonth(), date1.getDate());
-    const utc2 = Date.UTC(date2.getFullYear(), date2.getMonth(), date2.getDate());
+  const msPerDay = 1000 * 60 * 60 * 24;
 
-    return Math.floor((utc2 - utc1) / msPerDay) + 1;
+  // Normalize both dates to midnight UTC to avoid daylight saving shifts
+  const utc1 = Date.UTC(date1.getFullYear(), date1.getMonth(), date1.getDate());
+  const utc2 = Date.UTC(date2.getFullYear(), date2.getMonth(), date2.getDate());
+
+  return Math.floor((utc2 - utc1) / msPerDay) + 1;
 }
 
 function isDebtLoanExpense(name) {
-    return name && (name === 'Repayment' || name === 'Loan')
+  return name && (name === 'Repayment' || name === 'Loan')
 }
 
 function isDebtLoanIncome(name) {
-    return name && (name === 'Debt' || name === 'Debt Collection')
+  return name && (name === 'Debt' || name === 'Debt Collection')
 }
 
 /**
@@ -179,9 +179,9 @@ function isDebtLoanIncome(name) {
  * @returns Debt Loan type (Income or Expense)
  */
 export function getDebtLoanType(name) {
-    if(isDebtLoanExpense(name)) return 'Expense';
-    if(isDebtLoanIncome(name)) return 'Income';
-    return null;
+  if (isDebtLoanExpense(name)) return 'Expense';
+  if (isDebtLoanIncome(name)) return 'Income';
+  return null;
 }
 
 /**
@@ -190,14 +190,14 @@ export function getDebtLoanType(name) {
  * @returns 
  */
 export function getOwnerLabel(categoryName) {
-    if (categoryName === "Debt Collection" || categoryName == "Loan") {
-        return "Borrower";
-    }
-    if (categoryName === "Debt" || categoryName === "Repayment") {
-        return "Lender";
-    }
+  if (categoryName === "Debt Collection" || categoryName == "Loan") {
+    return "Borrower";
+  }
+  if (categoryName === "Debt" || categoryName === "Repayment") {
+    return "Lender";
+  }
 
-    return "";
+  return "";
 }
 
 /**
@@ -207,12 +207,12 @@ export function getOwnerLabel(categoryName) {
  * @returns 
  */
 export function isInAmountRange(amount, range) {
-    const [min, max] = range;
+  const [min, max] = range;
 
-    if(min && amount < min) return false;
-    if(max && amount > max) return false;
+  if (min && amount < min) return false;
+  if (max && amount > max) return false;
 
-    return true
+  return true
 }
 
 /**
@@ -222,17 +222,17 @@ export function isInAmountRange(amount, range) {
  * @returns 
  */
 export function isInDateRange(date, range) {
-    const [min, max] = range;
+  const [min, max] = range;
 
-    const currTime = date.getTime();
-    if(min && currTime < new Date(min).getTime()) return false;
-    if(max && currTime > new Date(max).getTime()) return false;
+  const currTime = date.getTime();
+  if (min && currTime < new Date(min).getTime()) return false;
+  if (max && currTime > new Date(max).getTime()) return false;
 
-    return true
+  return true
 }
 
 function zeroBased(value) {
-    return value.toString().padStart(2, '0');
+  return value.toString().padStart(2, '0');
 }
 
 /**
@@ -241,14 +241,14 @@ function zeroBased(value) {
  * @returns Value in datetime-local input format
  */
 export function dateToLocalInput(date = new Date()) {
-    const year = date.getFullYear();
-    const month = zeroBased(date.getMonth() + 1);
-    const day = zeroBased(date.getDate());
-    const hour = zeroBased(date.getHours());
-    const minute = zeroBased(date.getMinutes());
+  const year = date.getFullYear();
+  const month = zeroBased(date.getMonth() + 1);
+  const day = zeroBased(date.getDate());
+  const hour = zeroBased(date.getHours());
+  const minute = zeroBased(date.getMinutes());
 
-    const dateString = `${year}-${month}-${day}T${hour}:${minute}`;
-    return dateString;
+  const dateString = `${year}-${month}-${day}T${hour}:${minute}`;
+  return dateString;
 }
 
 /**
@@ -388,7 +388,7 @@ export function getDateRange(type, date = new Date()) {
   }
 
   // Set end time to 23:59:59.999
-  if(end) end.setHours(23, 59, 59, 999);
+  if (end) end.setHours(23, 59, 59, 999);
 
   return [start, end];
 }

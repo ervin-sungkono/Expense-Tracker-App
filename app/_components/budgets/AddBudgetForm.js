@@ -15,11 +15,11 @@ import { toast } from "react-toastify";
 export default function AddBudgetForm({ budget = {}, onSubmit }) {
     const categories = useLiveQuery(() => db.getAllCategories());
     const [errorMessage, setErrorMessage] = useState({});
-    const [selectedCategory, setSelectedCategory] = useState(budget.category); 
+    const [selectedCategory, setSelectedCategory] = useState(budget.category);
     const [selectCategory, setSelectCategory] = useState(false);
-    const [repeat, setRepeat] = useState(false);
+    const [repeat, setRepeat] = useState(budget.repeat ?? false);
     const [duration, setDuration] = useState('weekly');
-    const [dateRange, setDateRange] = useState([undefined, undefined]);
+    const [dateRange, setDateRange] = useState([budget.start_date, budget.end_date]);
 
     const excludedCategory = ["Debt", "Debt Collection"];
 
@@ -62,12 +62,12 @@ export default function AddBudgetForm({ budget = {}, onSubmit }) {
             .validate();
 
         let rangeDateValidation = null;
-        if(new Date(startDate).getTime() > new Date(endDate).getTime()) {
+        if (new Date(startDate).getTime() > new Date(endDate).getTime()) {
             rangeDateValidation = 'Start Date must not be later than End Date';
         }
 
         return startDateValidation ?? endDateValidation ?? rangeDateValidation;
-        
+
     }
 
     const validateAmount = (amount) => {
@@ -101,13 +101,13 @@ export default function AddBudgetForm({ budget = {}, onSubmit }) {
 
         // Create payload for add budget
         const payload = {}
-        for(const [key, value] of formData.entries()) {
+        for (const [key, value] of formData.entries()) {
             payload[key] = value;
         }
         payload.categoryId = selectedCategory?.id ?? null; // set to null if left unfilled
         payload.repeat = duration === 'custom' ? false : repeat; // if custom range then repeat is false by default
 
-        try{
+        try {
             let error = {};
             const { start_date, end_date, amount, categoryId } = payload;
 
@@ -116,7 +116,7 @@ export default function AddBudgetForm({ budget = {}, onSubmit }) {
             error.categoryId = validateCategory(categoryId);
 
             setErrorMessage(error);
-            if(Object.values(error).filter(Boolean).length > 0) {
+            if (Object.values(error).filter(Boolean).length > 0) {
                 return;
             }
 
@@ -126,18 +126,18 @@ export default function AddBudgetForm({ budget = {}, onSubmit }) {
             payload.start_date.setHours(0, 0, 0, 0);
             payload.end_date.setHours(23, 59, 59, 999);
 
-            if(budget.id) {
+            if (budget.id) {
                 db.updateBudget(budget.id, payload);
                 toast.success('Budget updated');
             } else {
                 db.addBudget(payload);
                 toast.success('Budget added');
             }
-            
+
             onSubmit && onSubmit();
-        } catch(e) {
+        } catch (e) {
             console.log(e);
-            if(budget.id) {
+            if (budget.id) {
                 toast.error('Fail to update budget');
             } else {
                 toast.error('Fail to add budget');
@@ -146,7 +146,7 @@ export default function AddBudgetForm({ budget = {}, onSubmit }) {
     }
 
     const renderCategorySelected = () => {
-        if(!selectedCategory) return (
+        if (!selectedCategory) return (
             <div className="flex items-center gap-2">
                 <p className="text-dark dark:text-white text-sm">Select Category</p>
             </div>
@@ -154,7 +154,7 @@ export default function AddBudgetForm({ budget = {}, onSubmit }) {
         return (
             <div className="flex items-center gap-2">
                 <div className="relative w-8 h-8 md:w-10 md:h-10 flex justify-center items-center bg-ocean-blue rounded-full">
-                    {selectedCategory.icon && <Image className="object-contain p-1.5 md:p-2" src={`./category_icons/${selectedCategory.icon}`} alt="" fill/>}
+                    {selectedCategory.icon && <Image className="object-contain p-1.5 md:p-2" src={`./category_icons/${selectedCategory.icon}`} alt="" fill />}
                 </div>
                 <p className="text-dark dark:text-white text-sm">{selectedCategory.name}</p>
             </div>
@@ -180,19 +180,19 @@ export default function AddBudgetForm({ budget = {}, onSubmit }) {
                     />
                     <div className="w-full flex flex-col gap-2">
                         <div className="grid grid-cols-2 gap-2">
-                            <InputField 
+                            <InputField
                                 required
-                                name={"start_date"} 
-                                label={"Start Date"} 
+                                name={"start_date"}
+                                label={"Start Date"}
                                 type={"date"}
                                 defaultValue={dateToInputValue(dateRange[0])}
                                 onChange={(e) => setDateRange((prevRange) => [new Date(e.target.value), prevRange[1]])}
                                 readOnly={duration !== 'custom'}
                             />
-                            <InputField 
+                            <InputField
                                 required
-                                name={"end_date"} 
-                                label={"End Date"} 
+                                name={"end_date"}
+                                label={"End Date"}
                                 type={"date"}
                                 defaultValue={dateToInputValue(dateRange[1])}
                                 onChange={(e) => setDateRange((prevRange) => [prevRange[0], new Date(e.target.value)])}
@@ -201,10 +201,10 @@ export default function AddBudgetForm({ budget = {}, onSubmit }) {
                         </div>
                         {errorMessage.date && <p className="text-[10.8px] md:text-xs text-red-600 dark:text-red-400">{errorMessage.date}</p>}
                     </div>
-                    <InputField 
+                    <InputField
                         required
-                        name={"amount"} 
-                        label={"Amount"} 
+                        name={"amount"}
+                        label={"Amount"}
                         placeholder={"Enter amount"}
                         type={"number"}
                         defaultValue={budget.amount}
@@ -219,12 +219,12 @@ export default function AddBudgetForm({ budget = {}, onSubmit }) {
                         customSelected={renderCategorySelected()}
                     />}
                     {duration !== 'custom' &&
-                    <div className="flex flex-col gap-2 text-dark dark:text-white">
-                        <p className="text-xs md:text-sm font-semibold">Enable budget repeat</p>
-                        <ToggleSwitch switchStatus={repeat} onStatusChange={(status) => setRepeat(status)}/>
-                    </div>}
+                        <div className="flex flex-col gap-2 text-dark dark:text-white">
+                            <p className="text-xs md:text-sm font-semibold">Enable budget repeat</p>
+                            <ToggleSwitch switchStatus={repeat} onStatusChange={(status) => setRepeat(status)} />
+                        </div>}
                 </div>
-                <Button type="submit" label={getDialogAction()}/>
+                <Button type="submit" label={getDialogAction()} />
             </form>
             <SelectCategoryPage
                 show={selectCategory}
