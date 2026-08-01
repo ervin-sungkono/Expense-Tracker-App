@@ -4,7 +4,7 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useState } 
 import { createClient } from '@lib/supabase/client';
 import { isSupabaseConfigured } from '@lib/supabase/config';
 import { getPrivateKey, getSpaceKey, saveSpaceKey } from '@lib/keyStore';
-import { createUserKeyring, recoverUserKeyring } from '@lib/keyring';
+import { createUserKeyring } from '@lib/keyring';
 import { generateSpaceKey, importPublicKey, unwrapSpaceKey, wrapSpaceKey } from '@lib/crypto';
 import { byteaToBase64 } from '@lib/supabase/binary';
 import { db } from '@lib/db';
@@ -171,15 +171,6 @@ export function AppProvider({ children }) {
     return result;
   }, [supabase, user]);
 
-  const unlockKeyring = useCallback(
-    async passphrase => {
-      const key = await recoverUserKeyring(supabase, user, profile.active_key_version, passphrase);
-      setPrivateKey(key);
-      return key;
-    },
-    [profile, supabase, user]
-  );
-
   const createSpace = useCallback(
     async name => {
       if (!privateKey || !profile?.active_key_version)
@@ -277,7 +268,6 @@ export function AppProvider({ children }) {
     signInWithGoogle,
     signOut,
     setupKeyring,
-    unlockKeyring,
     refreshProfile: () => user && loadProfile(user),
   };
   const spaceValue = {

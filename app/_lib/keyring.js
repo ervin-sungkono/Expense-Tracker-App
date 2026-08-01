@@ -1,6 +1,5 @@
-import { generateDeviceKeyring, recoverPrivateKey } from '@lib/crypto';
+import { generateDeviceKeyring } from '@lib/crypto';
 import { savePrivateKey } from '@lib/keyStore';
-import { byteaToBase64 } from '@lib/supabase/binary';
 
 export async function createUserKeyring(supabase, user) {
   const keyVersion = 1;
@@ -26,23 +25,4 @@ export async function createUserKeyring(supabase, user) {
   if (profileError) throw profileError;
 
   return { keyVersion, privateKey: generated.privateKey, fingerprint: generated.fingerprint };
-}
-
-export async function recoverUserKeyring(supabase, user, keyVersion, passphrase) {
-  const { data, error } = await supabase
-    .from('user_private_key_backups')
-    .select('encrypted_private_key,iv,salt,kdf_iterations')
-    .eq('user_id', user.id)
-    .eq('key_version', keyVersion)
-    .single();
-  if (error) throw error;
-
-  const privateKey = await recoverPrivateKey(passphrase, {
-    encrypted_private_key: byteaToBase64(data.encrypted_private_key),
-    iv: byteaToBase64(data.iv),
-    salt: byteaToBase64(data.salt),
-    kdf_iterations: data.kdf_iterations,
-  });
-  await savePrivateKey(user.id, keyVersion, privateKey);
-  return privateKey;
 }

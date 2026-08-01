@@ -31,7 +31,7 @@ function InviteContent() {
 
   async function accept() {
     if (!privateKey || !profile?.active_key_version)
-      return setError('Unlock your recovery key on the sign-in page first.');
+      return setError('This device does not have the encryption key required to join this space.');
     const secret = new URLSearchParams(window.location.hash.slice(1)).get('key');
     if (!secret) return setError('The invitation decryption key is missing from this link.');
     setBusy(true);

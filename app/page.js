@@ -2,7 +2,6 @@
 
 import AppLogo from '@components/common/AppLogo';
 import Button from '@components/common/Button';
-import InputField from '@components/common/InputField';
 import Loading from '@components/layout/Loading';
 import { useAuth } from '@components/providers/AppProvider';
 import { useRouter, useSearchParams } from 'next/navigation';
@@ -19,11 +18,9 @@ function OnboardingContent() {
     privateKey,
     authLoading,
     signInWithGoogle,
+    signOut,
     setupKeyring,
-    unlockKeyring,
   } = useAuth();
-  const [busy, setBusy] = useState(false);
-  const [passphrase, setPassphrase] = useState('');
   const [keySetupError, setKeySetupError] = useState('');
   const [keySetupAttempt, setKeySetupAttempt] = useState(0);
   const keySetupStarted = useRef(false);
@@ -100,31 +97,18 @@ function OnboardingContent() {
   }
 
   if (!privateKey) {
-    const submit = async event => {
-      event.preventDefault();
-      setBusy(true);
-      try {
-        await unlockKeyring(passphrase);
-        toast.success('Encryption key unlocked');
-      } catch {
-        toast.error('Unable to unlock. Check your recovery passphrase.');
-      } finally {
-        setBusy(false);
-      }
-    };
     return (
-      <form onSubmit={submit} className="w-full max-w-md flex flex-col gap-4">
-        <h1 className="text-2xl font-bold">Unlock this device</h1>
-        <InputField
-          required
-          type="password"
-          name="passphrase"
-          label="Recovery passphrase"
-          value={passphrase}
-          onChange={event => setPassphrase(event.target.value)}
+      <div className="w-full max-w-md flex flex-col gap-4 text-center">
+        <h1 className="text-2xl font-bold">Encryption key unavailable</h1>
+        <p className="text-sm text-dark/70 dark:text-white/70">
+          This device does not have the key required to open your encrypted spaces. Use a device
+          where you previously opened this account.
+        </p>
+        <Button
+          label="Sign out"
+          onClick={() => signOut().catch(error => toast.error(error.message))}
         />
-        <Button type="submit" label={busy ? 'Unlocking…' : 'Unlock'} />
-      </form>
+      </div>
     );
   }
 

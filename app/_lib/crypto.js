@@ -25,25 +25,6 @@ function randomBytes(length) {
   return getCrypto().getRandomValues(new Uint8Array(length));
 }
 
-async function derivePassphraseKey(passphrase, salt, iterations) {
-  const subtle = getCrypto().subtle;
-  const material = await subtle.importKey(
-    'raw',
-    new TextEncoder().encode(passphrase),
-    'PBKDF2',
-    false,
-    ['deriveKey']
-  );
-
-  return subtle.deriveKey(
-    { name: 'PBKDF2', salt, iterations, hash: 'SHA-256' },
-    material,
-    { name: 'AES-GCM', length: 256 },
-    false,
-    ['wrapKey', 'unwrapKey']
-  );
-}
-
 async function generateUserKeyMaterial() {
   const subtle = getCrypto().subtle;
   const pair = await subtle.generateKey(
@@ -80,23 +61,6 @@ async function generateUserKeyMaterial() {
 export async function generateDeviceKeyring() {
   const { publicKeyJwk, privateKey, fingerprint } = await generateUserKeyMaterial();
   return { publicKeyJwk, privateKey, fingerprint };
-}
-
-export async function recoverPrivateKey(passphrase, backup) {
-  const subtle = getCrypto().subtle;
-  const iv = base64ToBytes(backup.iv);
-  const salt = base64ToBytes(backup.salt);
-  const passphraseKey = await derivePassphraseKey(passphrase, salt, backup.kdf_iterations);
-
-  return subtle.unwrapKey(
-    'pkcs8',
-    base64ToBytes(backup.encrypted_private_key),
-    passphraseKey,
-    { name: 'AES-GCM', iv },
-    { name: 'RSA-OAEP', hash: 'SHA-256' },
-    false,
-    ['unwrapKey']
-  );
 }
 
 export async function importPublicKey(publicKeyJwk) {

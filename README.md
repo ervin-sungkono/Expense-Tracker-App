@@ -4,9 +4,9 @@ Xpensed is an offline-first, shared expense tracker. Google authentication and t
 
 ## Security model
 
-Expense payloads are encrypted in the browser with AES-256-GCM before upload. Every space has its own random key. That key is wrapped separately for each member with their RSA-OAEP-3072 public key. The user's private key is non-extractable in the browser and has an encrypted recovery backup protected by a user-chosen passphrase (PBKDF2-HMAC-SHA256, 600,000 iterations).
+Expense payloads are encrypted in the browser with AES-256-GCM before upload. Every space has its own random key. That key is wrapped separately for each member with their RSA-OAEP-3072 public key. The user's private key is non-extractable and stored only in that browser's IndexedDB.
 
-Supabase stores ciphertext plus operational metadata such as space membership, record type, versions, invitation email, and timestamps. Supabase operators or a leaked database cannot decrypt expense payloads without a user's private key/passphrase. This does not hide traffic metadata, space names, membership, or invitation email addresses. A member who already decrypted or copied data cannot be made to forget it; removing a member must be paired with space-key rotation before new data is written.
+Supabase stores ciphertext plus operational metadata such as space membership, record type, versions, invitation email, and timestamps. Supabase operators or a leaked database cannot decrypt expense payloads without a private key held on an authorized member's device. This does not hide traffic metadata, space names, membership, or invitation email addresses. A member who already decrypted or copied data cannot be made to forget it; removing a member must be paired with space-key rotation before new data is written.
 
 Row Level Security is enabled on every application table. Database policy is the final authorization boundary:
 
@@ -63,14 +63,14 @@ npx supabase db lint
 
 Manual acceptance checks:
 
-1. Sign in with Google, create a recovery passphrase, and create a space.
+1. Sign in with Google, wait for the device encryption key to initialize, and create a space.
 2. Create records offline and confirm the sync indicator reports pending changes.
 3. Reconnect, sync, and verify `space_records.ciphertext` is unreadable and no plaintext expense fields exist in Supabase.
 4. Invite a second Google account as viewer; verify it can read after accepting but cannot mutate through the UI or direct Supabase calls.
 5. Repeat as collaborator; verify transaction changes succeed while category, shop, and budget changes fail.
 6. Attempt to own a fourth space and confirm the database rejects it.
 7. Create concurrent edits on two devices and confirm the local conflict store captures the version conflict instead of silently overwriting it.
-8. Test recovery in a fresh browser using the recovery passphrase.
+8. Sign in from a fresh browser and confirm the app explains that existing encrypted spaces require the original device key.
 
 ## Offline and migration behavior
 
@@ -82,6 +82,6 @@ Existing installations using the old `ExpenseDB` are migrated once into the firs
 
 - Invitation links expire after seven days and are bound to the exact invited Google email.
 - The URL fragment contains the invitation's key material; browsers do not send fragments to the server. Avoid analytics/session-recording tools on invitation pages.
-- Losing both the recovery passphrase and all devices holding the private key makes encrypted data unrecoverable by design.
-- Back up Supabase normally, but also test passphrase recovery: database backups alone do not provide plaintext recovery.
+- Clearing browser storage or losing every device holding a private key makes that user's encrypted space access unrecoverable by design.
+- Back up Supabase normally, but remember that database backups alone do not provide plaintext recovery.
 - Keep the service key only in Vercel server environment variables and rotate it if it leaks.
