@@ -5,13 +5,17 @@ import { IoChevronDown as DownIcon } from 'react-icons/io5';
 import Button from '../common/Button';
 import InputField from '../common/InputField';
 import { useAuth, useSpace } from '../providers/AppProvider';
-import { base64ToBytea } from '@lib/supabase/binary';
-import { createInvitationSecret, encryptSpaceKeyForInvitation, sha256Base64 } from '@lib/crypto';
+
+async function invitationTokenHash(token) {
+  const digest = new Uint8Array(
+    await crypto.subtle.digest('SHA-256', new TextEncoder().encode(token))
+  );
+  return `\\x${Array.from(digest, byte => byte.toString(16).padStart(2, '0')).join('')}`;
+}
 
 export default function SpaceManagement() {
   const { supabase, user } = useAuth();
-  const { activeSpace, activeSpaceKey, canManageSpace, spaces, createSpace, refreshSpaces } =
-    useSpace();
+  const { activeSpace, canManageSpace, spaces, createSpace } = useSpace();
   const [members, setMembers] = useState([]);
   const [link, setLink] = useState('');
   const [message, setMessage] = useState('');
@@ -44,18 +48,10 @@ export default function SpaceManagement() {
 
   async function handleInvite(event) {
     event.preventDefault();
-    if (!activeSpaceKey) return setMessage('Unlock this space before inviting someone.');
     const values = new FormData(event.currentTarget);
     const email = values.get('email').toString().trim().toLowerCase();
     const role = values.get('role').toString();
-    const token = createInvitationSecret();
-    const secret = createInvitationSecret();
-    const encrypted = await encryptSpaceKeyForInvitation(activeSpaceKey, secret, {
-      spaceId: activeSpace.id,
-      email,
-      role,
-      keyVersion: activeSpace.current_key_version,
-    });
+    const token = crypto.randomUUID();
     setBusy(true);
     setMessage('');
     const { data, error } = await supabase
@@ -65,10 +61,7 @@ export default function SpaceManagement() {
         created_by: user.id,
         invited_email: email,
         role,
-        token_hash: base64ToBytea(await sha256Base64(token)),
-        encrypted_space_key: base64ToBytea(encrypted.encryptedSpaceKey),
-        key_iv: base64ToBytea(encrypted.iv),
-        space_key_version: activeSpace.current_key_version,
+        token_hash: await invitationTokenHash(token),
         expires_at: new Date(Date.now() + 7 * 86400000).toISOString(),
       })
       .select('id')
@@ -78,7 +71,7 @@ export default function SpaceManagement() {
       setBusy(false);
       return;
     }
-    const invitationLink = `${window.location.origin}/invite?token=${encodeURIComponent(token)}#key=${encodeURIComponent(secret)}`;
+    const invitationLink = `${window.location.origin}/invite?token=${encodeURIComponent(token)}`;
     setLink(invitationLink);
     try {
       const response = await fetch('/api/invitations/send', {

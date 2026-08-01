@@ -44,9 +44,6 @@ export default function HomeContent({ children }) {
           onChange={event => setSpaceName(event.target.value)}
         />
         <Button type="submit" label={busy ? 'Creating…' : 'Create space'} />
-        <p className="text-center text-xs text-dark/60 dark:text-white/60">
-          Your encryption key stays on this device.
-        </p>
       </form>
     </div>
   );

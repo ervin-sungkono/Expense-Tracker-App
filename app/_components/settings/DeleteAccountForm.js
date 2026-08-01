@@ -3,15 +3,13 @@ import { useRouter } from 'next/navigation';
 import Button from '../common/Button';
 import { toast } from 'react-toastify';
 import { useAuth } from '../providers/AppProvider';
-import { clearUserKeys } from '@lib/keyStore';
 
 export default function DeleteAccountForm({ onCancel }) {
   const router = useRouter();
-  const { signOut, user } = useAuth();
+  const { signOut } = useAuth();
 
   const handleDeleteAccount = async () => {
     await db.resetDB();
-    await clearUserKeys(user.id);
     await signOut();
     toast.success('Local data cleared');
 
@@ -26,7 +24,7 @@ export default function DeleteAccountForm({ onCancel }) {
           Remove offline data and sign out on this device?
         </p>
         <p className="text-dark/80 dark:text-white/80 text-sm md:text-base">
-          Synced encrypted data remains in your spaces.
+          Synced data remains in your spaces.
         </p>
       </div>
       <div className="flex justify-end gap-2.5">

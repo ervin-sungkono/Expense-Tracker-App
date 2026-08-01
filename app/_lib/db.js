@@ -109,7 +109,6 @@ class ExpenseDB extends Dexie {
         baseVersion: next.serverVersion ?? 0,
         state: 'pending',
         createdAt: now(),
-        attemptCount: 0,
       });
     });
     return next.id;
@@ -385,14 +384,6 @@ class ExpenseDB extends Dexie {
     return row ? withoutSyncFields(row) : null;
   }
 
-  async freezeMutation(mutationId, envelope) {
-    await this.outbox.update(mutationId, {
-      envelope,
-      attemptCount: Dexie.increment(1),
-      lastAttemptAt: now(),
-    });
-  }
-
   async markMutationsSynced(results, mutationIds) {
     await this.transaction(
       'rw',
@@ -444,7 +435,7 @@ class ExpenseDB extends Dexie {
     return (await this.syncCursors.get([userId, spaceId]))?.serverRevision ?? 0;
   }
 
-  async applyRemoteRows(userId, spaceId, rows, decrypt) {
+  async applyRemoteRows(userId, spaceId, rows) {
     let cursor = await this.getCursor(userId, spaceId);
     await this.transaction(
       'rw',
@@ -465,9 +456,8 @@ class ExpenseDB extends Dexie {
           if (pending && row.version > pending.baseVersion) continue;
           if (row.deleted_at) await table.delete(row.id);
           else {
-            const payload = await decrypt(row);
             await table.put({
-              ...payload,
+              ...row.payload,
               id: row.id,
               userId,
               spaceId,

@@ -16,21 +16,21 @@ export default function Layout({
   pathname,
   requireAuth = true,
 }) {
-  const { user, privateKey, authLoading } = useAuth();
+  const { user, authLoading } = useAuth();
   const { activeSpace, spacesLoading } = useSpace();
   const router = useRouter();
 
   useEffect(() => {
     if (!requireAuth || authLoading || spacesLoading) return;
-    if (!user || !privateKey) {
+    if (!user) {
       router.replace('/');
       return;
     }
     if (!activeSpace && pathname !== '/home') router.replace('/home');
-  }, [activeSpace, authLoading, pathname, privateKey, requireAuth, router, spacesLoading, user]);
+  }, [activeSpace, authLoading, pathname, requireAuth, router, spacesLoading, user]);
 
   if (requireAuth && (authLoading || spacesLoading)) return <Loading />;
-  if (requireAuth && (!user || !privateKey || (!activeSpace && pathname !== '/home'))) return null;
+  if (requireAuth && (!user || (!activeSpace && pathname !== '/home'))) return null;
 
   const showActionBar = !hideActionBar && Boolean(activeSpace);
   const showNavbar = !hideNavbar && Boolean(activeSpace);

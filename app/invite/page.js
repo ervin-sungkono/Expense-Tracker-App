@@ -4,14 +4,11 @@ import { Suspense, useEffect, useState } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import Button from '@components/common/Button';
 import { useAuth, useSpace } from '@components/providers/AppProvider';
-import { byteaToBase64 } from '@lib/supabase/binary';
-import { decryptInvitationSpaceKey, importPublicKey, wrapSpaceKey } from '@lib/crypto';
-import { saveSpaceKey } from '@lib/keyStore';
 
 function InviteContent() {
   const token = useSearchParams().get('token');
   const router = useRouter();
-  const { user, privateKey, supabase, signInWithGoogle } = useAuth();
+  const { user, signInWithGoogle } = useAuth();
   const { refreshSpaces } = useSpace();
   const [invite, setInvite] = useState(null);
   const [error, setError] = useState('');
@@ -30,47 +27,18 @@ function InviteContent() {
   }, [token, user]);
 
   async function accept() {
-    if (!privateKey)
-      return setError('This device does not have the encryption key required to join this space.');
-    const secret = new URLSearchParams(window.location.hash.slice(1)).get('key');
-    if (!secret) return setError('The invitation decryption key is missing from this link.');
     setBusy(true);
     setError('');
     try {
-      const spaceKey = await decryptInvitationSpaceKey(
-        {
-          encryptedSpaceKey: byteaToBase64(invite.encrypted_space_key),
-          iv: byteaToBase64(invite.key_iv),
-        },
-        secret,
-        {
-          spaceId: invite.space_id,
-          email: invite.invited_email,
-          role: invite.role,
-          keyVersion: invite.space_key_version,
-        }
-      );
-      const { data: publicRow, error: keyError } = await supabase
-        .from('user_public_keys')
-        .select('public_key_jwk')
-        .eq('user_id', user.id)
-        .single();
-      if (keyError) throw keyError;
-      const wrappedSpaceKey = await wrapSpaceKey(
-        spaceKey,
-        await importPublicKey(publicRow.public_key_jwk)
-      );
       const response = await fetch('/api/invitations', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           token,
-          wrappedSpaceKey,
         }),
       });
       const body = await response.json();
       if (!response.ok) throw new Error(body.error);
-      await saveSpaceKey(user.id, invite.space_id, invite.space_key_version, spaceKey);
       await refreshSpaces();
       router.replace('/home');
     } catch (error) {
@@ -87,9 +55,7 @@ function InviteContent() {
         <Button
           label="Continue with Google"
           contained
-          onClick={() =>
-            signInWithGoogle(`/invite?token=${encodeURIComponent(token)}${window.location.hash}`)
-          }
+          onClick={() => signInWithGoogle(`/invite?token=${encodeURIComponent(token)}`)}
         />
       </main>
     );

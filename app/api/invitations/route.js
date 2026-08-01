@@ -24,9 +24,7 @@ export async function GET(request) {
   const admin = createSecretClient();
   const { data, error } = await admin
     .from('space_invitations')
-    .select(
-      'id,space_id,invited_email,role,encrypted_space_key,key_iv,space_key_version,expires_at,accepted_at,revoked_at,spaces(name)'
-    )
+    .select('id,space_id,invited_email,role,expires_at,accepted_at,revoked_at,spaces(name)')
     .eq('token_hash', `\\x${Buffer.from(tokenHash(token), 'base64').toString('hex')}`)
     .maybeSingle();
   if (error) return NextResponse.json({ error: 'Unable to load invitation.' }, { status: 500 });
@@ -50,7 +48,7 @@ export async function POST(request) {
   const user = await authenticatedUser();
   if (!user) return NextResponse.json({ error: 'Authentication required.' }, { status: 401 });
   const body = await request.json();
-  if (!body.token || !body.wrappedSpaceKey) {
+  if (!body.token) {
     return NextResponse.json(
       { error: 'Invitation acceptance payload is incomplete.' },
       { status: 400 }
@@ -61,7 +59,6 @@ export async function POST(request) {
     invitation_token_hash_base64: tokenHash(body.token),
     recipient_user_id: user.id,
     recipient_email: user.email,
-    recipient_wrapped_key_base64: body.wrappedSpaceKey,
   });
   if (error) return NextResponse.json({ error: error.message }, { status: 400 });
   return NextResponse.json(data);
