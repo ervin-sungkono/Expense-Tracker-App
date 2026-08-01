@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { IoChevronDown as DownIcon } from 'react-icons/io5';
 import Button from '../common/Button';
 import InputField from '../common/InputField';
 import { useAuth, useSpace } from '../providers/AppProvider';
@@ -126,12 +127,31 @@ export default function SpaceManagement() {
           <h2 className="text-lg font-bold">Invite someone</h2>
           <form className="flex flex-col gap-3" onSubmit={handleInvite}>
             <InputField name="email" type="email" label="Google account email" required />
-            <label className="text-sm font-semibold">
-              Role
-              <select name="role" className="ml-3 rounded border bg-transparent px-3 py-2">
-                <option value="viewer">Viewer</option>
-                <option value="collaborator">Collaborator</option>
-              </select>
+            <label className="flex flex-col gap-2 text-sm font-semibold">
+              <span>Role</span>
+              <span className="relative">
+                <select
+                  name="role"
+                  className="w-full appearance-none rounded-md border border-deep-blue bg-transparent px-3 py-2 pr-10 text-sm text-dark outline-none transition-colors focus:border-sky-blue dark:border-ocean-blue/60 dark:text-white"
+                >
+                  <option
+                    className="bg-light text-dark dark:bg-neutral-800 dark:text-white"
+                    value="viewer"
+                  >
+                    Viewer
+                  </option>
+                  <option
+                    className="bg-light text-dark dark:bg-neutral-800 dark:text-white"
+                    value="collaborator"
+                  >
+                    Collaborator
+                  </option>
+                </select>
+                <DownIcon
+                  aria-hidden
+                  className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-ocean-blue dark:text-white"
+                />
+              </span>
             </label>
             <Button type="submit" label={busy ? 'Working…' : 'Create invitation'} contained />
           </form>

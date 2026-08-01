@@ -3,8 +3,8 @@ import Dexie from 'dexie';
 class KeyStore extends Dexie {
   constructor() {
     super('XpensedKeyStore');
-    this.version(1).stores({
-      privateKeys: '[userId+keyVersion], userId, keyVersion',
+    this.version(2).stores({
+      deviceKeys: '&userId',
       spaceKeys: '[userId+spaceId+keyVersion], userId, spaceId, keyVersion',
     });
   }
@@ -12,12 +12,12 @@ class KeyStore extends Dexie {
 
 export const keyStore = new KeyStore();
 
-export async function savePrivateKey(userId, keyVersion, privateKey) {
-  await keyStore.privateKeys.put({ userId, keyVersion, privateKey });
+export async function savePrivateKey(userId, privateKey) {
+  await keyStore.deviceKeys.put({ userId, privateKey });
 }
 
-export async function getPrivateKey(userId, keyVersion) {
-  return (await keyStore.privateKeys.get([userId, keyVersion]))?.privateKey ?? null;
+export async function getPrivateKey(userId) {
+  return (await keyStore.deviceKeys.get(userId))?.privateKey ?? null;
 }
 
 export async function saveSpaceKey(userId, spaceId, keyVersion, spaceKey) {
@@ -29,8 +29,8 @@ export async function getSpaceKey(userId, spaceId, keyVersion) {
 }
 
 export async function clearUserKeys(userId) {
-  await keyStore.transaction('rw', keyStore.privateKeys, keyStore.spaceKeys, async () => {
-    await keyStore.privateKeys.where('userId').equals(userId).delete();
+  await keyStore.transaction('rw', keyStore.deviceKeys, keyStore.spaceKeys, async () => {
+    await keyStore.deviceKeys.delete(userId);
     await keyStore.spaceKeys.where('userId').equals(userId).delete();
   });
 }

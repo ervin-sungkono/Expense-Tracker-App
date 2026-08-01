@@ -50,7 +50,7 @@ export async function POST(request) {
   const user = await authenticatedUser();
   if (!user) return NextResponse.json({ error: 'Authentication required.' }, { status: 401 });
   const body = await request.json();
-  if (!body.token || !body.wrappedSpaceKey || !body.userKeyVersion) {
+  if (!body.token || !body.wrappedSpaceKey) {
     return NextResponse.json(
       { error: 'Invitation acceptance payload is incomplete.' },
       { status: 400 }
@@ -62,7 +62,6 @@ export async function POST(request) {
     recipient_user_id: user.id,
     recipient_email: user.email,
     recipient_wrapped_key_base64: body.wrappedSpaceKey,
-    recipient_user_key_version: body.userKeyVersion,
   });
   if (error) return NextResponse.json({ error: error.message }, { status: 400 });
   return NextResponse.json(data);

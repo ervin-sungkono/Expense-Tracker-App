@@ -1,6 +1,14 @@
 'use client';
 
-import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import { createClient } from '@lib/supabase/client';
 import { isSupabaseConfigured } from '@lib/supabase/config';
 import { getPrivateKey, getSpaceKey, saveSpaceKey } from '@lib/keyStore';
@@ -20,6 +28,7 @@ export function AppProvider({ children }) {
   const [user, setUser] = useState(null);
   const [profile, setProfile] = useState(null);
   const [privateKey, setPrivateKey] = useState(null);
+  const [keyConfigured, setKeyConfigured] = useState(null);
   const [authLoading, setAuthLoading] = useState(configured);
   const [offlineSession, setOfflineSession] = useState(false);
   const [spaces, setSpaces] = useState([]);
@@ -28,18 +37,26 @@ export function AppProvider({ children }) {
   const [spacesLoading, setSpacesLoading] = useState(false);
   const [syncStatus, setSyncStatus] = useState('idle');
   const [pendingCount, setPendingCount] = useState(0);
+  const [localContextReady, setLocalContextReady] = useState(false);
+  const localInitialization = useRef({ key: null, promise: null });
 
   const loadProfile = useCallback(
     async currentUser => {
-      const { data } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('id', currentUser.id)
-        .maybeSingle();
-      setProfile(data ?? null);
-      if (data?.active_key_version) {
-        setPrivateKey(await getPrivateKey(currentUser.id, data.active_key_version));
-      }
+      const [profileResult, publicKeyResult] = await Promise.all([
+        supabase.from('profiles').select('*').eq('id', currentUser.id).maybeSingle(),
+        supabase
+          .from('user_public_keys')
+          .select('user_id')
+          .eq('user_id', currentUser.id)
+          .maybeSingle(),
+      ]);
+      if (profileResult.error) throw profileResult.error;
+      if (publicKeyResult.error) throw publicKeyResult.error;
+
+      setProfile(profileResult.data ?? null);
+      const hasPublicKey = Boolean(publicKeyResult.data);
+      setKeyConfigured(hasPublicKey);
+      setPrivateKey(hasPublicKey ? await getPrivateKey(currentUser.id) : null);
     },
     [supabase]
   );
@@ -106,6 +123,7 @@ export function AppProvider({ children }) {
       } else {
         setProfile(null);
         setPrivateKey(null);
+        setKeyConfigured(null);
         setSpaces([]);
         setActiveSpaceIdState(null);
       }
@@ -167,19 +185,18 @@ export function AppProvider({ children }) {
   const setupKeyring = useCallback(async () => {
     const result = await createUserKeyring(supabase, user);
     setPrivateKey(result.privateKey);
-    setProfile(current => ({ ...current, active_key_version: result.keyVersion }));
+    setKeyConfigured(true);
     return result;
   }, [supabase, user]);
 
   const createSpace = useCallback(
     async name => {
-      if (!privateKey || !profile?.active_key_version)
+      if (!privateKey || !keyConfigured)
         throw new Error('The encryption key is unavailable on this device.');
       const { data: publicRow, error: publicError } = await supabase
         .from('user_public_keys')
         .select('public_key_jwk')
         .eq('user_id', user.id)
-        .eq('key_version', profile.active_key_version)
         .single();
       if (publicError) throw publicError;
       const spaceKey = await generateSpaceKey();
@@ -188,7 +205,6 @@ export function AppProvider({ children }) {
       const { data, error } = await supabase.rpc('create_space', {
         space_name: name,
         owner_wrapped_key_base64: wrapped,
-        owner_user_key_version: profile.active_key_version,
       });
       if (error) throw error;
       const keyVersion = data.current_key_version ?? 1;
@@ -201,7 +217,7 @@ export function AppProvider({ children }) {
       loadSpaces(user, false).catch(console.error);
       return createdSpace;
     },
-    [loadSpaces, privateKey, profile, supabase, user]
+    [keyConfigured, loadSpaces, privateKey, supabase, user]
   );
 
   const setActiveSpaceId = useCallback(
@@ -218,7 +234,7 @@ export function AppProvider({ children }) {
     : null;
 
   const syncNow = useCallback(async () => {
-    if (!user || !activeSpace || !activeSpaceKey || offlineSession) return;
+    if (!user || !activeSpace || !activeSpaceKey || !localContextReady || offlineSession) return;
     setSyncStatus('syncing');
     try {
       await syncSpace({ supabase, user, space: activeSpace, spaceKey: activeSpaceKey });
@@ -229,23 +245,47 @@ export function AppProvider({ children }) {
       setSyncStatus(navigator.onLine ? 'error' : 'offline');
       throw error;
     }
-  }, [activeSpace, activeSpaceKey, offlineSession, supabase, user]);
+  }, [activeSpace, activeSpaceKey, localContextReady, offlineSession, supabase, user]);
 
   useEffect(() => {
+    let cancelled = false;
+    setLocalContextReady(false);
+    setSyncStatus('idle');
     if (!user || !activeSpace) return;
-    db.configureContext({ userId: user.id, spaceId: activeSpace.id, role: activeSpace.role }).then(
-      async () => {
-        setPendingCount((await db.getPendingMutations(user.id, activeSpace.id)).length);
-        if (activeSpace.role === 'admin') {
-          await db.migrateLegacyData(user.id, activeSpace.id);
-          await db.seedCategories(getCategories());
-        }
-      }
-    );
+
+    const initializationKey = `${user.id}:${activeSpace.id}:${activeSpace.role}`;
+    if (localInitialization.current.key !== initializationKey) {
+      localInitialization.current = {
+        key: initializationKey,
+        promise: (async () => {
+          await db.configureContext({
+            userId: user.id,
+            spaceId: activeSpace.id,
+            role: activeSpace.role,
+          });
+          if (activeSpace.role === 'admin') await db.seedCategories(getCategories());
+          return (await db.getPendingMutations(user.id, activeSpace.id)).length;
+        })(),
+      };
+    }
+
+    localInitialization.current.promise
+      .then(nextPendingCount => {
+        if (cancelled) return;
+        setPendingCount(nextPendingCount);
+        if (!cancelled) setLocalContextReady(true);
+      })
+      .catch(error => {
+        console.error('Local data initialization failed', error);
+        if (!cancelled) setSyncStatus('error');
+      });
+    return () => {
+      cancelled = true;
+    };
   }, [activeSpace, user]);
 
   useEffect(() => {
-    if (!activeSpaceKey || !navigator.onLine) return;
+    if (!activeSpaceKey || !localContextReady || !navigator.onLine) return;
     syncNow().catch(() => {});
     const handleOnline = () => syncNow().catch(() => {});
     const handleFocus = () => navigator.onLine && syncNow().catch(() => {});
@@ -255,7 +295,7 @@ export function AppProvider({ children }) {
       window.removeEventListener('online', handleOnline);
       window.removeEventListener('focus', handleFocus);
     };
-  }, [activeSpaceKey, syncNow]);
+  }, [activeSpaceKey, localContextReady, syncNow]);
 
   const authValue = {
     configured,
@@ -263,6 +303,7 @@ export function AppProvider({ children }) {
     user,
     profile,
     privateKey,
+    keyConfigured,
     authLoading,
     offlineSession,
     signInWithGoogle,

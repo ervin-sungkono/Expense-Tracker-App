@@ -16,6 +16,7 @@ function OnboardingContent() {
     user,
     profile,
     privateKey,
+    keyConfigured,
     authLoading,
     signInWithGoogle,
     signOut,
@@ -30,14 +31,14 @@ function OnboardingContent() {
   }, [privateKey, router, user]);
 
   useEffect(() => {
-    if (!user || !profile || profile.active_key_version || keySetupStarted.current) return;
+    if (!user || !profile || keyConfigured !== false || keySetupStarted.current) return;
 
     keySetupStarted.current = true;
     setupKeyring().catch(error => {
       keySetupStarted.current = false;
       setKeySetupError(error.message);
     });
-  }, [keySetupAttempt, profile, setupKeyring, user]);
+  }, [keyConfigured, keySetupAttempt, profile, setupKeyring, user]);
 
   if (authLoading) return <Loading />;
 
@@ -77,7 +78,7 @@ function OnboardingContent() {
     );
   }
 
-  if (!profile?.active_key_version) {
+  if (!keyConfigured) {
     if (!keySetupError) return <Loading />;
 
     return (

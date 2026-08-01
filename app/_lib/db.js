@@ -2,7 +2,7 @@ import Dexie from 'dexie';
 import { isInAmountRange, isInDateRange } from './utils';
 
 const DB_NAME = 'XpensedLocal';
-const DB_VERSION = 1;
+const DB_VERSION = 2;
 
 function uuid() {
   return globalThis.crypto.randomUUID();
@@ -41,7 +41,6 @@ class ExpenseDB extends Dexie {
         '&mutationId, groupId, userId, spaceId, entityType, entityId, state, createdAt, [userId+spaceId+state]',
       conflicts: '&id, userId, spaceId, entityType, entityId, createdAt, [userId+spaceId]',
       syncCursors: '[userId+spaceId], userId, spaceId',
-      migrationState: '&userId, status',
     });
   }
 
@@ -362,70 +361,6 @@ class ExpenseDB extends Dexie {
         id: idMap.get(category.id),
         parentId: category.parentId == null ? null : (idMap.get(category.parentId) ?? null),
       });
-    }
-  }
-
-  async migrateLegacyData(userId, spaceId) {
-    const state = await this.migrationState.get(userId);
-    if (state || !(await Dexie.exists('ExpenseDB'))) return false;
-    if (
-      (await this._activeRows(this.transactions)).length ||
-      (await this._activeRows(this.categories)).length
-    )
-      return false;
-
-    const legacy = new Dexie('ExpenseDB');
-    try {
-      await legacy.open();
-      const tableNames = new Set(legacy.tables.map(table => table.name));
-      const read = name => (tableNames.has(name) ? legacy.table(name).toArray() : []);
-      const [categories, shops, transactions, budgets] = await Promise.all([
-        read('categories'),
-        read('shops'),
-        read('transactions'),
-        read('budgets'),
-      ]);
-      if (![categories, shops, transactions, budgets].some(rows => rows.length)) {
-        await this.migrationState.put({ userId, status: 'empty', checkedAt: now() });
-        return false;
-      }
-      const categoryIds = new Map(categories.map(row => [row.id, uuid()]));
-      const shopIds = new Map(shops.map(row => [row.id, uuid()]));
-      for (const row of categories)
-        await this.addCategory({
-          ...row,
-          id: categoryIds.get(row.id),
-          parentId: row.parentId == null ? null : (categoryIds.get(row.parentId) ?? null),
-        });
-      for (const row of shops) await this.addShop({ ...row, id: shopIds.get(row.id) });
-      for (const row of transactions)
-        await this.addTransaction({
-          ...row,
-          id: uuid(),
-          categoryId: categoryIds.get(row.categoryId) ?? null,
-          shopId: shopIds.get(row.shopId) ?? null,
-        });
-      for (const row of budgets)
-        await this.addBudget({
-          ...row,
-          id: uuid(),
-          categoryId: categoryIds.get(row.categoryId) ?? null,
-        });
-      await this.migrationState.put({
-        userId,
-        status: 'migrated',
-        spaceId,
-        migratedAt: now(),
-        counts: {
-          categories: categories.length,
-          shops: shops.length,
-          transactions: transactions.length,
-          budgets: budgets.length,
-        },
-      });
-      return true;
-    } finally {
-      legacy.close();
     }
   }
 

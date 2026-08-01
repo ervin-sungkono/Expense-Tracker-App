@@ -11,7 +11,7 @@ import { saveSpaceKey } from '@lib/keyStore';
 function InviteContent() {
   const token = useSearchParams().get('token');
   const router = useRouter();
-  const { user, profile, privateKey, supabase, signInWithGoogle } = useAuth();
+  const { user, privateKey, supabase, signInWithGoogle } = useAuth();
   const { refreshSpaces } = useSpace();
   const [invite, setInvite] = useState(null);
   const [error, setError] = useState('');
@@ -30,7 +30,7 @@ function InviteContent() {
   }, [token, user]);
 
   async function accept() {
-    if (!privateKey || !profile?.active_key_version)
+    if (!privateKey)
       return setError('This device does not have the encryption key required to join this space.');
     const secret = new URLSearchParams(window.location.hash.slice(1)).get('key');
     if (!secret) return setError('The invitation decryption key is missing from this link.');
@@ -54,7 +54,6 @@ function InviteContent() {
         .from('user_public_keys')
         .select('public_key_jwk')
         .eq('user_id', user.id)
-        .eq('key_version', profile.active_key_version)
         .single();
       if (keyError) throw keyError;
       const wrappedSpaceKey = await wrapSpaceKey(
@@ -67,7 +66,6 @@ function InviteContent() {
         body: JSON.stringify({
           token,
           wrappedSpaceKey,
-          userKeyVersion: profile.active_key_version,
         }),
       });
       const body = await response.json();
