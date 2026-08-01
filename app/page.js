@@ -4,7 +4,7 @@ import AppLogo from '@components/common/AppLogo';
 import Button from '@components/common/Button';
 import InputField from '@components/common/InputField';
 import Loading from '@components/layout/Loading';
-import { useAuth, useSpace } from '@components/providers/AppProvider';
+import { useAuth } from '@components/providers/AppProvider';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Suspense, useEffect, useRef, useState } from 'react';
 import { toast } from 'react-toastify';
@@ -22,17 +22,15 @@ function OnboardingContent() {
     setupKeyring,
     unlockKeyring,
   } = useAuth();
-  const { spaces, createSpace, spacesLoading } = useSpace();
   const [busy, setBusy] = useState(false);
   const [passphrase, setPassphrase] = useState('');
   const [keySetupError, setKeySetupError] = useState('');
   const [keySetupAttempt, setKeySetupAttempt] = useState(0);
-  const [spaceName, setSpaceName] = useState('My Space');
   const keySetupStarted = useRef(false);
 
   useEffect(() => {
-    if (user && privateKey && spaces.length > 0) router.replace('/home');
-  }, [privateKey, router, spaces, user]);
+    if (user && privateKey) router.replace('/home');
+  }, [privateKey, router, user]);
 
   useEffect(() => {
     if (!user || !profile || profile.active_key_version || keySetupStarted.current) return;
@@ -44,7 +42,7 @@ function OnboardingContent() {
     });
   }, [keySetupAttempt, profile, setupKeyring, user]);
 
-  if (authLoading || spacesLoading) return <Loading />;
+  if (authLoading) return <Loading />;
 
   if (!configured) {
     return (
@@ -130,36 +128,7 @@ function OnboardingContent() {
     );
   }
 
-  const submitSpace = async event => {
-    event.preventDefault();
-    setBusy(true);
-    try {
-      await createSpace(spaceName);
-      toast.success('Space created');
-      router.replace('/home');
-    } catch (error) {
-      toast.error(error.message);
-    } finally {
-      setBusy(false);
-    }
-  };
-  return (
-    <form onSubmit={submitSpace} className="w-full max-w-md flex flex-col gap-4">
-      <h1 className="text-2xl font-bold">Create your first space</h1>
-      <p className="text-sm text-dark/70 dark:text-white/70">
-        A space contains its own transactions, categories, budgets, shops, members, and encryption
-        key. Your encryption key stays on this device.
-      </p>
-      <InputField
-        required
-        name="spaceName"
-        label="Space name"
-        value={spaceName}
-        onChange={event => setSpaceName(event.target.value)}
-      />
-      <Button type="submit" label={busy ? 'Creating…' : 'Create space'} />
-    </form>
-  );
+  return <Loading />;
 }
 
 export default function Onboarding() {

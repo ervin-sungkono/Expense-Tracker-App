@@ -5,16 +5,19 @@ import TransactionReport from '@components/home/TransactionReport';
 import CategoriesCarousel from '@components/home/CategoriesCarousel';
 import ShopsCarousel from '@components/home/ShopsCarousel';
 import RecentTransactions from '@components/home/RecentTransactions';
+import HomeContent from '@components/home/HomeContent';
 
 export default function Home() {
   return (
     <Layout pathname={'/home'}>
-      <Header />
-      <TransactionData />
-      <TransactionReport />
-      <RecentTransactions />
-      <CategoriesCarousel />
-      <ShopsCarousel />
+      <HomeContent>
+        <Header />
+        <TransactionData />
+        <TransactionReport />
+        <RecentTransactions />
+        <CategoriesCarousel />
+        <ShopsCarousel />
+      </HomeContent>
     </Layout>
   );
 }

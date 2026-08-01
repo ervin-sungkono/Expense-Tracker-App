@@ -45,24 +45,27 @@ export function AppProvider({ children }) {
   );
 
   const loadSpaces = useCallback(
-    async currentUser => {
+    async (currentUser, showLoading = true) => {
       if (!supabase || !currentUser) return;
-      setSpacesLoading(true);
-      const { data, error } = await supabase
-        .from('space_members')
-        .select('role,status,spaces(*)')
-        .eq('user_id', currentUser.id)
-        .eq('status', 'active');
-      if (!error) {
-        const nextSpaces = (data ?? []).map(row => ({ ...row.spaces, role: row.role }));
-        setSpaces(nextSpaces);
-        const stored = window.localStorage.getItem(`activeSpace:${currentUser.id}`);
-        const nextActive = nextSpaces.some(space => space.id === stored)
-          ? stored
-          : (nextSpaces[0]?.id ?? null);
-        setActiveSpaceIdState(nextActive);
+      if (showLoading) setSpacesLoading(true);
+      try {
+        const { data, error } = await supabase
+          .from('space_members')
+          .select('role,status,spaces(*)')
+          .eq('user_id', currentUser.id)
+          .eq('status', 'active');
+        if (!error) {
+          const nextSpaces = (data ?? []).map(row => ({ ...row.spaces, role: row.role }));
+          setSpaces(nextSpaces);
+          const stored = window.localStorage.getItem(`activeSpace:${currentUser.id}`);
+          const nextActive = nextSpaces.some(space => space.id === stored)
+            ? stored
+            : (nextSpaces[0]?.id ?? null);
+          setActiveSpaceIdState(nextActive);
+        }
+      } finally {
+        if (showLoading) setSpacesLoading(false);
       }
-      setSpacesLoading(false);
     },
     [supabase]
   );
@@ -197,10 +200,15 @@ export function AppProvider({ children }) {
         owner_user_key_version: profile.active_key_version,
       });
       if (error) throw error;
-      await saveSpaceKey(user.id, data.id, 1, spaceKey);
-      await loadSpaces(user);
+      const keyVersion = data.current_key_version ?? 1;
+      await saveSpaceKey(user.id, data.id, keyVersion, spaceKey);
+      const createdSpace = { ...data, role: 'admin' };
+      setSpaces(current => [createdSpace, ...current.filter(space => space.id !== data.id)]);
       setActiveSpaceIdState(data.id);
-      return data;
+      setSpaceKeys(current => ({ ...current, [`${data.id}:${keyVersion}`]: spaceKey }));
+      window.localStorage.setItem(`activeSpace:${user.id}`, data.id);
+      loadSpaces(user, false).catch(console.error);
+      return createdSpace;
     },
     [loadSpaces, privateKey, profile, supabase, user]
   );
