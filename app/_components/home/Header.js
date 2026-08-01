@@ -1,29 +1,14 @@
 'use client'
-import { useLocalStorage } from "@lib/hooks"
-import { useEffect, useState } from "react";
+import { useAuth, useSpace } from '@components/providers/AppProvider';
 
 export default function Header() {
-    const [loading, setLoading] = useState(true);
-    const [username, _] = useLocalStorage('username');
-
-    useEffect(() => {
-        setLoading(false);
-    }, [])
-
-    if(loading) {
-        return(
-            <div className="w-full flex flex-col gap-1 mb-5 animate-pulse">
-                <div className="w-2/5 h-4 md:h-5 my-1 bg-neutral-300 dark:bg-neutral-800 rounded-full"></div>
-                <div className="w-3/4 h-7 md:h-8 my-0.5 bg-neutral-300 dark:bg-neutral-800 rounded-full"></div>
-            </div>
-        )
-    }
-    else { 
-        return(
-            <div className="w-full flex flex-col gap-1 mb-5">
-                <p className="text-dark dark:text-white text-base md:text-lg">Welcome back,</p>
-                <p className="text-dark dark:text-white w-full line-clamp-1 text-2xl md:text-3xl font-bold break-all">{username}</p>
-            </div>
-        )
-    }
+    const { profile, user } = useAuth();
+    const { activeSpace } = useSpace();
+    return(
+        <div className="w-full flex flex-col gap-1 mb-5">
+            <p className="text-dark dark:text-white text-base md:text-lg">Welcome back,</p>
+            <p className="text-dark dark:text-white w-full line-clamp-1 text-2xl md:text-3xl font-bold break-all">{profile?.display_name ?? user?.email}</p>
+            <p className="text-xs text-dark/60 dark:text-white/60">{activeSpace?.name} · {activeSpace?.role}</p>
+        </div>
+    );
 }

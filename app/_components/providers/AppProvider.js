@@ -1,0 +1,253 @@
+'use client';
+
+import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import { createClient } from '@lib/supabase/client';
+import { isSupabaseConfigured } from '@lib/supabase/config';
+import { getPrivateKey, getSpaceKey, saveSpaceKey } from '@lib/keyStore';
+import { createUserKeyring, recoverUserKeyring } from '@lib/keyring';
+import { generateSpaceKey, importPublicKey, unwrapSpaceKey, wrapSpaceKey } from '@lib/crypto';
+import { byteaToBase64 } from '@lib/supabase/binary';
+import { db } from '@lib/db';
+import { syncSpace } from '@lib/sync';
+import { getCategories } from '@lib/seeder';
+
+const AuthContext = createContext(null);
+const SpaceContext = createContext(null);
+
+export function AppProvider({ children }) {
+    const configured = isSupabaseConfigured();
+    const supabase = useMemo(() => configured ? createClient() : null, [configured]);
+    const [user, setUser] = useState(null);
+    const [profile, setProfile] = useState(null);
+    const [privateKey, setPrivateKey] = useState(null);
+    const [authLoading, setAuthLoading] = useState(configured);
+    const [offlineSession, setOfflineSession] = useState(false);
+    const [spaces, setSpaces] = useState([]);
+    const [activeSpaceId, setActiveSpaceIdState] = useState(null);
+    const [spaceKeys, setSpaceKeys] = useState({});
+    const [spacesLoading, setSpacesLoading] = useState(false);
+    const [syncStatus, setSyncStatus] = useState('idle');
+    const [pendingCount, setPendingCount] = useState(0);
+
+    const loadProfile = useCallback(async currentUser => {
+        const { data } = await supabase.from('profiles').select('*').eq('id', currentUser.id).maybeSingle();
+        setProfile(data ?? null);
+        if (data?.active_key_version) {
+            setPrivateKey(await getPrivateKey(currentUser.id, data.active_key_version));
+        }
+    }, [supabase]);
+
+    const loadSpaces = useCallback(async currentUser => {
+        if (!supabase || !currentUser) return;
+        setSpacesLoading(true);
+        const { data, error } = await supabase
+            .from('space_members')
+            .select('role,status,spaces(*)')
+            .eq('user_id', currentUser.id)
+            .eq('status', 'active');
+        if (!error) {
+            const nextSpaces = (data ?? []).map(row => ({ ...row.spaces, role: row.role }));
+            setSpaces(nextSpaces);
+            const stored = window.localStorage.getItem(`activeSpace:${currentUser.id}`);
+            const nextActive = nextSpaces.some(space => space.id === stored) ? stored : nextSpaces[0]?.id ?? null;
+            setActiveSpaceIdState(nextActive);
+        }
+        setSpacesLoading(false);
+    }, [supabase]);
+
+    useEffect(() => {
+        if (!supabase) return;
+        let mounted = true;
+        const initialize = async () => {
+            try {
+                const { data: sessionData } = await supabase.auth.getSession();
+                if (!mounted) return;
+                const sessionUser = sessionData.session?.user ?? null;
+                if (sessionUser) {
+                    try {
+                        const { data } = await supabase.auth.getUser();
+                        setUser(data.user);
+                        setOfflineSession(false);
+                        window.localStorage.setItem('lastAuthenticatedUser', JSON.stringify(data.user));
+                        await Promise.all([loadProfile(data.user), loadSpaces(data.user)]);
+                    } catch {
+                        setUser(sessionUser);
+                        setOfflineSession(true);
+                    }
+                }
+            } finally {
+                if (mounted) setAuthLoading(false);
+            }
+        };
+        initialize();
+        const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
+            const nextUser = session?.user ?? null;
+            setUser(nextUser);
+            if (nextUser) {
+                queueMicrotask(() => {
+                    loadProfile(nextUser);
+                    loadSpaces(nextUser);
+                });
+            } else {
+                setProfile(null);
+                setPrivateKey(null);
+                setSpaces([]);
+                setActiveSpaceIdState(null);
+            }
+        });
+        return () => {
+            mounted = false;
+            listener.subscription.unsubscribe();
+        };
+    }, [supabase, loadProfile, loadSpaces]);
+
+    useEffect(() => {
+        const loadActiveKey = async () => {
+            if (!user || !privateKey || !activeSpaceId) return;
+            const activeSpace = spaces.find(space => space.id === activeSpaceId);
+            if (!activeSpace) return;
+            const cached = await getSpaceKey(user.id, activeSpaceId, activeSpace.current_key_version);
+            if (cached) {
+                setSpaceKeys(current => ({ ...current, [`${activeSpaceId}:${activeSpace.current_key_version}`]: cached }));
+                return;
+            }
+            const { data } = await supabase
+                .from('space_member_keys')
+                .select('wrapped_space_key,space_key_version')
+                .eq('space_id', activeSpaceId)
+                .eq('user_id', user.id)
+                .eq('space_key_version', activeSpace.current_key_version)
+                .maybeSingle();
+            if (data) {
+                const key = await unwrapSpaceKey(byteaToBase64(data.wrapped_space_key), privateKey);
+                await saveSpaceKey(user.id, activeSpaceId, data.space_key_version, key);
+                setSpaceKeys(current => ({ ...current, [`${activeSpaceId}:${data.space_key_version}`]: key }));
+            }
+        };
+        loadActiveKey().catch(console.error);
+    }, [activeSpaceId, privateKey, spaces, supabase, user]);
+
+    const signInWithGoogle = useCallback(async (next = '/home') => {
+        const redirectTo = `${window.location.origin}/auth/callback?next=${encodeURIComponent(next)}`;
+        const { error } = await supabase.auth.signInWithOAuth({
+            provider: 'google',
+            options: { redirectTo, scopes: 'openid email profile' },
+        });
+        if (error) throw error;
+    }, [supabase]);
+
+    const signOut = useCallback(async () => {
+        await supabase.auth.signOut({ scope: 'local' });
+    }, [supabase]);
+
+    const setupKeyring = useCallback(async passphrase => {
+        const result = await createUserKeyring(supabase, user, passphrase);
+        setPrivateKey(result.privateKey);
+        setProfile(current => ({ ...current, active_key_version: result.keyVersion }));
+        return result;
+    }, [supabase, user]);
+
+    const unlockKeyring = useCallback(async passphrase => {
+        const key = await recoverUserKeyring(supabase, user, profile.active_key_version, passphrase);
+        setPrivateKey(key);
+        return key;
+    }, [profile, supabase, user]);
+
+    const createSpace = useCallback(async name => {
+        if (!privateKey || !profile?.active_key_version) throw new Error('Unlock your recovery key first.');
+        const { data: publicRow, error: publicError } = await supabase
+            .from('user_public_keys')
+            .select('public_key_jwk')
+            .eq('user_id', user.id)
+            .eq('key_version', profile.active_key_version)
+            .single();
+        if (publicError) throw publicError;
+        const spaceKey = await generateSpaceKey();
+        const publicKey = await importPublicKey(publicRow.public_key_jwk);
+        const wrapped = await wrapSpaceKey(spaceKey, publicKey);
+        const { data, error } = await supabase.rpc('create_space', {
+            space_name: name,
+            owner_wrapped_key_base64: wrapped,
+            owner_user_key_version: profile.active_key_version,
+        });
+        if (error) throw error;
+        await saveSpaceKey(user.id, data.id, 1, spaceKey);
+        await loadSpaces(user);
+        setActiveSpaceIdState(data.id);
+        return data;
+    }, [loadSpaces, privateKey, profile, supabase, user]);
+
+    const setActiveSpaceId = useCallback(spaceId => {
+        setActiveSpaceIdState(spaceId);
+        if (user) window.localStorage.setItem(`activeSpace:${user.id}`, spaceId);
+    }, [user]);
+
+    const activeSpace = spaces.find(space => space.id === activeSpaceId) ?? null;
+    const activeSpaceKey = activeSpace
+        ? spaceKeys[`${activeSpace.id}:${activeSpace.current_key_version}`] ?? null
+        : null;
+
+    const syncNow = useCallback(async () => {
+        if (!user || !activeSpace || !activeSpaceKey || offlineSession) return;
+        setSyncStatus('syncing');
+        try {
+            await syncSpace({ supabase, user, space: activeSpace, spaceKey: activeSpaceKey });
+            setPendingCount((await db.getPendingMutations(user.id, activeSpace.id)).length);
+            setSyncStatus('synced');
+        } catch (error) {
+            console.error(error);
+            setSyncStatus(navigator.onLine ? 'error' : 'offline');
+            throw error;
+        }
+    }, [activeSpace, activeSpaceKey, offlineSession, supabase, user]);
+
+    useEffect(() => {
+        if (!user || !activeSpace) return;
+        db.configureContext({ userId: user.id, spaceId: activeSpace.id, role: activeSpace.role }).then(async () => {
+            setPendingCount((await db.getPendingMutations(user.id, activeSpace.id)).length);
+            if (activeSpace.role === 'admin') {
+                await db.migrateLegacyData(user.id, activeSpace.id);
+                await db.seedCategories(getCategories());
+            }
+        });
+    }, [activeSpace, user]);
+
+    useEffect(() => {
+        if (!activeSpaceKey || !navigator.onLine) return;
+        syncNow().catch(() => {});
+        const handleOnline = () => syncNow().catch(() => {});
+        const handleFocus = () => navigator.onLine && syncNow().catch(() => {});
+        window.addEventListener('online', handleOnline);
+        window.addEventListener('focus', handleFocus);
+        return () => {
+            window.removeEventListener('online', handleOnline);
+            window.removeEventListener('focus', handleFocus);
+        };
+    }, [activeSpaceKey, syncNow]);
+
+    const authValue = {
+        configured, supabase, user, profile, privateKey, authLoading, offlineSession,
+        signInWithGoogle, signOut, setupKeyring, unlockKeyring, refreshProfile: () => user && loadProfile(user),
+    };
+    const spaceValue = {
+        spaces, activeSpace, activeSpaceId, activeSpaceKey, spacesLoading,
+        setActiveSpaceId, createSpace, refreshSpaces: () => user && loadSpaces(user),
+        syncStatus, pendingCount, syncNow,
+        canManageSpace: activeSpace?.role === 'admin',
+        canWriteTransactions: ['admin', 'collaborator'].includes(activeSpace?.role),
+    };
+
+    return (
+        <AuthContext.Provider value={authValue}>
+            <SpaceContext.Provider value={spaceValue}>{children}</SpaceContext.Provider>
+        </AuthContext.Provider>
+    );
+}
+
+export function useAuth() {
+    return useContext(AuthContext);
+}
+
+export function useSpace() {
+    return useContext(SpaceContext);
+}

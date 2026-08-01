@@ -1,11 +1,9 @@
-import withPWA from "@ducanh2912/next-pwa";
+import withPWAInit from "@ducanh2912/next-pwa";
 
-/** @type {import('next').NextConfig} */
-const nextConfig = withPWA({
+const withPWA = withPWAInit({
   cacheOnFrontEndNav: process.env.NODE_ENV !== 'development',
   aggressiveFrontEndNavCaching: process.env.NODE_ENV !== 'development',
   reloadOnOnline: true,
-  swcMinify: true,
   dest: "public",
   cacheStartUrl: true,
   dynamicStartUrl: true,
@@ -23,4 +21,31 @@ const nextConfig = withPWA({
   disable: process.env.NODE_ENV === 'development'
 });
 
-export default nextConfig;
+/** @type {import('next').NextConfig} */
+const nextConfig = {
+  async headers() {
+    return [
+      {
+        source: '/:path*',
+        headers: [
+          { key: 'X-Content-Type-Options', value: 'nosniff' },
+          { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
+          { key: 'Permissions-Policy', value: 'camera=(), microphone=(), geolocation=()' },
+        ],
+      },
+      {
+        source: '/invite',
+        headers: [
+          { key: 'Cache-Control', value: 'no-store, max-age=0' },
+          { key: 'Referrer-Policy', value: 'no-referrer' },
+        ],
+      },
+      {
+        source: '/api/invitations/:path*',
+        headers: [{ key: 'Cache-Control', value: 'no-store, max-age=0' }],
+      },
+    ];
+  },
+};
+
+export default withPWA(nextConfig);

@@ -6,6 +6,8 @@ import { useState } from "react";
 import CategoryListPage from "./page/CategoryListPage";
 import AboutAppPage from "./page/AboutAppPage";
 import BudgetListPage from "./page/BudgetListPage";
+import SpaceSwitcher from '@components/spaces/SpaceSwitcher';
+import SyncStatus from '@components/sync/SyncStatus';
 
 export default function ActionBar() {
     const [showMenu, setShowMenu] = useState(false);
@@ -36,7 +38,9 @@ export default function ActionBar() {
     return(
         <div className="max-w-3xl w-full px-6 py-1.5 mx-auto bg-ocean-blue ">
             <div className="relative w-full flex items-center">
+                <SpaceSwitcher/>
                 <BalanceView/>
+                <SyncStatus/>
                 <div onClick={() => setShowMenu(true)} className="text-white cursor-pointer p-1.5 rounded-ful active:bg-light/20 rounded-full transition-colors duration-150 ease-in-out">
                     <MoreIcon size={24}/>
                 </div>
