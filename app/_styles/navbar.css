@@ -1,51 +1,51 @@
 .navbar {
-    @apply w-full px-6 fixed bottom-6 left-0 z-fixed;
+  @apply w-full px-6 fixed bottom-6 left-0 z-fixed;
 }
 
 .navbar-content {
-    @apply max-w-3xl mx-auto px-4 h-16 rounded-2xl bg-light dark:bg-neutral-800 grid grid-cols-5 items-center shadow-[0_0_16px_rgba(0,0,0,0.12)] dark:shadow-none;
+  @apply max-w-3xl mx-auto px-4 h-16 rounded-2xl bg-light dark:bg-neutral-800 grid grid-cols-5 items-center shadow-[0_0_16px_rgba(0,0,0,0.12)] dark:shadow-none;
 }
 
 .nav-link {
-    @apply flex justify-center;
+  @apply flex justify-center;
 }
 
 .nav-link > a {
-    @apply flex flex-col items-center gap-1 relative text-dark/60 dark:text-white/60 hover:text-ocean-blue transition-opacity duration-300 ease-in-out after:absolute;
+  @apply flex flex-col items-center gap-1 relative text-dark/60 dark:text-white/60 hover:text-ocean-blue transition-opacity duration-300 ease-in-out after:absolute;
 }
 
 .nav-link .nav-label {
-    @apply text-[10.8px] md:text-xs
+  @apply text-[10.8px] md:text-xs;
 }
 
 .nav-link > .nav-active {
-    @apply text-ocean-blue;
+  @apply text-ocean-blue;
 }
 
 .nav-link > .nav-active .nav-label {
-    @apply font-semibold
+  @apply font-semibold;
 }
 
 .nav-link > a::after {
-    @apply hidden -bottom-2 left-1/2 -translate-1/2 w-1 h-1 rounded-full bg-basic-gradient;
+  @apply hidden -bottom-2 left-1/2 -translate-1/2 w-1 h-1 rounded-full bg-basic-gradient;
 }
 
 .nav-link > .nav-active > a::after {
-    @apply block;
+  @apply block;
 }
 
 .nav-fab {
-    @apply relative h-full flex justify-center z-fixed;
+  @apply relative h-full flex justify-center z-fixed;
 }
 
 .nav-fab .fab-button {
-    @apply relative cursor-pointer p-3.5 rounded-full bg-basic-gradient text-white z-fixed transition-transform duration-150 ease-in-out hover:scale-105 active:scale-95;
+  @apply relative cursor-pointer p-3.5 rounded-full bg-basic-gradient text-white z-fixed transition-transform duration-150 ease-in-out hover:scale-105 active:scale-95;
 }
 
 .nav-fab > .fab-wrapper {
-    @apply absolute top-0 -translate-y-1/4 before:absolute;
+  @apply absolute top-0 -translate-y-1/4 before:absolute;
 }
 
 .nav-fab > .fab-wrapper::before {
-    @apply w-4/5 h-4/5 -bottom-1.5 left-1/2 -translate-x-1/2 bg-basic-gradient rounded-full blur-xl opacity-80;
+  @apply w-4/5 h-4/5 -bottom-1.5 left-1/2 -translate-x-1/2 bg-basic-gradient rounded-full blur-xl opacity-80;
 }

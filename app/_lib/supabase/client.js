@@ -4,10 +4,10 @@ import { getSupabasePublicConfig } from './config';
 let browserClient;
 
 export function createClient() {
-    if (!browserClient) {
-        const { url, publishableKey } = getSupabasePublicConfig();
-        browserClient = createBrowserClient(url, publishableKey);
-    }
+  if (!browserClient) {
+    const { url, publishableKey } = getSupabasePublicConfig();
+    browserClient = createBrowserClient(url, publishableKey);
+  }
 
-    return browserClient;
+  return browserClient;
 }

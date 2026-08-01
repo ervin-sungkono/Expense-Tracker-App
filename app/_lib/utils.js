@@ -1,4 +1,4 @@
-import { MONTHS } from "./const";
+import { MONTHS } from './const';
 
 export function extractText(text) {
   const regex = /\[(.*?)\]/g;
@@ -12,14 +12,14 @@ export function extractText(text) {
     if (match.index > lastIndex) {
       result.push({
         type: 'text',
-        value: text.slice(lastIndex, match.index)
+        value: text.slice(lastIndex, match.index),
       });
     }
 
     // Push the matched pattern
     result.push({
       type: 'tag',
-      value: match[1]
+      value: match[1],
     });
 
     lastIndex = regex.lastIndex;
@@ -29,7 +29,7 @@ export function extractText(text) {
   if (lastIndex < text.length) {
     result.push({
       type: 'text',
-      value: text.slice(lastIndex)
+      value: text.slice(lastIndex),
     });
   }
 
@@ -51,7 +51,7 @@ export function generateRandomDistinctColors(amount) {
 }
 
 export function generateRangeOptions(start, end) {
-  const range = []
+  const range = [];
   for (let i = start; i <= end; i++) {
     range.push(i);
   }
@@ -70,12 +70,20 @@ export function generateAsterisks(length) {
 }
 
 export function formatCurrency(value, locale = 'id-ID', currency = 'IDR') {
-  const formatter = new Intl.NumberFormat(locale, { style: 'currency', currency, minimumFractionDigits: 0 });
+  const formatter = new Intl.NumberFormat(locale, {
+    style: 'currency',
+    currency,
+    minimumFractionDigits: 0,
+  });
   return formatter.format(value);
 }
 
 export function formatDateString(date, locale = 'en-US') {
-  return new Date(date).toLocaleDateString(locale, { day: 'numeric', month: 'long', year: 'numeric' })
+  return new Date(date).toLocaleDateString(locale, {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+  });
 }
 
 export function getBase64(file) {
@@ -99,14 +107,18 @@ export function getMonthlyLabels(year, month) {
 }
 
 /**
- * 
- * @param {WeekRange} weekRange 
+ *
+ * @param {WeekRange} weekRange
  */
 export function getWeeklyLabels(weekRange) {
   if (!weekRange) return [];
 
   const result = [];
-  for (let date = new Date(weekRange.start); date <= weekRange.end; date.setDate(date.getDate() + 1)) {
+  for (
+    let date = new Date(weekRange.start);
+    date <= weekRange.end;
+    date.setDate(date.getDate() + 1)
+  ) {
     result.push(formatDateString(date));
   }
 
@@ -115,25 +127,25 @@ export function getWeeklyLabels(weekRange) {
 
 export function nFormatter(num, digits) {
   const lookup = [
-    { value: 1, symbol: "" },
-    { value: 1e3, symbol: "k" },
-    { value: 1e6, symbol: "M" },
-    { value: 1e9, symbol: "G" },
-    { value: 1e12, symbol: "T" },
-    { value: 1e15, symbol: "P" },
-    { value: 1e18, symbol: "E" }
+    { value: 1, symbol: '' },
+    { value: 1e3, symbol: 'k' },
+    { value: 1e6, symbol: 'M' },
+    { value: 1e9, symbol: 'G' },
+    { value: 1e12, symbol: 'T' },
+    { value: 1e15, symbol: 'P' },
+    { value: 1e18, symbol: 'E' },
   ];
   const regexp = /\.0+$|(?<=\.[0-9]*[1-9])0+$/;
   const item = lookup.findLast(item => num >= item.value);
-  return item ? (num / item.value).toFixed(digits).replace(regexp, "").concat(item.symbol) : "0";
+  return item ? (num / item.value).toFixed(digits).replace(regexp, '').concat(item.symbol) : '0';
 }
 
 /**
- * 
- * @param {Date} date 
- * @param {string} locale 
- * @param {object} options 
- * @returns 
+ *
+ * @param {Date} date
+ * @param {string} locale
+ * @param {object} options
+ * @returns
  */
 export function formatDate(date, format = 'DD/MM/YYYY') {
   const map = {
@@ -150,10 +162,10 @@ export function formatDate(date, format = 'DD/MM/YYYY') {
 }
 
 /**
- * 
+ *
  * @param {Date} date1 - Start date
  * @param {Date} date2 - End date
- * @returns 
+ * @returns
  */
 export function getDayDifference(date1, date2) {
   const msPerDay = 1000 * 60 * 60 * 24;
@@ -166,16 +178,16 @@ export function getDayDifference(date1, date2) {
 }
 
 function isDebtLoanExpense(name) {
-  return name && (name === 'Repayment' || name === 'Loan')
+  return name && (name === 'Repayment' || name === 'Loan');
 }
 
 function isDebtLoanIncome(name) {
-  return name && (name === 'Debt' || name === 'Debt Collection')
+  return name && (name === 'Debt' || name === 'Debt Collection');
 }
 
 /**
- * 
- * @param {string} name 
+ *
+ * @param {string} name
  * @returns Debt Loan type (Income or Expense)
  */
 export function getDebtLoanType(name) {
@@ -185,26 +197,26 @@ export function getDebtLoanType(name) {
 }
 
 /**
- * 
- * @param {string} categoryName 
- * @returns 
+ *
+ * @param {string} categoryName
+ * @returns
  */
 export function getOwnerLabel(categoryName) {
-  if (categoryName === "Debt Collection" || categoryName == "Loan") {
-    return "Borrower";
+  if (categoryName === 'Debt Collection' || categoryName == 'Loan') {
+    return 'Borrower';
   }
-  if (categoryName === "Debt" || categoryName === "Repayment") {
-    return "Lender";
+  if (categoryName === 'Debt' || categoryName === 'Repayment') {
+    return 'Lender';
   }
 
-  return "";
+  return '';
 }
 
 /**
- * 
- * @param {number} amount 
- * @param {number[]} range 
- * @returns 
+ *
+ * @param {number} amount
+ * @param {number[]} range
+ * @returns
  */
 export function isInAmountRange(amount, range) {
   const [min, max] = range;
@@ -212,14 +224,14 @@ export function isInAmountRange(amount, range) {
   if (min && amount < min) return false;
   if (max && amount > max) return false;
 
-  return true
+  return true;
 }
 
 /**
- * 
- * @param {Date} date 
- * @param {Date[]} range 
- * @returns 
+ *
+ * @param {Date} date
+ * @param {Date[]} range
+ * @returns
  */
 export function isInDateRange(date, range) {
   const [min, max] = range;
@@ -228,7 +240,7 @@ export function isInDateRange(date, range) {
   if (min && currTime < new Date(min).getTime()) return false;
   if (max && currTime > new Date(max).getTime()) return false;
 
-  return true
+  return true;
 }
 
 function zeroBased(value) {
@@ -236,8 +248,8 @@ function zeroBased(value) {
 }
 
 /**
- * 
- * @param {Date} date 
+ *
+ * @param {Date} date
  * @returns Value in datetime-local input format
  */
 export function dateToLocalInput(date = new Date()) {
@@ -252,8 +264,8 @@ export function dateToLocalInput(date = new Date()) {
 }
 
 /**
- * 
- * @param {Date} date 
+ *
+ * @param {Date} date
  * @returns Value in date input format
  */
 export function dateToInputValue(date = new Date()) {
@@ -261,7 +273,7 @@ export function dateToInputValue(date = new Date()) {
   const month = zeroBased(date.getMonth() + 1); // Month is 0-based
   const day = zeroBased(date.getDate());
 
-  const dateString = `${year}-${month}-${day}`
+  const dateString = `${year}-${month}-${day}`;
   return dateString;
 }
 
@@ -269,7 +281,7 @@ export function dateToInputValue(date = new Date()) {
  * @typedef {Object} WeekRange
  * @property {Date} start - Starting date of the week
  * @property {Date} end - End date of the week
- * 
+ *
  * @param {number} year Year to get the week range
  * @returns {WeekRange[]}
  */
@@ -293,7 +305,7 @@ export function getWeekRanges(year) {
     if (weekStart.getFullYear() === year || weekEnd.getFullYear() === year) {
       weekRanges.push({
         start: weekStart,
-        end: weekEnd
+        end: weekEnd,
       });
     }
 
@@ -304,7 +316,7 @@ export function getWeekRanges(year) {
 }
 
 /**
- * 
+ *
  * @param {Date} date
  * @param {number} year
  * @returns {number} Week in the year of given date
@@ -337,7 +349,7 @@ export function getWeekNumber(dateInput, year) {
 }
 
 /**
- * 
+ *
  * @param {string} type Type of date range
  * @param {*} date Given date to get the range
  * @returns
@@ -398,7 +410,7 @@ const imageSignatures = {
   iVBORw0KGgo: 'image/png',
   '/9j/': 'image/jpeg',
   Qk02U: 'image/bmp',
-  UklGR: 'image/webp'
+  UklGR: 'image/webp',
 };
 
 export function detectMimeType(base64 = '') {

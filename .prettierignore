@@ -1,0 +1,9 @@
+.next
+coverage
+node_modules
+public/sw.js
+public/fallback-*.js
+public/swe-worker-*.js
+public/workbox-*.js
+package-lock.json
+supabase/.temp

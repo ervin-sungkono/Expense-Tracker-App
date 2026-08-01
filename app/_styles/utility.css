@@ -1,27 +1,27 @@
 @utility z-fixed {
-    z-index: 9999;
+  z-index: 9999;
 }
 
 @utility bg-basic-gradient {
-    @apply bg-linear-to-r from-deep-blue to-ocean-blue;
+  @apply bg-linear-to-r from-deep-blue to-ocean-blue;
 }
 
 @utility bg-basic-gradient--hover {
-    @apply bg-linear-to-r from-ocean-blue to-ocean-blue/80;
+  @apply bg-linear-to-r from-ocean-blue to-ocean-blue/80;
 }
 
 @utility bg-danger-gradient {
-    @apply bg-linear-to-r from-red-600 to-red-400;
+  @apply bg-linear-to-r from-red-600 to-red-400;
 }
 
 @utility bg-danger-gradient--hover {
-    @apply bg-linear-to-r from-red-600 to-red-600/80;
+  @apply bg-linear-to-r from-red-600 to-red-600/80;
 }
 
 @utility bg-success-gradient {
-    @apply bg-linear-to-r from-green-600 to-green-400;
+  @apply bg-linear-to-r from-green-600 to-green-400;
 }
 
 @utility bg-success-gradient--hover {
-    @apply bg-linear-to-r from-green-600 to-green-600/80;
+  @apply bg-linear-to-r from-green-600 to-green-600/80;
 }

@@ -1,16 +1,16 @@
-import withPWAInit from "@ducanh2912/next-pwa";
+import withPWAInit from '@ducanh2912/next-pwa';
 
 const withPWA = withPWAInit({
   cacheOnFrontEndNav: process.env.NODE_ENV !== 'development',
   aggressiveFrontEndNavCaching: process.env.NODE_ENV !== 'development',
   reloadOnOnline: true,
-  dest: "public",
+  dest: 'public',
   cacheStartUrl: true,
   dynamicStartUrl: true,
   dynamicStartUrlRedirect: '/home',
   fallbacks: {
     //image: "/static/images/fallback.png",
-    document: "/offline", // if you want to fallback to a custom page rather than /_offline
+    document: '/offline', // if you want to fallback to a custom page rather than /_offline
     // font: '/static/font/fallback.woff2',
     // audio: ...,
     // video: ...,
@@ -18,7 +18,7 @@ const withPWA = withPWAInit({
   workboxOptions: {
     disableDevLogs: true,
   },
-  disable: process.env.NODE_ENV === 'development'
+  disable: process.env.NODE_ENV === 'development',
 });
 
 /** @type {import('next').NextConfig} */

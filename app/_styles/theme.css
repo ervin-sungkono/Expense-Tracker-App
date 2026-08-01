@@ -1,14 +1,14 @@
-@theme inline{
-    --color-background: var(--background);
-    --color-foreground: var(--foreground);
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
 }
 
 @theme {
-    --color-sky-blue: #A5E6F4;
-    --color-ocean-blue: #209AB8;
-    --color-deep-blue: #0D667C;
-    --color-dark: #2b2b2b;
-    --color-light: #FAFAFA;
+  --color-sky-blue: #a5e6f4;
+  --color-ocean-blue: #209ab8;
+  --color-deep-blue: #0d667c;
+  --color-dark: #2b2b2b;
+  --color-light: #fafafa;
 
-    --breakpoint-xs: 30rem;
+  --breakpoint-xs: 30rem;
 }

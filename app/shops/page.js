@@ -1,78 +1,75 @@
-'use client'
-import Layout from "@components/layout/Layout";
-import VirtualizedShopList from "@components/shops/VirtualizedShopList";
-import { useEffect, useState } from "react";
-import { db } from "@lib/db";
-import SearchBar from "@components/common/Searchbar";
-import Header from "@components/common/Header";
-import IconButton from "@components/common/IconButton";
-import { IoMdAdd as PlusIcon } from "react-icons/io";
-import { useLiveQuery } from "dexie-react-hooks";
-import Dialog from "@components/common/Dialog";
-import InfoShopForm from "@components/shops/InfoShopForm";
-import { useSpace } from "@components/providers/AppProvider";
+'use client';
+import Layout from '@components/layout/Layout';
+import VirtualizedShopList from '@components/shops/VirtualizedShopList';
+import { useEffect, useState } from 'react';
+import { db } from '@lib/db';
+import SearchBar from '@components/common/Searchbar';
+import Header from '@components/common/Header';
+import IconButton from '@components/common/IconButton';
+import { IoMdAdd as PlusIcon } from 'react-icons/io';
+import { useLiveQuery } from 'dexie-react-hooks';
+import Dialog from '@components/common/Dialog';
+import InfoShopForm from '@components/shops/InfoShopForm';
+import { useSpace } from '@components/providers/AppProvider';
 
 export default function Shops() {
-    const { canManageSpace } = useSpace();
-    const PAGE_SIZE = 10;
-    const [limit, setLimit] = useState(PAGE_SIZE);
-    const [searchText, setSearchText] = useState("");
-    const [selectedShop, setSelectedShop] = useState(null);
+  const { canManageSpace } = useSpace();
+  const PAGE_SIZE = 10;
+  const [limit, setLimit] = useState(PAGE_SIZE);
+  const [searchText, setSearchText] = useState('');
+  const [selectedShop, setSelectedShop] = useState(null);
 
-    const shops = useLiveQuery(
-        () => db.getPaginatedShops(limit, searchText), 
-        [limit, searchText]
-    )
-    
-    const [showAdd, setShowAdd] = useState(false);
+  const shops = useLiveQuery(() => db.getPaginatedShops(limit, searchText), [limit, searchText]);
 
-    useEffect(() => {        
-        setLimit(PAGE_SIZE); // Refresh search
-    }, [searchText])
+  const [showAdd, setShowAdd] = useState(false);
 
-    const fetchMoreData = async() => {
-        setLimit(currentLimit => currentLimit + PAGE_SIZE);
-    };
+  useEffect(() => {
+    setLimit(PAGE_SIZE); // Refresh search
+  }, [searchText]);
 
-    const handleShopAdd = (shop = null) => {
-        if (!canManageSpace) return;
-        setSelectedShop(shop);
-        setShowAdd(true);
-    }
+  const fetchMoreData = async () => {
+    setLimit(currentLimit => currentLimit + PAGE_SIZE);
+  };
 
-    return(
-        <Layout pathname={"/shops"}>
-            <div className="h-full flex flex-col">
-                <div className="mb-4">
-                    <Header title={"Shop List"} textAlign="center"/>
-                    <div className="flex items-center gap-2">
-                        <SearchBar
-                            placeholder={"Search based on name"}
-                            onSearch={(value) => setSearchText(value.toLowerCase())}
-                        />
-                        {canManageSpace && <div className="relative z-0">
-                            <IconButton icon={<PlusIcon size={20}/>} contained onClick={() => handleShopAdd()}/>
-                        </div>}
-                    </div>
-                </div>
-                <div className="flex grow mb-2">
-                    <VirtualizedShopList
-                        items={shops}
-                        loadMore={fetchMoreData}
-                        hasNextPage={shops && shops.length > 0 && shops.length % PAGE_SIZE === 0}
-                        onShopClick={canManageSpace ? handleShopAdd : undefined}
-                    />
-                </div>
-                <Dialog
-                    show={showAdd}
-                    hideFn={() => setShowAdd(false)}
-                >
-                    <InfoShopForm 
-                        shop={selectedShop} 
-                        hideFn={() => setShowAdd(false)}
-                    />
-                </Dialog>
-            </div>
-        </Layout>
-    )
+  const handleShopAdd = (shop = null) => {
+    if (!canManageSpace) return;
+    setSelectedShop(shop);
+    setShowAdd(true);
+  };
+
+  return (
+    <Layout pathname={'/shops'}>
+      <div className="h-full flex flex-col">
+        <div className="mb-4">
+          <Header title={'Shop List'} textAlign="center" />
+          <div className="flex items-center gap-2">
+            <SearchBar
+              placeholder={'Search based on name'}
+              onSearch={value => setSearchText(value.toLowerCase())}
+            />
+            {canManageSpace && (
+              <div className="relative z-0">
+                <IconButton
+                  icon={<PlusIcon size={20} />}
+                  contained
+                  onClick={() => handleShopAdd()}
+                />
+              </div>
+            )}
+          </div>
+        </div>
+        <div className="flex grow mb-2">
+          <VirtualizedShopList
+            items={shops}
+            loadMore={fetchMoreData}
+            hasNextPage={shops && shops.length > 0 && shops.length % PAGE_SIZE === 0}
+            onShopClick={canManageSpace ? handleShopAdd : undefined}
+          />
+        </div>
+        <Dialog show={showAdd} hideFn={() => setShowAdd(false)}>
+          <InfoShopForm shop={selectedShop} hideFn={() => setShowAdd(false)} />
+        </Dialog>
+      </div>
+    </Layout>
+  );
 }

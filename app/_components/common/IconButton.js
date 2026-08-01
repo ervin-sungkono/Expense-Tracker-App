@@ -1,8 +1,6 @@
-'use client'
-import Button from "./Button";
+'use client';
+import Button from './Button';
 
 export default function IconButton({ icon, onClick, contained = false }) {
-    return(
-        <Button onClick={onClick} size='icon' contained={contained} label={icon}/>
-    )
+  return <Button onClick={onClick} size="icon" contained={contained} label={icon} />;
 }
