@@ -2,11 +2,13 @@
 import { useState } from "react";
 import Dialog from "../Dialog";
 import AddTransactionForm from "../../transactions/AddTransactionForm";
+import { useSpace } from "../../providers/AppProvider";
 
 export default function AddTransactionButton({ item }) {
     const [showDialog, setShowDialog] = useState(false);
+    const { canWriteTransactions } = useSpace();
 
-    if (!item) return
+    if (!item || !canWriteTransactions) return null;
     return (
         <div 
             className={`nav-fab`}

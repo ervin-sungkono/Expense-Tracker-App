@@ -5,8 +5,10 @@ import Button from "../common/Button";
 import { formatCurrency, formatDateString, getOwnerLabel } from "@lib/utils";
 import AddTransactionForm from "./AddTransactionForm";
 import DeleteTransactionForm from "./DeleteTransactionForm";
+import { useSpace } from "../providers/AppProvider";
 
 export default function InfoTransactionForm({ transaction, hideFn }) {
+    const { canWriteTransactions } = useSpace();
     const [showEdit, setShowEdit] = useState(false);
     const [showDelete, setShowDelete] = useState(false);
 
@@ -56,10 +58,10 @@ export default function InfoTransactionForm({ transaction, hideFn }) {
                         </div>
                     ))}
                 </div>
-                <div className="flex justify-end gap-2.5">
+                {canWriteTransactions && <div className="flex justify-end gap-2.5">
                     <Button label={"Edit"} contained onClick={() => setShowEdit(true)}/>
                     <Button label={"Delete"} style="danger" contained onClick={() => setShowDelete(true)}/>
-                </div>
+                </div>}
             </div>
             <Dialog
                 show={showEdit} 

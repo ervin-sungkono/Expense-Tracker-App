@@ -5,6 +5,7 @@ import ContextMenu from "../common/ContextMenu";
 import { IoMdMore as MoreIcon } from "react-icons/io";
 import Image from "next/image";
 import Dialog from "../common/Dialog";
+import { useSpace } from "../providers/AppProvider";
 
 const InfoCategoryContent = dynamic(() => import("./InfoCategoryContent"))
 const AddCategoryForm = dynamic(() => import("./AddCategoryForm"));
@@ -16,9 +17,10 @@ function CategoryCard({ category, onClick, style, depth = 0 }) {
     const [showInfo, setShowInfo] = useState(false);
     const [showEdit, setShowEdit] = useState(false);
     const [showDelete, setShowDelete] = useState(false);
+    const { canManageSpace } = useSpace();
 
     const getMutableItems = () => {
-        return mutable ? [
+        return mutable && canManageSpace ? [
             {
                 label: 'Edit',
                 onClick: () => setShowEdit(true)

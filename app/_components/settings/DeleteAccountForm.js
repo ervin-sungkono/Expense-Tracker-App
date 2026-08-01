@@ -1,18 +1,19 @@
 import { db } from "@lib/db";
 import { useRouter } from "next/navigation";
 import Button from "../common/Button";
-import { useLocalStorage } from "@lib/hooks";
 import { toast } from "react-toastify";
+import { useAuth } from "../providers/AppProvider";
+import { clearUserKeys } from "@lib/keyStore";
 
 export default function DeleteAccountForm({ onCancel }) {
     const router = useRouter();
-    const [_, setUsername] = useLocalStorage('username');
+    const { signOut, user } = useAuth();
 
     const handleDeleteAccount = async() => {
-        // Delete account and reset DB
-        setUsername(null);
         await db.resetDB();
-        toast.success('Account deleted');
+        await clearUserKeys(user.id);
+        await signOut();
+        toast.success('Local data cleared');
         
         router.replace('/');
     }
@@ -20,13 +21,13 @@ export default function DeleteAccountForm({ onCancel }) {
     return(
         <div className="flex flex-col gap-4">
             <div className="flex flex-col gap-2">
-                <div className="text-xl font-bold">Delete Account</div>
-                <p className="text-dark/80 dark:text-white/80 text-sm md:text-base">Are you sure you want to delete your account?</p>
-                <p className="text-dark/80 dark:text-white/80 text-sm md:text-base"><b>Note:</b> your account is <b>NOT</b> recoverable.</p>
+                <div className="text-xl font-bold">Clear this device</div>
+                <p className="text-dark/80 dark:text-white/80 text-sm md:text-base">Remove offline data and sign out on this device?</p>
+                <p className="text-dark/80 dark:text-white/80 text-sm md:text-base">Synced encrypted data remains in your spaces.</p>
             </div>
             <div className="flex justify-end gap-2.5">
                 <Button label={"Cancel"} contained onClick={onCancel}/>
-                <Button label={"Delete"} style="danger" contained onClick={handleDeleteAccount}/>
+                <Button label={"Clear"} style="danger" contained onClick={handleDeleteAccount}/>
             </div>
         </div>
     )

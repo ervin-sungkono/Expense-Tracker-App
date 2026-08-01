@@ -9,10 +9,12 @@ import CategoryCard from "./CategoryCard"
 import Button from "../common/Button"
 import Dialog from "../common/Dialog"
 import CategoryListPage from "../common/page/CategoryListPage"
+import { useSpace } from "../providers/AppProvider"
 
 const AddCategoryForm = dynamic(() => import("../categories/AddCategoryForm"))
 
 export default function CategoriesCarousel() {
+    const { canManageSpace } = useSpace();
     const [categoryData, setCategoryData] = useState(null);
     const [showCategory, setShowCategory] = useState(false);
     const [showAdd, setShowAdd] = useState(false);
@@ -56,7 +58,7 @@ export default function CategoriesCarousel() {
                 /> :
                 <div className="h-40 flex flex-col justify-center items-center gap-4 w-full bg-neutral-200 dark:bg-neutral-800 rounded-lg py-6 px-4">
                     <p className="text-sm md:text-base text-center font-medium text-dark/80 dark:text-white/80">No category found, please create a new category</p>
-                    <Button onClick={() => setShowAdd(true)} label="Add New Category" contained/>
+                    {canManageSpace && <Button onClick={() => setShowAdd(true)} label="Add New Category" contained/>}
                 </div>}
                 <CategoryListPage
                     show={showCategory}

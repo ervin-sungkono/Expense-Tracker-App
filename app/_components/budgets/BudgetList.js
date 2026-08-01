@@ -7,8 +7,10 @@ import { db } from "@lib/db";
 import Dialog from "../common/Dialog";
 import AddBudgetForm from "./AddBudgetForm";
 import BudgetTab from "./BudgetTab";
+import { useSpace } from "../providers/AppProvider";
 
 export default function BudgetList() {
+    const { canManageSpace } = useSpace();
     const PAGE_SIZE = 10;
 
     const [budgetType, setBudgetType] = useState(null);
@@ -43,9 +45,9 @@ export default function BudgetList() {
                     loadMore={fetchMoreData}
                 />
             </div>
-            <div className="flex justify-center mt-2">
+            {canManageSpace && <div className="flex justify-center mt-2">
                 <Button label={"Add New Budget"} onClick={() => setShowAdd(true)}/>
-            </div>
+            </div>}
             <Dialog
                 show={showAdd}
                 hideFn={() => setShowAdd(false)}

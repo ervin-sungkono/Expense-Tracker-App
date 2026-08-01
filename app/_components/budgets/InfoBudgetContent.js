@@ -5,6 +5,7 @@ import Button from "../common/Button";
 import BudgetProgress from "./BudgetProgress";
 import { useState } from "react";
 import Dialog from "../common/Dialog";
+import { useSpace } from "../providers/AppProvider";
 
 const AddBudgetForm = dynamic(() => import("./AddBudgetForm"));
 const DeleteBudgetForm = dynamic(() => import("./DeleteBudgetForm"));
@@ -18,6 +19,7 @@ export default function InfoBudgetContent({ budget = {}, hideFn }) {
 
     const [showEdit, setShowEdit] = useState(false);
     const [showDelete, setShowDelete] = useState(false);
+    const { canManageSpace } = useSpace();
 
     const handleDelete = () => {
         setShowDelete(false);
@@ -69,10 +71,10 @@ export default function InfoBudgetContent({ budget = {}, hideFn }) {
                     budgetAmount={budget.amount}
                 />
             </div>
-            <div className="flex justify-end gap-2.5">
+            {canManageSpace && <div className="flex justify-end gap-2.5">
                 <Button label={"Delete"} style="danger" contained onClick={() => setShowDelete(true)}/>
                 <Button label={"Edit"} contained onClick={() => setShowEdit(true)}/>
-            </div>
+            </div>}
             <Dialog
                 show={showEdit}
                 hideFn={() => setShowEdit(false)}

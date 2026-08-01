@@ -7,6 +7,7 @@ import ContextMenu from "../common/ContextMenu";
 import { isMobile } from "react-device-detect";
 import Dialog from "../common/Dialog";
 import Image from "next/image";
+import { useSpace } from "../providers/AppProvider";
 
 const AddTransactionForm = dynamic(() => import("./AddTransactionForm"));
 const DeleteTransactionForm = dynamic(() => import("./DeleteTransactionForm"));
@@ -18,6 +19,7 @@ function TransactionCard({ transaction }) {
     const [showInfo, setShowInfo] = useState(false);
     const [showEdit, setShowEdit] = useState(false);
     const [showDelete, setShowDelete] = useState(false);
+    const { canWriteTransactions } = useSpace();
 
     const handlers = useLongPress(() => {
         setShowMenu(true);
@@ -31,14 +33,14 @@ function TransactionCard({ transaction }) {
             label: 'Info',
             onClick: () => setShowInfo(true)
         },
-        {
+        ...(canWriteTransactions ? [{
             label: 'Edit',
             onClick: () => setShowEdit(true)
         },
         {
             label: 'Delete',
             onClick: () => setShowDelete(true)
-        }
+        }] : [])
     ]
 
     return(

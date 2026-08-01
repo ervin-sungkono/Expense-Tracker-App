@@ -3,12 +3,12 @@ import InputField from "../common/InputField";
 import { useState } from "react";
 import Button from "../common/Button";
 import { StringValidator } from "@lib/validator";
-import { useLocalStorage } from "@lib/hooks";
 import { toast } from "react-toastify";
+import { useAuth } from "../providers/AppProvider";
 
 export default function ChangeUsernameForm({ onSubmit }) {
     const [errorMessage, setErrorMessage] = useState({});
-    const [username, setUsername] = useLocalStorage('username');
+    const { supabase, user, profile, refreshProfile } = useAuth();
 
     const validateName = (name) => {
         return new StringValidator("Name", name)
@@ -18,7 +18,7 @@ export default function ChangeUsernameForm({ onSubmit }) {
             .validate();
     }
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async(e) => {
         e.preventDefault();
 
         const form = e.target;
@@ -42,7 +42,9 @@ export default function ChangeUsernameForm({ onSubmit }) {
                 return;
             }
 
-            setUsername(name)
+            const { error: updateError } = await supabase.from('profiles').update({ display_name: name }).eq('id', user.id);
+            if (updateError) throw updateError;
+            await refreshProfile();
             onSubmit && onSubmit();
             toast.success("Username changed");
         } catch(e) {
@@ -63,7 +65,7 @@ export default function ChangeUsernameForm({ onSubmit }) {
                         placeholder={"Enter new username (max 25 characters)"}
                         type={"text"}
                         maxLength={25}
-                        defaultValue={username}
+                        defaultValue={profile?.display_name}
                         errorMessage={errorMessage?.name}
                     />
                 </div>

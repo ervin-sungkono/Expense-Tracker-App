@@ -10,8 +10,10 @@ import { IoMdAdd as PlusIcon } from "react-icons/io";
 import { useLiveQuery } from "dexie-react-hooks";
 import Dialog from "@components/common/Dialog";
 import InfoShopForm from "@components/shops/InfoShopForm";
+import { useSpace } from "@components/providers/AppProvider";
 
 export default function Shops() {
+    const { canManageSpace } = useSpace();
     const PAGE_SIZE = 10;
     const [limit, setLimit] = useState(PAGE_SIZE);
     const [searchText, setSearchText] = useState("");
@@ -33,6 +35,7 @@ export default function Shops() {
     };
 
     const handleShopAdd = (shop = null) => {
+        if (!canManageSpace) return;
         setSelectedShop(shop);
         setShowAdd(true);
     }
@@ -47,9 +50,9 @@ export default function Shops() {
                             placeholder={"Search based on name"}
                             onSearch={(value) => setSearchText(value.toLowerCase())}
                         />
-                        <div className="relative z-0">
+                        {canManageSpace && <div className="relative z-0">
                             <IconButton icon={<PlusIcon size={20}/>} contained onClick={() => handleShopAdd()}/>
-                        </div>
+                        </div>}
                     </div>
                 </div>
                 <div className="flex grow mb-2">
@@ -57,7 +60,7 @@ export default function Shops() {
                         items={shops}
                         loadMore={fetchMoreData}
                         hasNextPage={shops && shops.length > 0 && shops.length % PAGE_SIZE === 0}
-                        onShopClick={handleShopAdd}
+                        onShopClick={canManageSpace ? handleShopAdd : undefined}
                     />
                 </div>
                 <Dialog

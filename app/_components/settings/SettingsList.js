@@ -9,6 +9,8 @@ import ThemeSwitch from "../common/ThemeSwitch";
 import Dialog from "../common/Dialog";
 import CategoryListPage from "../common/page/CategoryListPage";
 import AboutAppPage from "../common/page/AboutAppPage";
+import { useRouter } from "next/navigation";
+import { useSpace } from "../providers/AppProvider";
 // import ChangeCurrencyDialog from "./ChangeCurrencyDialog";
 
 const ImportDataForm = dynamic(() => import("./ImportDataForm"));
@@ -16,6 +18,8 @@ const DeleteAccountForm = dynamic(() => import("./DeleteAccountForm"));
 const ChangeUsernameForm = dynamic(() => import("./ChangeUsernameForm"));
 
 export default function SettingsList() {
+    const router = useRouter();
+    const { canManageSpace } = useSpace();
     const [showCategory, setShowCategory] = useState(false);
     const [showUsername, setShowUsername] = useState(false);
     // const [showCurrency, setShowCurrency] = useState(false);
@@ -87,6 +91,12 @@ export default function SettingsList() {
     
     const SETTING_ITEMS = [
         {
+            id: 'spaces',
+            title: 'Spaces & sharing',
+            description: 'Switch spaces, invite people, and review roles',
+            onClick: () => router.push('/spaces')
+        },
+        {
             id: 'change-username',
             title: 'Change username',
             description: 'Set a new username',
@@ -102,7 +112,8 @@ export default function SettingsList() {
             id: 'category',
             title: 'Category',
             description: 'Manage your categories',
-            onClick: () => setShowCategory(true)
+            onClick: () => setShowCategory(true),
+            disabled: !canManageSpace
         },
         {
             id: 'theme',
@@ -118,7 +129,7 @@ export default function SettingsList() {
             title: 'Import Data',
             description: 'Import user data',
             onClick: () => setShowImport(true), // TODO: import user data
-            // disabled: !isOnline,
+            disabled: !canManageSpace,
         },
         {
             id: 'export-data',
@@ -148,7 +159,7 @@ export default function SettingsList() {
                 show={showCategory}
                 hideFn={() => setShowCategory(false)}
             />
-            <Button style="danger" label={"Delete Account"} onClick={() => setDeleteAccount(true)} className="mt-8 pb-4"/>
+            <Button style="danger" label={"Clear This Device & Sign Out"} onClick={() => setDeleteAccount(true)} className="mt-8 pb-4"/>
             <Dialog
                 show={showUsername}
                 hideFn={() => setShowUsername(false)}

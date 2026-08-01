@@ -7,10 +7,12 @@ import { useLiveQuery } from "dexie-react-hooks";
 import { db } from "@lib/db";
 import dynamic from "next/dynamic";
 import Dialog from "./Dialog";
+import { useSpace } from "../providers/AppProvider";
 
 const AddCategoryForm = dynamic(() => import("../categories/AddCategoryForm"))
 
 export default function CategoryList() {
+    const { canManageSpace } = useSpace();
     const [showDialog, setShowDialog] = useState(false);
     const [categoryData, setCategoryData] = useState(null);
     const [selectedType, setSelectedType] = useState('Expense');
@@ -67,9 +69,9 @@ export default function CategoryList() {
                     items={categoryData?.[selectedType]}
                 />
             </div>
-            <div className="flex justify-center mt-2">
+            {canManageSpace && <div className="flex justify-center mt-2">
                 <Button label={"Add New Category"} onClick={() => setShowDialog(true)}/>
-            </div>
+            </div>}
             <Dialog
                 show={showDialog}
                 hideFn={() => setShowDialog(false)}
