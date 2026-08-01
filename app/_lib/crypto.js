@@ -1,5 +1,4 @@
 const CRYPTO_VERSION = 1;
-const PBKDF2_ITERATIONS = 600_000;
 
 function getCrypto() {
   if (!globalThis.crypto?.subtle) {
@@ -26,7 +25,7 @@ function randomBytes(length) {
   return getCrypto().getRandomValues(new Uint8Array(length));
 }
 
-async function derivePassphraseKey(passphrase, salt, iterations = PBKDF2_ITERATIONS) {
+async function derivePassphraseKey(passphrase, salt, iterations) {
   const subtle = getCrypto().subtle;
   const material = await subtle.importKey(
     'raw',
@@ -45,11 +44,7 @@ async function derivePassphraseKey(passphrase, salt, iterations = PBKDF2_ITERATI
   );
 }
 
-export async function generateUserKeyring(passphrase) {
-  if (typeof passphrase !== 'string' || passphrase.length < 12) {
-    throw new Error('Recovery passphrase must contain at least 12 characters.');
-  }
-
+async function generateUserKeyMaterial() {
   const subtle = getCrypto().subtle;
   const pair = await subtle.generateKey(
     {
@@ -61,13 +56,6 @@ export async function generateUserKeyring(passphrase) {
     true,
     ['wrapKey', 'unwrapKey']
   );
-  const salt = randomBytes(16);
-  const iv = randomBytes(12);
-  const passphraseKey = await derivePassphraseKey(passphrase, salt);
-  const encryptedPrivateKey = await subtle.wrapKey('pkcs8', pair.privateKey, passphraseKey, {
-    name: 'AES-GCM',
-    iv,
-  });
   const privatePkcs8 = await subtle.exportKey('pkcs8', pair.privateKey);
   const privateKey = await subtle.importKey(
     'pkcs8',
@@ -85,17 +73,13 @@ export async function generateUserKeyring(passphrase) {
   return {
     publicKeyJwk,
     privateKey,
-    backup: {
-      crypto_version: CRYPTO_VERSION,
-      encrypted_private_key: bytesToBase64(encryptedPrivateKey),
-      iv: bytesToBase64(iv),
-      salt: bytesToBase64(salt),
-      kdf_algorithm: 'PBKDF2-HMAC-SHA256',
-      kdf_iterations: PBKDF2_ITERATIONS,
-      key_algorithm: 'RSA-OAEP-3072-SHA256',
-    },
     fingerprint: bytesToBase64(fingerprintBytes),
   };
+}
+
+export async function generateDeviceKeyring() {
+  const { publicKeyJwk, privateKey, fingerprint } = await generateUserKeyMaterial();
+  return { publicKeyJwk, privateKey, fingerprint };
 }
 
 export async function recoverPrivateKey(passphrase, backup) {
@@ -244,4 +228,4 @@ export async function sha256Base64(value) {
   return bytesToBase64(digest);
 }
 
-export { CRYPTO_VERSION, PBKDF2_ITERATIONS };
+export { CRYPTO_VERSION };

@@ -161,15 +161,12 @@ export function AppProvider({ children }) {
     await supabase.auth.signOut({ scope: 'local' });
   }, [supabase]);
 
-  const setupKeyring = useCallback(
-    async passphrase => {
-      const result = await createUserKeyring(supabase, user, passphrase);
-      setPrivateKey(result.privateKey);
-      setProfile(current => ({ ...current, active_key_version: result.keyVersion }));
-      return result;
-    },
-    [supabase, user]
-  );
+  const setupKeyring = useCallback(async () => {
+    const result = await createUserKeyring(supabase, user);
+    setPrivateKey(result.privateKey);
+    setProfile(current => ({ ...current, active_key_version: result.keyVersion }));
+    return result;
+  }, [supabase, user]);
 
   const unlockKeyring = useCallback(
     async passphrase => {
@@ -183,7 +180,7 @@ export function AppProvider({ children }) {
   const createSpace = useCallback(
     async name => {
       if (!privateKey || !profile?.active_key_version)
-        throw new Error('Unlock your recovery key first.');
+        throw new Error('The encryption key is unavailable on this device.');
       const { data: publicRow, error: publicError } = await supabase
         .from('user_public_keys')
         .select('public_key_jwk')

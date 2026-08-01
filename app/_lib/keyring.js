@@ -1,30 +1,23 @@
-import { generateUserKeyring, recoverPrivateKey } from '@lib/crypto';
+import { generateDeviceKeyring, recoverPrivateKey } from '@lib/crypto';
 import { savePrivateKey } from '@lib/keyStore';
-import { base64ToBytea, byteaToBase64 } from '@lib/supabase/binary';
+import { byteaToBase64 } from '@lib/supabase/binary';
 
-export async function createUserKeyring(supabase, user, passphrase) {
+export async function createUserKeyring(supabase, user) {
   const keyVersion = 1;
-  const generated = await generateUserKeyring(passphrase);
-  const { error: publicKeyError } = await supabase.from('user_public_keys').insert({
-    user_id: user.id,
-    key_version: keyVersion,
-    algorithm: 'RSA-OAEP-3072-SHA256',
-    public_key_jwk: generated.publicKeyJwk,
-    fingerprint: generated.fingerprint,
-  });
+  const generated = await generateDeviceKeyring();
+  const { error: publicKeyError } = await supabase.from('user_public_keys').upsert(
+    {
+      user_id: user.id,
+      key_version: keyVersion,
+      algorithm: 'RSA-OAEP-3072-SHA256',
+      public_key_jwk: generated.publicKeyJwk,
+      fingerprint: generated.fingerprint,
+    },
+    { onConflict: 'user_id,key_version' }
+  );
   if (publicKeyError) throw publicKeyError;
 
-  const { error: backupError } = await supabase.from('user_private_key_backups').insert({
-    user_id: user.id,
-    key_version: keyVersion,
-    encrypted_private_key: base64ToBytea(generated.backup.encrypted_private_key),
-    iv: base64ToBytea(generated.backup.iv),
-    salt: base64ToBytea(generated.backup.salt),
-    kdf_algorithm: generated.backup.kdf_algorithm,
-    kdf_iterations: generated.backup.kdf_iterations,
-    key_algorithm: generated.backup.key_algorithm,
-  });
-  if (backupError) throw backupError;
+  await savePrivateKey(user.id, keyVersion, generated.privateKey);
 
   const { error: profileError } = await supabase
     .from('profiles')
@@ -32,7 +25,6 @@ export async function createUserKeyring(supabase, user, passphrase) {
     .eq('id', user.id);
   if (profileError) throw profileError;
 
-  await savePrivateKey(user.id, keyVersion, generated.privateKey);
   return { keyVersion, privateKey: generated.privateKey, fingerprint: generated.fingerprint };
 }
 

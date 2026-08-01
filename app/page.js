@@ -6,7 +6,7 @@ import InputField from '@components/common/InputField';
 import Loading from '@components/layout/Loading';
 import { useAuth, useSpace } from '@components/providers/AppProvider';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { Suspense, useEffect, useState } from 'react';
+import { Suspense, useEffect, useRef, useState } from 'react';
 import { toast } from 'react-toastify';
 
 function OnboardingContent() {
@@ -25,12 +25,24 @@ function OnboardingContent() {
   const { spaces, createSpace, spacesLoading } = useSpace();
   const [busy, setBusy] = useState(false);
   const [passphrase, setPassphrase] = useState('');
-  const [confirmation, setConfirmation] = useState('');
+  const [keySetupError, setKeySetupError] = useState('');
+  const [keySetupAttempt, setKeySetupAttempt] = useState(0);
   const [spaceName, setSpaceName] = useState('My Space');
+  const keySetupStarted = useRef(false);
 
   useEffect(() => {
     if (user && privateKey && spaces.length > 0) router.replace('/home');
   }, [privateKey, router, spaces, user]);
+
+  useEffect(() => {
+    if (!user || !profile || profile.active_key_version || keySetupStarted.current) return;
+
+    keySetupStarted.current = true;
+    setupKeyring().catch(error => {
+      keySetupStarted.current = false;
+      setKeySetupError(error.message);
+    });
+  }, [keySetupAttempt, profile, setupKeyring, user]);
 
   if (authLoading || spacesLoading) return <Loading />;
 
@@ -71,47 +83,21 @@ function OnboardingContent() {
   }
 
   if (!profile?.active_key_version) {
-    const submit = async event => {
-      event.preventDefault();
-      if (passphrase.length < 12) return toast.error('Use at least 12 characters.');
-      if (passphrase !== confirmation) return toast.error('Passphrases do not match.');
-      setBusy(true);
-      try {
-        await setupKeyring(passphrase);
-        toast.success('Recovery key created');
-        setPassphrase('');
-        setConfirmation('');
-      } catch (error) {
-        toast.error(error.message);
-      } finally {
-        setBusy(false);
-      }
-    };
+    if (!keySetupError) return <Loading />;
+
     return (
-      <form onSubmit={submit} className="w-full max-w-md flex flex-col gap-4">
-        <h1 className="text-2xl font-bold">Protect your encryption key</h1>
-        <p className="text-sm text-dark/70 dark:text-white/70">
-          This recovery passphrase never leaves your browser. If you lose it and every unlocked
-          device, encrypted spaces cannot be recovered.
-        </p>
-        <InputField
-          required
-          type="password"
-          name="passphrase"
-          label="Recovery passphrase"
-          value={passphrase}
-          onChange={event => setPassphrase(event.target.value)}
+      <div className="w-full max-w-md flex flex-col gap-4 text-center">
+        <h1 className="text-2xl font-bold">Encryption setup failed</h1>
+        <p className="text-sm text-dark/70 dark:text-white/70">{keySetupError}</p>
+        <Button
+          label="Try again"
+          onClick={() => {
+            keySetupStarted.current = false;
+            setKeySetupError('');
+            setKeySetupAttempt(attempt => attempt + 1);
+          }}
         />
-        <InputField
-          required
-          type="password"
-          name="confirmation"
-          label="Confirm passphrase"
-          value={confirmation}
-          onChange={event => setConfirmation(event.target.value)}
-        />
-        <Button type="submit" label={busy ? 'Creating key…' : 'Create encryption key'} />
-      </form>
+      </div>
     );
   }
 
@@ -150,6 +136,7 @@ function OnboardingContent() {
     try {
       await createSpace(spaceName);
       toast.success('Space created');
+      router.replace('/home');
     } catch (error) {
       toast.error(error.message);
     } finally {
@@ -161,7 +148,7 @@ function OnboardingContent() {
       <h1 className="text-2xl font-bold">Create your first space</h1>
       <p className="text-sm text-dark/70 dark:text-white/70">
         A space contains its own transactions, categories, budgets, shops, members, and encryption
-        key.
+        key. Your encryption key stays on this device.
       </p>
       <InputField
         required
