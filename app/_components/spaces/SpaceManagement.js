@@ -17,17 +17,68 @@ export default function SpaceManagement() {
   const { supabase, user } = useAuth();
   const { activeSpace, canManageSpace, spaces, createSpace } = useSpace();
   const [members, setMembers] = useState([]);
+  const [membersError, setMembersError] = useState('');
   const [link, setLink] = useState('');
   const [message, setMessage] = useState('');
   const [busy, setBusy] = useState(false);
 
   useEffect(() => {
-    if (!activeSpace) return;
-    supabase
-      .from('space_members')
-      .select('user_id,role,status,profiles(display_name,avatar_url)')
-      .eq('space_id', activeSpace.id)
-      .then(({ data }) => setMembers(data ?? []));
+    if (!activeSpace) {
+      setMembers([]);
+      return;
+    }
+
+    let cancelled = false;
+
+    async function loadMembers() {
+      setMembersError('');
+      const { data: memberRows, error: membersLoadError } = await supabase
+        .from('space_members')
+        .select('user_id,role,status')
+        .eq('space_id', activeSpace.id)
+        .eq('status', 'active');
+
+      if (membersLoadError) {
+        if (!cancelled) {
+          setMembers([]);
+          setMembersError('Unable to load members. Please try again.');
+        }
+        return;
+      }
+
+      const userIds = memberRows.map(member => member.user_id);
+      if (!userIds.length) {
+        if (!cancelled) setMembers([]);
+        return;
+      }
+      const { data: profiles, error: profilesLoadError } = await supabase
+        .from('profiles')
+        .select('id,display_name,avatar_url')
+        .in('id', userIds);
+
+      if (profilesLoadError) {
+        if (!cancelled) {
+          setMembers([]);
+          setMembersError('Unable to load member profiles. Please try again.');
+        }
+        return;
+      }
+
+      const profilesById = new Map(profiles.map(profile => [profile.id, profile]));
+      if (!cancelled) {
+        setMembers(
+          memberRows.map(member => ({
+            ...member,
+            profile: profilesById.get(member.user_id),
+          }))
+        );
+      }
+    }
+
+    loadMembers();
+    return () => {
+      cancelled = true;
+    };
   }, [activeSpace, supabase]);
 
   async function handleCreateSpace(event) {
@@ -110,10 +161,11 @@ export default function SpaceManagement() {
         <h2 className="text-lg font-bold">Members</h2>
         {members.map(member => (
           <div key={member.user_id} className="flex justify-between border-b py-2 text-sm">
-            <span>{member.profiles?.display_name ?? member.user_id}</span>
+            <span>{member.profile?.display_name ?? member.user_id}</span>
             <span className="capitalize">{member.role}</span>
           </div>
         ))}
+        {membersError && <p className="text-sm text-red-500">{membersError}</p>}
       </section>
       {canManageSpace && (
         <section className="flex flex-col gap-3">

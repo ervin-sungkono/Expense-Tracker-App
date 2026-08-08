@@ -1,4 +1,4 @@
-import { MONTHS } from './const';
+import { MONTHS } from './const/months';
 
 export function extractText(text) {
   const regex = /\[(.*?)\]/g;

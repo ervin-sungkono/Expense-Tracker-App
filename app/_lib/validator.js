@@ -49,7 +49,7 @@ export class StringValidator extends Validator {
   }
 
   minLength(value) {
-    if (this._error && this._value.length < value) {
+    if (!this._error && this._value.length < value) {
       this._error = `${this._name} must be at least ${value} characters.`;
     }
 
@@ -95,7 +95,7 @@ export class NumberValidator extends Validator {
   }
 
   min(value) {
-    if (this._error && this._value < value) {
+    if (!this._error && this._value < value) {
       this._error = `${this._name} must be at least ${value}.`;
     }
 
@@ -103,7 +103,7 @@ export class NumberValidator extends Validator {
   }
 
   max(value) {
-    if (this._error && this._value > value) {
+    if (!this._error && this._value > value) {
       this._error = `${this._name} must not exceed ${value}.`;
     }
 

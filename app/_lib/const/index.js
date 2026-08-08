@@ -4,6 +4,7 @@ import {
   IoMdSettings as SettingIcon,
 } from 'react-icons/io';
 import { IoList as ListIcon, IoStorefront as StoreIcon } from 'react-icons/io5';
+export { MONTHS } from './months';
 
 // navbar items
 export const NAV_ITEMS = [
@@ -31,19 +32,4 @@ export const NAV_ITEMS = [
     icon: <SettingIcon size={24} />,
     url: '/settings',
   },
-];
-
-export const MONTHS = [
-  'January',
-  'February',
-  'March',
-  'April',
-  'May',
-  'June',
-  'July',
-  'August',
-  'September',
-  'October',
-  'November',
-  'December',
 ];
