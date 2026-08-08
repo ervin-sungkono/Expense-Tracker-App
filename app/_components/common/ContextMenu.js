@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 
 export default function ContextMenu({
   items = [],
+  children = null,
   show = false,
   hideFn = null,
   hideOnItemClick = false,
@@ -40,6 +41,7 @@ export default function ContextMenu({
                 {item.label}
               </div>
             ))}
+            {children}
           </div>
         </div>
         <div onClick={hideFn} className="fixed w-full h-full top-0 left-0 z-10"></div>

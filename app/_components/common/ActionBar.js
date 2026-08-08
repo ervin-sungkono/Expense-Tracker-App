@@ -38,22 +38,25 @@ export default function ActionBar() {
   return (
     <div className="max-w-3xl w-full px-6 py-1.5 mx-auto bg-ocean-blue ">
       <div className="relative w-full flex items-center">
-        <SpaceSwitcher />
         <BalanceView />
-        <SyncStatus />
-        <div
+        <SpaceSwitcher />
+        <button
+          type="button"
+          aria-label="More options"
           onClick={() => setShowMenu(true)}
-          className="text-white cursor-pointer p-1.5 rounded-ful active:bg-light/20 rounded-full transition-colors duration-150 ease-in-out"
+          className="ml-1 cursor-pointer rounded-full p-1.5 text-white transition-colors duration-150 ease-in-out active:bg-light/20"
         >
           <MoreIcon size={24} />
-        </div>
+        </button>
         <ContextMenu
           items={items}
           show={showMenu}
           hideFn={() => setShowMenu(false)}
           position={{ bottom: '-10px' }}
           hideOnItemClick
-        />
+        >
+          <SyncStatus onStarted={() => setShowMenu(false)} />
+        </ContextMenu>
       </div>
       <CategoryListPage show={showCategory} hideFn={() => setShowCategory(false)} />
       <AboutAppPage show={showAbout} hideFn={() => setShowAbout(false)} />
