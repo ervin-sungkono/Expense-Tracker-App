@@ -28,6 +28,7 @@ export default function CategoryList() {
       };
 
       categories.forEach(category => {
+        if (!result[category.type]) return;
         if (!category.parentId) {
           result[category.type][category.id] = {
             ...category,

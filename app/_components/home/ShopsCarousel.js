@@ -24,9 +24,10 @@ export default function ShopsCarousel() {
       }
 
       for (let i = 0; i < transactions.length; i++) {
-        if (transactions[i].shopId) {
-          shopsMap[transactions[i].shopId].count++;
-          shopsMap[transactions[i].shopId].amount += Number(transactions[i].amount);
+        const shop = shopsMap[transactions[i].shopId];
+        if (shop) {
+          shop.count++;
+          shop.amount += Number(transactions[i].amount);
         }
       }
 

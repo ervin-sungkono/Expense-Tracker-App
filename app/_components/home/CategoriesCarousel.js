@@ -29,8 +29,8 @@ export default function CategoriesCarousel() {
       }
 
       for (let i = 0; i < transactions.length; i++) {
-        if (transactions[i].categoryId)
-          categoriesMap[transactions[i].categoryId].total += Number(transactions[i].amount);
+        const category = categoriesMap[transactions[i].categoryId];
+        if (category) category.total += Number(transactions[i].amount);
       }
 
       setCategoryData([...Object.values(categoriesMap)]);

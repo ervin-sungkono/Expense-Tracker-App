@@ -50,6 +50,7 @@ export default function SpaceSwitcher() {
     }
 
     if (event.key !== 'ArrowDown' && event.key !== 'ArrowUp') return;
+    if (!spaces.length) return;
     event.preventDefault();
     const currentIndex = spaces.findIndex(space => space.id === (highlightedId ?? activeSpaceId));
     const direction = event.key === 'ArrowDown' ? 1 : -1;

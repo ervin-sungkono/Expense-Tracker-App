@@ -99,7 +99,7 @@ export default function TransactionReport() {
   useEffect(() => {
     if (selectedYear && weeks) {
       setWeekOptions(
-        weeks[selectedYear].map((_, index) => ({
+        (weeks[selectedYear] ?? []).map((_, index) => ({
           id: index + 1,
           label: `Week ${index + 1}`,
         }))
@@ -149,6 +149,7 @@ export default function TransactionReport() {
           };
         }
 
+        if (!['Income', 'Expense'].includes(transaction.type)) return;
         newWeekMap[weekKey][transaction.type].push(transaction);
         newMonthMap[monthKey][transaction.type].push(transaction);
         newYearMap[year][transaction.type].push(transaction);
@@ -164,6 +165,7 @@ export default function TransactionReport() {
     { id: 'Expense', label: 'Expense' },
     { id: 'Income', label: 'Income' },
   ];
+  const selectedWeekRange = weeks?.[selectedYear]?.[selectedWeek - 1];
 
   const contents = [
     {
@@ -207,10 +209,12 @@ export default function TransactionReport() {
           {weeks ? (
             <div className="col-span-2 text-center font-semibold mt-2">
               <span>
-                {formatDate(weeks[selectedYear]?.[selectedWeek - 1].start, 'DD MMM YYYY')}
+                {selectedWeekRange ? formatDate(selectedWeekRange.start, 'DD MMM YYYY') : 'â€”'}
               </span>
               <span> - </span>
-              <span>{formatDate(weeks[selectedYear]?.[selectedWeek - 1].end, 'DD MMM YYYY')}</span>
+              <span>
+                {selectedWeekRange ? formatDate(selectedWeekRange.end, 'DD MMM YYYY') : 'â€”'}
+              </span>
             </div>
           ) : (
             <div className="col-span-2 mt-2 h-6 bg-neutral-300 dark:bg-neutral-800 animate-pulse rounded-md"></div>
@@ -221,7 +225,7 @@ export default function TransactionReport() {
         <TransactionGraph
           type="WEEKLY"
           transactionType={selectedType}
-          labels={weeks && weeks[selectedYear]?.[selectedWeek - 1]?.labels}
+          labels={selectedWeekRange?.labels}
           historyLabels={weeks && getPreviousWeek(selectedYear, selectedWeek)?.labels}
           transactionData={weekMap && weekMap[getWeekKey(selectedYear, selectedWeek)]}
           historyTransactionData={

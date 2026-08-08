@@ -29,11 +29,9 @@ export default function TransactionChart({ transactionData = [] }) {
         groupCategory[categories[i].name] = 0;
       }
 
-      let sumTransactionAmount = 0;
       for (let i = 0; i < transactionData.length; i++) {
-        if (transactionData[i].categoryId)
-          groupCategory[categoriesMap[transactionData[i].categoryId]] += transactionData[i].amount;
-        sumTransactionAmount += transactionData[i].amount;
+        const categoryName = categoriesMap[transactionData[i].categoryId];
+        if (categoryName) groupCategory[categoryName] += transactionData[i].amount;
       }
 
       const result = Object.entries(groupCategory)

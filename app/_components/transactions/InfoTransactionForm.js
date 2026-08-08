@@ -11,6 +11,7 @@ export default function InfoTransactionForm({ transaction, hideFn }) {
   const { canWriteTransactions } = useSpace();
   const [showEdit, setShowEdit] = useState(false);
   const [showDelete, setShowDelete] = useState(false);
+  const categoryName = transaction.category?.name ?? 'Category is still syncing';
 
   const handleDelete = () => {
     setShowDelete(false);
@@ -28,7 +29,7 @@ export default function InfoTransactionForm({ transaction, hideFn }) {
     },
     {
       label: 'Category',
-      value: transaction.category.name,
+      value: categoryName,
     },
     {
       label: 'Shop',
@@ -36,7 +37,7 @@ export default function InfoTransactionForm({ transaction, hideFn }) {
       isHidden: transaction.shop == null,
     },
     {
-      label: getOwnerLabel(transaction.category.name),
+      label: getOwnerLabel(categoryName),
       value: transaction.owner,
       isHidden: transaction.owner == null,
     },
