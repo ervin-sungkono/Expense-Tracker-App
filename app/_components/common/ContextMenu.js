@@ -11,6 +11,7 @@ export default function ContextMenu({
 }) {
   const [hidden, setHidden] = useState(true);
   const opensUpward = position.top !== undefined;
+  const overlapsTrigger = position.overlap === true;
 
   useEffect(() => {
     let hide = null;
@@ -26,7 +27,7 @@ export default function ContextMenu({
     return (
       <>
         <div
-          className={`absolute z-50 min-w-[120px] ${opensUpward ? '-translate-y-full origin-bottom-right' : 'translate-y-full origin-top-right'} ${show ? 'animate-[scale-in_.25s_forwards_ease-in-out]' : 'animate-[scale-out_.25s_forwards_ease-in-out]'}`}
+          className={`absolute z-50 min-w-[120px] ${overlapsTrigger ? 'origin-top-right' : opensUpward ? '-translate-y-full origin-bottom-right' : 'translate-y-full origin-top-right'} ${show ? 'animate-[scale-in_.25s_forwards_ease-in-out]' : 'animate-[scale-out_.25s_forwards_ease-in-out]'}`}
           style={{
             ...(opensUpward ? { top: position.top } : { bottom: position.bottom ?? 0 }),
             right: position.right ?? 0,

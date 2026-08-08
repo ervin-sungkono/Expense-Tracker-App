@@ -274,7 +274,7 @@ export default function SpaceManagement() {
                     show={memberMenuId === member.user_id}
                     hideFn={() => setMemberMenuId(null)}
                     hideOnItemClick
-                    position={{ top: -2, right: 8 }}
+                    position={{ top: 0, right: 8, overlap: true }}
                   />
                 )}
               </div>
