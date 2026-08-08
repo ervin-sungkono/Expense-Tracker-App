@@ -32,6 +32,7 @@ export function AppProvider({ children }) {
   const [pendingCount, setPendingCount] = useState(0);
   const [localContextReady, setLocalContextReady] = useState(false);
   const localInitialization = useRef({ key: null, promise: null });
+  const newlyCreatedSpaceIds = useRef(new Set());
   const spacesRequest = useRef(0);
 
   const loadProfile = useCallback(
@@ -143,6 +144,7 @@ export function AppProvider({ children }) {
       if (error) throw error;
       spacesRequest.current += 1;
       const createdSpace = { ...data, role: 'admin' };
+      newlyCreatedSpaceIds.current.add(data.id);
       setSpaces(current => [createdSpace, ...current.filter(space => space.id !== data.id)]);
       setActiveSpaceIdState(data.id);
       setSpacesLoading(false);
@@ -192,7 +194,9 @@ export function AppProvider({ children }) {
             spaceId: activeSpace.id,
             role: activeSpace.role,
           });
-          if (activeSpace.role === 'admin') await db.seedCategories(getCategories());
+          if (newlyCreatedSpaceIds.current.delete(activeSpace.id)) {
+            await db.seedCategories(getCategories());
+          }
           return (await db.getPendingMutations(user.id, activeSpace.id)).length;
         })(),
       };
