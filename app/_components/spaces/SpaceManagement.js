@@ -1,8 +1,10 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { IoMdMore as MoreIcon } from 'react-icons/io';
 import { IoChevronDown as DownIcon } from 'react-icons/io5';
 import Button from '../common/Button';
+import ContextMenu from '../common/ContextMenu';
 import InputField from '../common/InputField';
 import { useAuth, useSpace } from '../providers/AppProvider';
 
@@ -15,9 +17,11 @@ async function invitationTokenHash(token) {
 
 export default function SpaceManagement() {
   const { supabase, user } = useAuth();
-  const { activeSpace, canManageSpace, spaces, createSpace } = useSpace();
+  const { activeSpace, canManageSpace, spaces, createSpace, refreshSpaces } = useSpace();
   const [members, setMembers] = useState([]);
   const [membersError, setMembersError] = useState('');
+  const [memberMenuId, setMemberMenuId] = useState(null);
+  const [memberActionId, setMemberActionId] = useState(null);
   const [link, setLink] = useState('');
   const [message, setMessage] = useState('');
   const [busy, setBusy] = useState(false);
@@ -141,6 +145,60 @@ export default function SpaceManagement() {
     setBusy(false);
   }
 
+  async function updateMember(member, updates, successMessage) {
+    if (!activeSpace || memberActionId) return;
+
+    setMemberActionId(member.user_id);
+    setMemberMenuId(null);
+    setMessage('');
+    const { data, error } = await supabase
+      .from('space_members')
+      .update(updates)
+      .eq('space_id', activeSpace.id)
+      .eq('user_id', member.user_id)
+      .select('user_id,role,status,revoked_at')
+      .single();
+
+    if (error || !data) {
+      setMessage(error?.message ?? 'Unable to update member. Please try again.');
+      setMemberActionId(null);
+      return false;
+    }
+
+    setMembers(current =>
+      data.status === 'active'
+        ? current.map(item => (item.user_id === data.user_id ? { ...item, ...data } : item))
+        : current.filter(item => item.user_id !== data.user_id)
+    );
+    setMessage(successMessage);
+    setMemberActionId(null);
+    return true;
+  }
+
+  function handleRoleChange(member, role) {
+    updateMember(member, { role, revoked_at: null }, 'Member role updated.');
+  }
+
+  function handleRemoveMember(member) {
+    updateMember(
+      member,
+      { status: 'revoked', revoked_at: new Date().toISOString() },
+      'Member removed from this space.'
+    );
+  }
+
+  async function handleLeaveSpace() {
+    const currentMember = members.find(member => member.user_id === user?.id);
+    if (!currentMember || currentMember.role === 'admin') return;
+
+    const leftSpace = await updateMember(
+      currentMember,
+      { status: 'revoked', revoked_at: new Date().toISOString() },
+      'You left this space.'
+    );
+    if (leftSpace) await refreshSpaces();
+  }
+
   return (
     <div className="flex flex-col gap-6">
       <section className="flex flex-col gap-3">
@@ -159,13 +217,78 @@ export default function SpaceManagement() {
       </section>
       <section className="flex flex-col gap-3">
         <h2 className="text-lg font-bold">Members</h2>
-        {members.map(member => (
-          <div key={member.user_id} className="flex justify-between border-b py-2 text-sm">
-            <span>{member.profile?.display_name ?? member.user_id}</span>
-            <span className="capitalize">{member.role}</span>
-          </div>
-        ))}
+        <div className="overflow-hidden rounded-lg bg-light py-1.5 dark:bg-neutral-800">
+          {members.map(member => {
+            const memberName = member.profile?.display_name ?? member.user_id;
+            const isCurrentUser = member.user_id === user?.id;
+            const canManageMember = canManageSpace && !isCurrentUser;
+            const isUpdating = memberActionId === member.user_id;
+            const memberActions = [
+              member.role !== 'collaborator' && {
+                label: 'Make collaborator',
+                onClick: () => handleRoleChange(member, 'collaborator'),
+              },
+              member.role !== 'viewer' && {
+                label: 'Make viewer',
+                onClick: () => handleRoleChange(member, 'viewer'),
+              },
+              {
+                label: 'Remove member',
+                onClick: () => handleRemoveMember(member),
+              },
+            ].filter(Boolean);
+
+            return (
+              <div
+                key={member.user_id}
+                className="relative flex items-center gap-3 border-b border-dark/10 px-4 py-3 last:border-b-0 dark:border-white/10"
+              >
+                <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-ocean-blue font-semibold text-white">
+                  {memberName.charAt(0).toUpperCase()}
+                </span>
+                <div className="min-w-0 grow">
+                  <p className="truncate text-sm font-semibold md:text-base">{memberName}</p>
+                  <p className="text-xs capitalize text-dark/70 dark:text-white/70">
+                    {member.role}
+                  </p>
+                </div>
+                {canManageMember && (
+                  <button
+                    type="button"
+                    aria-label={`Manage ${memberName}`}
+                    disabled={isUpdating}
+                    onClick={() =>
+                      setMemberMenuId(current =>
+                        current === member.user_id ? null : member.user_id
+                      )
+                    }
+                    className="rounded p-1 text-dark/80 transition-colors hover:bg-dark/10 disabled:opacity-50 dark:text-white/80 dark:hover:bg-white/10"
+                  >
+                    <MoreIcon className="text-xl" />
+                  </button>
+                )}
+                {canManageMember && (
+                  <ContextMenu
+                    items={memberActions}
+                    show={memberMenuId === member.user_id}
+                    hideFn={() => setMemberMenuId(null)}
+                    hideOnItemClick
+                    position={{ bottom: -2, right: 8 }}
+                  />
+                )}
+              </div>
+            );
+          })}
+        </div>
         {membersError && <p className="text-sm text-red-500">{membersError}</p>}
+        {!canManageSpace && (
+          <Button
+            label={memberActionId === user?.id ? 'Leavingâ€¦' : 'Leave space'}
+            style="danger"
+            contained
+            onClick={handleLeaveSpace}
+          />
+        )}
       </section>
       {canManageSpace && (
         <section className="flex flex-col gap-3">

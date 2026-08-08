@@ -248,6 +248,8 @@ create policy profiles_update on public.profiles for update to authenticated usi
 create policy spaces_select on public.spaces for select to authenticated using (private.is_active_space_member(id));
 create policy spaces_update on public.spaces for update to authenticated using (owner_id = (select auth.uid())) with check (owner_id = (select auth.uid()));
 create policy members_select on public.space_members for select to authenticated using (private.is_active_space_member(space_id));
+create policy members_manage on public.space_members for update to authenticated using (private.is_space_owner(space_id) and user_id <> (select auth.uid())) with check (private.is_space_owner(space_id) and user_id <> (select auth.uid()));
+create policy members_leave on public.space_members for update to authenticated using (user_id = (select auth.uid()) and role <> 'admin' and status = 'active') with check (user_id = (select auth.uid()) and role <> 'admin' and status = 'revoked' and revoked_at is not null);
 create policy records_select on public.space_records for select to authenticated using (private.is_active_space_member(space_id));
 create policy records_insert on public.space_records for insert to authenticated with check (private.current_space_role(space_id) = 'admin' or (private.current_space_role(space_id) = 'collaborator' and entity_type = 'transaction'));
 create policy records_update on public.space_records for update to authenticated using (private.current_space_role(space_id) = 'admin' or (private.current_space_role(space_id) = 'collaborator' and entity_type = 'transaction')) with check (private.current_space_role(space_id) = 'admin' or (private.current_space_role(space_id) = 'collaborator' and entity_type = 'transaction'));
@@ -258,7 +260,7 @@ create policy invitations_update on public.space_invitations for update to authe
 revoke all on all tables in schema public from anon;
 grant select, insert, update on public.profiles to authenticated;
 grant select, update on public.spaces to authenticated;
-grant select on public.space_members to authenticated;
+grant select, update on public.space_members to authenticated;
 grant select, insert, update on public.space_records to authenticated;
 grant select, insert, update on public.space_invitations to authenticated;
 grant usage, select on sequence public.space_revision_seq to authenticated;
