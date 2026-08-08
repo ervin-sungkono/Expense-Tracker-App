@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { IoMdMore as MoreIcon } from 'react-icons/io';
 import { IoChevronDown as DownIcon } from 'react-icons/io5';
+import { toast } from 'react-toastify';
 import Button from '../common/Button';
 import ContextMenu from '../common/ContextMenu';
 import InputField from '../common/InputField';
@@ -160,7 +161,7 @@ export default function SpaceManagement() {
       .single();
 
     if (error || !data) {
-      setMessage(error?.message ?? 'Unable to update member. Please try again.');
+      toast.error(error?.message ?? 'Unable to update member. Please try again.');
       setMemberActionId(null);
       return false;
     }
@@ -170,7 +171,7 @@ export default function SpaceManagement() {
         ? current.map(item => (item.user_id === data.user_id ? { ...item, ...data } : item))
         : current.filter(item => item.user_id !== data.user_id)
     );
-    setMessage(successMessage);
+    toast.success(successMessage);
     setMemberActionId(null);
     return true;
   }
@@ -217,7 +218,7 @@ export default function SpaceManagement() {
       </section>
       <section className="flex flex-col gap-3">
         <h2 className="text-lg font-bold">Members</h2>
-        <div className="overflow-hidden rounded-lg bg-light py-1.5 dark:bg-neutral-800">
+        <div className="rounded-lg bg-light py-1.5 dark:bg-neutral-800">
           {members.map(member => {
             const memberName = member.profile?.display_name ?? member.user_id;
             const isCurrentUser = member.user_id === user?.id;
@@ -262,7 +263,7 @@ export default function SpaceManagement() {
                         current === member.user_id ? null : member.user_id
                       )
                     }
-                    className="rounded p-1 text-dark/80 transition-colors hover:bg-dark/10 disabled:opacity-50 dark:text-white/80 dark:hover:bg-white/10"
+                    className="rounded-full p-1 text-dark/80 transition-colors hover:bg-dark/10 active:bg-dark/20 disabled:opacity-50 dark:text-white/80 dark:hover:bg-white/10 dark:active:bg-white/20"
                   >
                     <MoreIcon className="text-xl" />
                   </button>
@@ -273,7 +274,7 @@ export default function SpaceManagement() {
                     show={memberMenuId === member.user_id}
                     hideFn={() => setMemberMenuId(null)}
                     hideOnItemClick
-                    position={{ bottom: -2, right: 8 }}
+                    position={{ top: -2, right: 8 }}
                   />
                 )}
               </div>
