@@ -12,8 +12,13 @@ ChartJS.defaults.font.style = 'normal';
 ChartJS.defaults.font.weight = 700;
 ChartJS.register(ArcElement, Tooltip, Legend);
 
-export default function TransactionChart({ transactionData = [] }) {
-  const categories = useLiveQuery(() => db.getAllCategories());
+export default function TransactionChart({ transactionData = [], categories: suppliedCategories }) {
+  const localCategories = useLiveQuery(
+    () => (suppliedCategories ? suppliedCategories : db.getAllCategories()),
+    [suppliedCategories],
+    []
+  );
+  const categories = suppliedCategories ?? localCategories;
   const [labels, setLabels] = useState(null);
   const [data, setData] = useState(null);
   const [chartData, setChartData] = useState(null);

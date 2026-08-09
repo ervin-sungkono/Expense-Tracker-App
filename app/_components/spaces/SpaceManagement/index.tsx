@@ -24,6 +24,9 @@ export default function SpaceManagement() {
   const [memberMenuId, setMemberMenuId] = useState(null);
   const [memberActionId, setMemberActionId] = useState(null);
   const [link, setLink] = useState('');
+  const [publicLink, setPublicLink] = useState('');
+  const [publicShare, setPublicShare] = useState(null);
+  const [publicShareBusy, setPublicShareBusy] = useState(false);
   const [message, setMessage] = useState('');
   const [busy, setBusy] = useState(false);
 
@@ -86,6 +89,33 @@ export default function SpaceManagement() {
     };
   }, [activeSpace, supabase]);
 
+  useEffect(() => {
+    if (!activeSpace || !canManageSpace) {
+      setPublicShare(null);
+      setPublicLink('');
+      return;
+    }
+
+    let cancelled = false;
+    fetch(`/api/public-shares?spaceId=${encodeURIComponent(activeSpace.id)}`, {
+      cache: 'no-store',
+    })
+      .then(async response => {
+        if (!response.ok) throw new Error('Unable to load public sharing.');
+        return response.json();
+      })
+      .then(status => {
+        if (!cancelled) setPublicShare(status);
+      })
+      .catch(() => {
+        if (!cancelled) setPublicShare(null);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [activeSpace, canManageSpace]);
+
   async function handleCreateSpace(event) {
     event.preventDefault();
     const name = new FormData(event.currentTarget).get('spaceName')?.toString().trim();
@@ -144,6 +174,59 @@ export default function SpaceManagement() {
       setMessage('Email is unavailable; copy and send the link.');
     }
     setBusy(false);
+  }
+
+  async function createPublicLink() {
+    if (!activeSpace || publicShareBusy) return;
+    setPublicShareBusy(true);
+    try {
+      const response = await fetch('/api/public-shares', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ spaceId: activeSpace.id }),
+      });
+      const result = await response.json();
+      if (!response.ok || !result.token)
+        throw new Error(result.error ?? 'Unable to create public link.');
+      setPublicShare(result);
+      setPublicLink(`${window.location.origin}/share/${encodeURIComponent(result.token)}`);
+      toast.success('Public link created. Copy it before leaving this page.');
+    } catch (error) {
+      toast.error(error.message ?? 'Unable to create public link.');
+    } finally {
+      setPublicShareBusy(false);
+    }
+  }
+
+  async function revokePublicLink() {
+    if (!activeSpace || publicShareBusy) return;
+    setPublicShareBusy(true);
+    try {
+      const response = await fetch('/api/public-shares', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ spaceId: activeSpace.id }),
+      });
+      const result = await response.json();
+      if (!response.ok) throw new Error(result.error ?? 'Unable to disable public link.');
+      setPublicShare(result);
+      setPublicLink('');
+      toast.success('Public link disabled.');
+    } catch (error) {
+      toast.error(error.message ?? 'Unable to disable public link.');
+    } finally {
+      setPublicShareBusy(false);
+    }
+  }
+
+  async function copyPublicLink() {
+    if (!publicLink) return;
+    try {
+      await navigator.clipboard.writeText(publicLink);
+      toast.success('Public link copied.');
+    } catch {
+      toast.error('Unable to copy the public link.');
+    }
   }
 
   async function updateMember(member, updates, successMessage) {
@@ -338,6 +421,56 @@ export default function SpaceManagement() {
               />
             </div>
           )}
+        </section>
+      )}
+      {canManageSpace && (
+        <section className="flex flex-col gap-3">
+          <div>
+            <h2 className="text-lg font-bold">Public sharing</h2>
+            <p className="text-sm text-dark/70 dark:text-white/70">
+              Anyone with this link can view this space&apos;s summary, charts, budgets, and
+              transactions. No sign-in is required.
+            </p>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            <Button
+              type="button"
+              contained
+              label={
+                publicShareBusy
+                  ? 'Working…'
+                  : publicShare?.active
+                    ? 'Regenerate link'
+                    : 'Create public link'
+              }
+              onClick={createPublicLink}
+            />
+            {publicShare?.active && (
+              <Button
+                type="button"
+                contained
+                style="danger"
+                label="Disable link"
+                onClick={revokePublicLink}
+              />
+            )}
+          </div>
+          {publicLink ? (
+            <div className="flex flex-col gap-2">
+              <input
+                readOnly
+                value={publicLink}
+                aria-label="Public sharing link"
+                className="w-full rounded border bg-transparent p-2 text-xs"
+              />
+              <Button type="button" label="Copy public link" contained onClick={copyPublicLink} />
+            </div>
+          ) : publicShare?.active ? (
+            <p className="text-sm text-dark/70 dark:text-white/70">
+              The current link is hidden for security. Regenerate it to receive a new copyable link;
+              the previous link will stop working.
+            </p>
+          ) : null}
         </section>
       )}
       {message && <p className="text-sm">{message}</p>}

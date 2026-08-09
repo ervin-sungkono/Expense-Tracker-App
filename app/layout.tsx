@@ -1,9 +1,8 @@
 import { Inter } from 'next/font/google';
 import './globals.css';
-import { ThemeProvider } from 'next-themes';
 import ToastComponent from '@components/toast/Toast';
-import { AppProvider } from '@components/providers/AppProvider';
 import Analytics from '@components/providers/Analytics';
+import RootProviders from '@components/providers/RootProviders';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -17,9 +16,7 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={inter.className}>
-        <ThemeProvider enableColorScheme enableSystem>
-          <AppProvider>{children}</AppProvider>
-        </ThemeProvider>
+        <RootProviders>{children}</RootProviders>
         <ToastComponent />
         <Analytics />
       </body>

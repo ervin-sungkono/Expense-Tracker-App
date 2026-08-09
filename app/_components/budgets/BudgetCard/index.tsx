@@ -9,7 +9,13 @@ import BudgetProgress from '../BudgetProgress';
 import Dialog from '../../common/Dialog';
 import InfoBudgetContent from '../InfoBudgetContent';
 
-function BudgetCard({ budget, style }) {
+function BudgetCard({
+  budget,
+  style,
+  category: suppliedCategory,
+  transactions: suppliedTransactions,
+  readOnly = false,
+}) {
   const { amount, categoryId, start_date, end_date } = budget;
   const [totalTransaction, setTotalTransaction] = useState(0);
   const [showInfo, setShowInfo] = useState(false);
@@ -20,20 +26,24 @@ function BudgetCard({ budget, style }) {
   const totalDays = getDayDifference(start_date, end_date);
   const remainingDays = Math.max(0, Math.min(getDayDifference(todayDate, end_date), totalDays));
 
-  const category = useLiveQuery(() => db.getCategoryById(categoryId), [categoryId]);
-  const transactions = useLiveQuery(
-    () => db.getTransactionsRange(start_date, end_date, categoryId),
-    [categoryId]
+  const localCategory = useLiveQuery(
+    () => (suppliedCategory ? suppliedCategory : db.getCategoryById(categoryId)),
+    [categoryId, suppliedCategory]
   );
+  const localTransactions = useLiveQuery(
+    () =>
+      suppliedTransactions
+        ? suppliedTransactions
+        : db.getTransactionsRange(start_date, end_date, categoryId),
+    [categoryId, start_date, end_date, suppliedTransactions]
+  );
+  const category = suppliedCategory ?? localCategory;
+  const transactions = suppliedTransactions ?? localTransactions;
 
   useEffect(() => {
-    if (transactions && transactions.length > 0) {
-      const sum = transactions.reduce((acc, transaction) => {
-        return (acc += transaction.amount);
-      }, 0);
-
-      setTotalTransaction(sum);
-    }
+    setTotalTransaction(
+      transactions?.reduce((acc, transaction) => acc + Number(transaction.amount || 0), 0) ?? 0
+    );
   }, [transactions]);
 
   if (!transactions || !category) {
@@ -48,16 +58,18 @@ function BudgetCard({ budget, style }) {
   return (
     <div style={style} className="pb-3">
       <div
-        onClick={() => setShowInfo(true)}
-        className="cursor-pointer flex gap-2 md:gap-4 px-4 py-4 rounded-lg bg-light dark:bg-neutral-800 active:scale-95 transition-transform duration-150 ease-in-out"
+        onClick={readOnly ? undefined : () => setShowInfo(true)}
+        className={`${readOnly ? '' : 'cursor-pointer active:scale-95'} flex gap-2 md:gap-4 px-4 py-4 rounded-lg bg-light dark:bg-neutral-800 transition-transform duration-150 ease-in-out`}
       >
         <div className="relative w-8 h-8 md:w-10 md:h-10 flex shrink-0 justify-center items-center bg-ocean-blue rounded-full">
-          <Image
-            className="object-contain p-1.5 md:p-2"
-            src={`./category_icons/${category.icon}`}
-            alt=""
-            fill
-          />
+          {category.icon && (
+            <Image
+              className="object-contain p-1.5 md:p-2"
+              src={`/category_icons/${category.icon}`}
+              alt=""
+              fill
+            />
+          )}
         </div>
         <div className="grow">
           <div className="flex items-center gap-2">
@@ -73,18 +85,14 @@ function BudgetCard({ budget, style }) {
           />
         </div>
       </div>
-      <Dialog show={showInfo} hideFn={() => setShowInfo(false)}>
-        <InfoBudgetContent
-          budget={{
-            ...budget,
-            totalTransaction,
-            remainingBudget,
-            remainingDays,
-            category,
-          }}
-          hideFn={() => setShowInfo(false)}
-        />
-      </Dialog>
+      {!readOnly && (
+        <Dialog show={showInfo} hideFn={() => setShowInfo(false)}>
+          <InfoBudgetContent
+            budget={{ ...budget, totalTransaction, remainingBudget, remainingDays, category }}
+            hideFn={() => setShowInfo(false)}
+          />
+        </Dialog>
+      )}
     </div>
   );
 }

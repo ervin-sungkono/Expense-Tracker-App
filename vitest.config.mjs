@@ -24,6 +24,7 @@ export default defineConfig({
         'app/_lib/currency.ts',
         'app/_lib/utils.ts',
         'app/_lib/seeder.ts',
+        'app/_lib/public-share/server.ts',
       ],
       thresholds: {
         lines: 90,

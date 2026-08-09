@@ -40,6 +40,7 @@ export default function TransactionGraph({
   historyLabels,
   type = 'MONTHLY',
   title = '',
+  allowDownload = true,
 }) {
   const [data, setData] = useState(null);
   const [historyData, setHistoryData] = useState(null);
@@ -263,7 +264,11 @@ export default function TransactionGraph({
     }
   }, [labels, data, historyData, type, transactionType]);
 
-  if (transactionData && transactionData.length === 0)
+  if (
+    !transactionData ||
+    !transactionData[transactionType] ||
+    transactionData[transactionType].length === 0
+  )
     return (
       <div className="flex justify-center items-center h-48 xs:h-64 px-3 py-4">
         <p className="text-sm md:text-base text-center text-dark dark:text-white">
@@ -293,9 +298,11 @@ export default function TransactionGraph({
           <div className="w-full h-full rounded-lg bg-neutral-300 dark:bg-neutral-800 animate-pulse"></div>
         </div>
       )}
-      <div className="w-full px-4 my-1 pb-4">
-        <Button label={'Download Report'} onClick={handleDownloadReport} />
-      </div>
+      {allowDownload && (
+        <div className="w-full px-4 my-1 pb-4">
+          <Button label={'Download Report'} onClick={handleDownloadReport} />
+        </div>
+      )}
     </div>
   );
 }
