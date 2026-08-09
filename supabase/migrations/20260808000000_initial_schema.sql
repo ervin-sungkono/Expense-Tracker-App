@@ -342,7 +342,7 @@ create function public.consume_api_rate_limit(
 returns jsonb language plpgsql security definer set search_path = '' as $$
 declare
     bucket private.api_rate_limits;
-    current_time timestamptz := clock_timestamp();
+    now_at timestamptz := clock_timestamp();
     retry_after integer;
     request_allowed boolean := true;
 begin
@@ -361,19 +361,19 @@ begin
 
     if not found then
         insert into private.api_rate_limits (bucket_hash, window_started_at, request_count)
-        values (target_bucket_hash, current_time, 1)
+        values (target_bucket_hash, now_at, 1)
         returning * into bucket;
-    elsif bucket.window_started_at + make_interval(secs => window_seconds) <= current_time then
+    elsif bucket.window_started_at + make_interval(secs => window_seconds) <= now_at then
         update private.api_rate_limits
-        set window_started_at = current_time,
+        set window_started_at = now_at,
             request_count = 1,
-            updated_at = current_time
+            updated_at = now_at
         where bucket_hash = target_bucket_hash
         returning * into bucket;
     elsif bucket.request_count < max_requests then
         update private.api_rate_limits
         set request_count = request_count + 1,
-            updated_at = current_time
+            updated_at = now_at
         where bucket_hash = target_bucket_hash
         returning * into bucket;
     else
@@ -383,7 +383,7 @@ begin
     retry_after := greatest(
         0,
         ceil(extract(epoch from (
-            bucket.window_started_at + make_interval(secs => window_seconds) - current_time
+            bucket.window_started_at + make_interval(secs => window_seconds) - now_at
         )))::integer
     );
 
