@@ -138,6 +138,7 @@ export default function AddTransactionForm({ transaction = {}, onSubmit }) {
       method: 'POST',
       headers: {
         accept: 'application/json',
+        'content-type': 'application/json',
       },
       body: JSON.stringify({
         mimeType,
