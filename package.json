@@ -18,6 +18,7 @@
     "@ducanh2912/next-pwa": "^10.2.9",
     "@formatjs/intl-enumerator": "^1.8.10",
     "@google/genai": "^1.7.0",
+    "@modelcontextprotocol/sdk": "1.30.0",
     "@next/third-parties": "^15.3.2",
     "@supabase/ssr": "0.7.0",
     "@supabase/supabase-js": "2.95.3",
@@ -43,7 +44,8 @@
     "remove-markdown": "^0.6.2",
     "resend": "6.18.1",
     "swiper": "^11.2.6",
-    "use-long-press": "^3.3.0"
+    "use-long-press": "^3.3.0",
+    "zod": "4.4.3"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",

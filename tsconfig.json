@@ -14,14 +14,19 @@
     "isolatedModules": true,
     "jsx": "preserve",
     "incremental": true,
-    "plugins": [{ "name": "next" }],
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ],
     "types": ["vitest/globals"],
     "baseUrl": "app/",
     "paths": {
       "@/*": ["./*"],
       "@components/*": ["_components/*"],
       "@lib/*": ["_lib/*"]
-    }
+    },
+    "allowJs": true
   },
   "include": ["next-env.d.ts", ".next/types/**/*.ts", "**/*.ts", "**/*.tsx"],
   "exclude": ["node_modules"]

@@ -25,7 +25,23 @@ The UI mirrors these permissions, but it is not relied upon for security.
    - `https://YOUR_DOMAIN/auth/callback`
 6. Confirm the private `space-assets` bucket exists after migration.
 
-Never expose `SUPABASE_SECRET_KEY` through a `NEXT_PUBLIC_` variable. It is used only by the invitation acceptance server route.
+Never expose `SUPABASE_SECRET_KEY` through a `NEXT_PUBLIC_` variable. It is used only by server-side
+invitation acceptance and public-share routes.
+
+## Public sharing
+
+Space admins can create a revocable public link from the Space & sharing page. Anyone holding the
+link can view a sanitized, read-only snapshot containing the space summary, charts, budgets, and
+recent transactions; authentication is not required. Notes, shops, members, and sync metadata are
+never returned. The raw bearer token is shown only when a link is created or regenerated, while
+Supabase stores only its SHA-256 hash. Regenerating a link immediately revokes the previous link.
+
+## MCP integration
+
+Xpensed exposes an authenticated remote MCP server for MCP-capable desktop applications, IDEs, and
+local-LLM agent hosts. It supports listing expense data and importing a confirmed, structured Gmail
+expense without sending the email body to Xpensed. See [Xpensed MCP setup](docs/mcp.md), including
+the local LLM host connection guide and OAuth requirements.
 
 ## Environment variables
 

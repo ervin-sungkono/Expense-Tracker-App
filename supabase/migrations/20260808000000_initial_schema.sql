@@ -250,9 +250,33 @@ create policy spaces_update on public.spaces for update to authenticated using (
 create policy members_select on public.space_members for select to authenticated using (private.is_active_space_member(space_id));
 create policy members_manage on public.space_members for update to authenticated using (private.is_space_owner(space_id) and user_id <> (select auth.uid())) with check (private.is_space_owner(space_id) and user_id <> (select auth.uid()));
 create policy members_leave on public.space_members for update to authenticated using (user_id = (select auth.uid()) and role <> 'admin' and status = 'active') with check (user_id = (select auth.uid()) and role <> 'admin' and status = 'revoked' and revoked_at is not null);
-create policy records_select on public.space_records for select to authenticated using (private.is_active_space_member(space_id));
-create policy records_insert on public.space_records for insert to authenticated with check (private.current_space_role(space_id) = 'admin' or (private.current_space_role(space_id) = 'collaborator' and entity_type = 'transaction'));
-create policy records_update on public.space_records for update to authenticated using (private.current_space_role(space_id) = 'admin' or (private.current_space_role(space_id) = 'collaborator' and entity_type = 'transaction')) with check (private.current_space_role(space_id) = 'admin' or (private.current_space_role(space_id) = 'collaborator' and entity_type = 'transaction'));
+create policy records_select on public.space_records for select to authenticated using (
+    private.is_active_space_member(space_id)
+    and (
+        auth.jwt() ->> 'client_id' is null
+        or entity_type in ('transaction', 'category', 'shop')
+    )
+);
+create policy records_insert on public.space_records for insert to authenticated with check (
+    auth.jwt() ->> 'client_id' is null
+    and (
+        private.current_space_role(space_id) = 'admin'
+        or (private.current_space_role(space_id) = 'collaborator' and entity_type = 'transaction')
+    )
+);
+create policy records_update on public.space_records for update to authenticated using (
+    auth.jwt() ->> 'client_id' is null
+    and (
+        private.current_space_role(space_id) = 'admin'
+        or (private.current_space_role(space_id) = 'collaborator' and entity_type = 'transaction')
+    )
+) with check (
+    auth.jwt() ->> 'client_id' is null
+    and (
+        private.current_space_role(space_id) = 'admin'
+        or (private.current_space_role(space_id) = 'collaborator' and entity_type = 'transaction')
+    )
+);
 create policy invitations_select on public.space_invitations for select to authenticated using (private.is_space_owner(space_id));
 create policy invitations_insert on public.space_invitations for insert to authenticated with check (created_by = (select auth.uid()) and private.is_space_owner(space_id));
 create policy invitations_update on public.space_invitations for update to authenticated using (private.is_space_owner(space_id)) with check (private.is_space_owner(space_id));
@@ -276,3 +300,311 @@ grant execute on function private.is_active_space_member(uuid) to authenticated,
 grant execute on function private.current_space_role(uuid) to authenticated, service_role;
 grant execute on function private.is_space_owner(uuid) to authenticated, service_role;
 grant execute on function private.users_share_space(uuid) to authenticated, service_role;
+
+-- MCP-backed Gmail imports and shared API abuse protection.
+create table public.transaction_sources (
+    id uuid primary key default gen_random_uuid(),
+    space_id uuid not null references public.spaces(id) on delete cascade,
+    transaction_id uuid not null unique references public.space_records(id) on delete restrict,
+    imported_by uuid not null references auth.users(id) on delete cascade,
+    provider text not null check (provider = 'gmail'),
+    source_id text not null check (char_length(source_id) between 1 and 512),
+    merchant text not null check (char_length(trim(merchant)) between 1 and 120),
+    currency text not null default 'IDR' check (currency = 'IDR'),
+    created_at timestamptz not null default now(),
+    unique (space_id, imported_by, provider, source_id)
+);
+create index transaction_sources_lookup_idx
+    on public.transaction_sources (space_id, imported_by, provider, source_id);
+
+alter table public.transaction_sources enable row level security;
+create policy transaction_sources_select on public.transaction_sources
+    for select to authenticated
+    using (imported_by = (select auth.uid()) and private.is_active_space_member(space_id));
+
+revoke all on public.transaction_sources from public, anon, authenticated;
+grant select on public.transaction_sources to authenticated;
+
+create table private.api_rate_limits (
+    bucket_hash text primary key check (bucket_hash ~ '^[0-9a-f]{64}$'),
+    window_started_at timestamptz not null,
+    request_count integer not null check (request_count > 0),
+    updated_at timestamptz not null default now()
+);
+create index api_rate_limits_window_idx on private.api_rate_limits (window_started_at);
+revoke all on private.api_rate_limits from public, anon, authenticated, service_role;
+
+create function public.consume_api_rate_limit(
+    target_bucket_hash text,
+    max_requests integer,
+    window_seconds integer
+)
+returns jsonb language plpgsql security definer set search_path = '' as $$
+declare
+    bucket private.api_rate_limits;
+    current_time timestamptz := clock_timestamp();
+    retry_after integer;
+    request_allowed boolean := true;
+begin
+    if target_bucket_hash !~ '^[0-9a-f]{64}$'
+       or max_requests not between 1 and 10000
+       or window_seconds not between 1 and 86400 then
+        raise exception 'Invalid rate limit parameters' using errcode = '22023';
+    end if;
+
+    perform pg_advisory_xact_lock(hashtextextended(target_bucket_hash, 0));
+
+    select * into bucket
+    from private.api_rate_limits
+    where bucket_hash = target_bucket_hash
+    for update;
+
+    if not found then
+        insert into private.api_rate_limits (bucket_hash, window_started_at, request_count)
+        values (target_bucket_hash, current_time, 1)
+        returning * into bucket;
+    elsif bucket.window_started_at + make_interval(secs => window_seconds) <= current_time then
+        update private.api_rate_limits
+        set window_started_at = current_time,
+            request_count = 1,
+            updated_at = current_time
+        where bucket_hash = target_bucket_hash
+        returning * into bucket;
+    elsif bucket.request_count < max_requests then
+        update private.api_rate_limits
+        set request_count = request_count + 1,
+            updated_at = current_time
+        where bucket_hash = target_bucket_hash
+        returning * into bucket;
+    else
+        request_allowed := false;
+    end if;
+
+    retry_after := greatest(
+        0,
+        ceil(extract(epoch from (
+            bucket.window_started_at + make_interval(secs => window_seconds) - current_time
+        )))::integer
+    );
+
+    return jsonb_build_object(
+        'allowed', request_allowed,
+        'limit', max_requests,
+        'remaining', greatest(0, max_requests - bucket.request_count),
+        'retry_after', retry_after
+    );
+end;
+$$;
+
+revoke execute on function public.consume_api_rate_limit(text, integer, integer)
+    from public, anon, authenticated;
+grant execute on function public.consume_api_rate_limit(text, integer, integer)
+    to service_role;
+
+create function private.enforce_mcp_import_rate_limit()
+returns trigger language plpgsql security definer set search_path = '' as $$
+declare
+    caller_id uuid := (select auth.uid());
+    oauth_client_id text := nullif(auth.jwt() ->> 'client_id', '');
+    minute_result jsonb;
+    daily_result jsonb;
+begin
+    if caller_id is null or oauth_client_id is null then
+        raise exception 'MCP OAuth token required' using errcode = '42501';
+    end if;
+
+    minute_result := public.consume_api_rate_limit(
+        encode(extensions.digest(
+            'mcp-import-minute:' || caller_id::text || ':' || oauth_client_id,
+            'sha256'
+        ), 'hex'),
+        30,
+        60
+    );
+    if not (minute_result ->> 'allowed')::boolean then
+        raise exception 'MCP import rate limit exceeded' using errcode = '53300';
+    end if;
+
+    daily_result := public.consume_api_rate_limit(
+        encode(extensions.digest(
+            'mcp-import-daily:' || caller_id::text || ':' || oauth_client_id,
+            'sha256'
+        ), 'hex'),
+        500,
+        86400
+    );
+    if not (daily_result ->> 'allowed')::boolean then
+        raise exception 'MCP import daily limit exceeded' using errcode = '53300';
+    end if;
+
+    return new;
+end;
+$$;
+
+create trigger transaction_sources_mcp_rate_limit
+    before insert on public.transaction_sources
+    for each row execute function private.enforce_mcp_import_rate_limit();
+
+create function public.import_transaction_from_email(
+    target_space_id uuid,
+    gmail_message_id text,
+    transaction_amount numeric,
+    transaction_date date,
+    category_id uuid,
+    merchant_name text,
+    shop_id uuid default null,
+    transaction_remarks text default null,
+    transaction_currency text default 'IDR'
+)
+returns jsonb language plpgsql security definer set search_path = '' as $$
+declare
+    caller_id uuid := (select auth.uid());
+    caller_role text;
+    existing_source public.transaction_sources;
+    category_record public.space_records;
+    shop_record public.space_records;
+    created_transaction public.space_records;
+    transaction_id uuid := gen_random_uuid();
+    transaction_payload jsonb;
+begin
+    if caller_id is null then
+        raise exception 'Authentication required' using errcode = '28000';
+    end if;
+    if nullif(auth.jwt() ->> 'client_id', '') is null
+       or auth.jwt() ->> 'aud' <> 'https://xpensedv2.vercel.app/api/mcp' then
+        raise exception 'MCP OAuth token required' using errcode = '42501';
+    end if;
+
+    caller_role := private.current_space_role(target_space_id);
+    if caller_role is null or caller_role not in ('admin', 'collaborator') then
+        raise exception 'Role cannot create transactions' using errcode = '42501';
+    end if;
+
+    if gmail_message_id is null or char_length(gmail_message_id) not between 1 and 512 then
+        raise exception 'Gmail message ID is invalid' using errcode = '22023';
+    end if;
+    if transaction_amount is null or transaction_amount <= 0 or transaction_amount > 999999999999.99 then
+        raise exception 'Transaction amount is invalid' using errcode = '22023';
+    end if;
+    if merchant_name is null or char_length(trim(merchant_name)) not between 1 and 120 then
+        raise exception 'Merchant is invalid' using errcode = '22023';
+    end if;
+    if transaction_remarks is not null and char_length(transaction_remarks) > 120 then
+        raise exception 'Remarks are too long' using errcode = '22023';
+    end if;
+    if transaction_currency <> 'IDR' then
+        raise exception 'Only IDR is supported' using errcode = '22023';
+    end if;
+
+    perform pg_advisory_xact_lock(
+        hashtextextended(
+            target_space_id::text || ':' || caller_id::text || ':gmail:' || gmail_message_id,
+            0
+        )
+    );
+
+    select * into existing_source
+    from public.transaction_sources
+    where space_id = target_space_id
+      and imported_by = caller_id
+      and provider = 'gmail'
+      and source_id = gmail_message_id;
+
+    if found then
+        return jsonb_build_object(
+            'status', case
+                when exists (
+                    select 1 from public.space_records
+                    where id = existing_source.transaction_id and deleted_at is not null
+                ) then 'already_exists_deleted'
+                else 'already_exists'
+            end,
+            'transaction_id', existing_source.transaction_id
+        );
+    end if;
+
+    select * into category_record
+    from public.space_records
+    where id = category_id
+      and space_id = target_space_id
+      and entity_type = 'category'
+      and deleted_at is null;
+
+    if not found or category_record.payload ->> 'type' <> 'Expense' then
+        raise exception 'An active expense category is required' using errcode = '22023';
+    end if;
+
+    if shop_id is not null then
+        select * into shop_record
+        from public.space_records
+        where id = shop_id
+          and space_id = target_space_id
+          and entity_type = 'shop'
+          and deleted_at is null;
+        if not found then
+            raise exception 'Shop was not found' using errcode = '22023';
+        end if;
+    end if;
+
+    transaction_payload := jsonb_strip_nulls(jsonb_build_object(
+        'amount', transaction_amount,
+        'date', transaction_date::text,
+        'categoryId', category_id,
+        'shopId', shop_id,
+        'type', 'Expense',
+        'merchant', trim(merchant_name),
+        'currency', transaction_currency,
+        'remarks', nullif(trim(transaction_remarks), '')
+    ));
+
+    insert into public.space_records (
+        id,
+        space_id,
+        entity_type,
+        payload,
+        last_mutation_id,
+        created_by,
+        updated_by
+    ) values (
+        transaction_id,
+        target_space_id,
+        'transaction',
+        transaction_payload,
+        gen_random_uuid(),
+        caller_id,
+        caller_id
+    ) returning * into created_transaction;
+
+    insert into public.transaction_sources (
+        space_id,
+        transaction_id,
+        imported_by,
+        provider,
+        source_id,
+        merchant,
+        currency
+    ) values (
+        target_space_id,
+        transaction_id,
+        caller_id,
+        'gmail',
+        gmail_message_id,
+        trim(merchant_name),
+        transaction_currency
+    );
+
+    return jsonb_build_object(
+        'status', 'created',
+        'transaction_id', transaction_id,
+        'version', created_transaction.version,
+        'server_revision', created_transaction.server_revision
+    );
+end;
+$$;
+
+revoke execute on function public.import_transaction_from_email(
+    uuid, text, numeric, date, uuid, text, uuid, text, text
+) from public, anon;
+grant execute on function public.import_transaction_from_email(
+    uuid, text, numeric, date, uuid, text, uuid, text, text
+) to authenticated;
