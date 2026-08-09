@@ -1,0 +1,75 @@
+'use client';
+import InputField from '@components/common/InputField';
+import { useState } from 'react';
+import Button from '@components/common/Button';
+import { StringValidator } from '@lib/validator';
+import { toast } from 'react-toastify';
+import { useAuth } from '@components/providers/AppProvider';
+
+export default function ChangeUsernameForm({ onSubmit }) {
+  const [errorMessage, setErrorMessage] = useState({});
+  const { supabase, user, profile, refreshProfile } = useAuth();
+
+  const validateName = name => {
+    return new StringValidator('Name', name).required().minLength(3).maxLength(25).validate();
+  };
+
+  const handleSubmit = async e => {
+    e.preventDefault();
+
+    const form = e.target;
+    const formData = new FormData(form);
+
+    // Create payload for add transaction
+    const payload = {};
+    for (const [key, value] of formData.entries()) {
+      payload[key] = value;
+    }
+
+    try {
+      let error = {};
+      payload.budget = Number(payload.budget); // ensure that value stored is Number type
+      const { name } = payload;
+
+      error.name = validateName(name);
+
+      setErrorMessage(error);
+      if (Object.values(error).filter(Boolean).length > 0) {
+        return;
+      }
+
+      const { error: updateError } = await supabase
+        .from('profiles')
+        .update({ display_name: name })
+        .eq('id', user.id);
+      if (updateError) throw updateError;
+      await refreshProfile();
+      onSubmit && onSubmit();
+      toast.success('Username changed');
+    } catch (e) {
+      console.log(e);
+      toast.error('Fail to change username');
+    }
+  };
+
+  return (
+    <div className="flex flex-col gap-4">
+      <div className="text-xl font-bold">{'Change Username'}</div>
+      <form onSubmit={handleSubmit}>
+        <div className="flex flex-col gap-4 mb-6">
+          <InputField
+            required
+            name={'name'}
+            label={'New Username'}
+            placeholder={'Enter new username (max 25 characters)'}
+            type={'text'}
+            maxLength={25}
+            defaultValue={profile?.display_name}
+            errorMessage={errorMessage?.name}
+          />
+        </div>
+        <Button type="submit" label={'Update'} />
+      </form>
+    </div>
+  );
+}

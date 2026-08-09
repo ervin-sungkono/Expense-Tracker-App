@@ -12,7 +12,7 @@ export default defineConfig({
   test: {
     environment: 'node',
     globals: true,
-    setupFiles: ['./tests/setup.js'],
+    setupFiles: ['./tests/setup.ts'],
     clearMocks: true,
     restoreMocks: true,
     coverage: {
@@ -20,10 +20,10 @@ export default defineConfig({
       reporter: ['text', 'html'],
       reportsDirectory: './coverage',
       include: [
-        'app/_lib/validator.js',
-        'app/_lib/currency.js',
-        'app/_lib/utils.js',
-        'app/_lib/seeder.js',
+        'app/_lib/validator.ts',
+        'app/_lib/currency.ts',
+        'app/_lib/utils.ts',
+        'app/_lib/seeder.ts',
       ],
       thresholds: {
         lines: 90,
