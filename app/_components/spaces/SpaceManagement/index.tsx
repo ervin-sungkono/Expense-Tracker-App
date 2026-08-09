@@ -284,7 +284,7 @@ export default function SpaceManagement() {
   }
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col gap-6 pb-4">
       <section className="flex flex-col gap-3">
         <h2 className="text-lg font-bold">
           Spaces ({spaces.filter(space => space.owner_id === user?.id).length}/3 owned)
