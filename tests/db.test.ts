@@ -68,6 +68,47 @@ describe('ExpenseDB', () => {
     expect(await db.getPendingMutations(guest.userId, guest.spaceId)).toEqual([]);
   });
 
+  it('preserves the furthest destination sync cursor when rehoming', async () => {
+    const guest = { userId: 'guest-user', spaceId: 'guest-space', role: 'admin' };
+    const account = { userId: 'user-2', spaceId: 'space-2', role: 'admin' };
+    await db.syncCursors.bulkPut([
+      { userId: guest.userId, spaceId: guest.spaceId, serverRevision: 3 },
+      { userId: account.userId, spaceId: account.spaceId, serverRevision: 9 },
+    ]);
+
+    await db.rehomeContext({
+      fromUserId: guest.userId,
+      fromSpaceId: guest.spaceId,
+      toUserId: account.userId,
+      toSpaceId: account.spaceId,
+    });
+
+    expect(await db.getCursor(account.userId, account.spaceId)).toBe(9);
+    expect(await db.getCursor(guest.userId, guest.spaceId)).toBe(0);
+  });
+
+  it('discards only the guest namespace', async () => {
+    const guest = { userId: 'guest-user', spaceId: 'guest-space', role: 'admin' };
+    const account = { userId: 'user-2', spaceId: 'space-2', role: 'admin' };
+    await db.configureContext(guest);
+    await db.addTransaction({ amount: 250, date: new Date(2026, 0, 2) });
+    await db.configureContext(account);
+    await db.addTransaction({ amount: 500, date: new Date(2026, 0, 3) });
+
+    expect(await db.getContextSummary(guest.userId, guest.spaceId)).toMatchObject({
+      transactions: 1,
+      total: 1,
+    });
+    await db.discardContext(guest.userId, guest.spaceId);
+
+    expect(await db.getContextSummary(guest.userId, guest.spaceId)).toMatchObject({ total: 0 });
+    expect(await db.getContextSummary(account.userId, account.spaceId)).toMatchObject({
+      transactions: 1,
+      total: 1,
+    });
+    expect(await db.getContext()).toMatchObject(account);
+  });
+
   it('enforces viewer and collaborator permissions', async () => {
     await db.configureContext({ ...owner, role: 'viewer' });
     await expect(db.addTransaction({ amount: 1 })).rejects.toThrow(

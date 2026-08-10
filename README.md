@@ -138,6 +138,9 @@ Manual acceptance checks:
 6. Attempt to own a fourth space and confirm the database rejects it.
 7. Create concurrent edits on two devices and confirm the local conflict store captures the version conflict instead of silently overwriting it.
 8. Sign in from a fresh browser and confirm the selected space syncs from Supabase.
+9. Start in guest mode, sign in with Google, and verify the migration dialog can import into an
+   admin space, create a private space when fewer than three are owned, defer the decision, or
+   permanently discard only the guest namespace.
 
 For an existing production database, apply every newer migration in `supabase/migrations` in
 filename order from the Supabase SQL Editor. The MCP surface requires

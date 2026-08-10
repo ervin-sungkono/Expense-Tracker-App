@@ -46,7 +46,11 @@ export function AppProvider({ children }) {
   const localInitialization = useRef({ key: null, promise: null });
   const newlyCreatedSpaceIds = useRef(new Set());
   const spacesRequest = useRef(0);
-  const guestMigration = useRef(null);
+  const guestMigrationInFlight = useRef(null);
+  const [guestMigrationPending, setGuestMigrationPending] = useState(false);
+  const [guestMigrationSummary, setGuestMigrationSummary] = useState(null);
+  const [guestMigrationBusy, setGuestMigrationBusy] = useState(false);
+  const [guestMigrationError, setGuestMigrationError] = useState(null);
 
   const loadProfile = useCallback(
     async currentUser => {
@@ -72,7 +76,8 @@ export function AppProvider({ children }) {
           .select('role,status,spaces(*)')
           .eq('user_id', currentUser.id)
           .eq('status', 'active');
-        if (!error && requestId === spacesRequest.current) {
+        if (error) throw error;
+        if (requestId === spacesRequest.current) {
           const nextSpaces = (data ?? []).map(row => ({ ...row.spaces, role: row.role }));
           setSpaces(nextSpaces);
           const stored = window.localStorage.getItem(`activeSpace:${currentUser.id}`);
@@ -91,6 +96,9 @@ export function AppProvider({ children }) {
   const activateGuest = useCallback(() => {
     newlyCreatedSpaceIds.current.add(GUEST_SPACE_ID);
     window.localStorage.setItem(GUEST_SESSION_KEY, 'true');
+    setGuestMigrationPending(false);
+    setGuestMigrationSummary(null);
+    setGuestMigrationError(null);
     setUser(GUEST_USER);
     setProfile(null);
     setOfflineSession(true);
@@ -99,49 +107,26 @@ export function AppProvider({ children }) {
     setSpacesLoading(false);
   }, []);
 
-  const migrateGuestData = useCallback(
-    async currentUser => {
-      if (!supabase || window.localStorage.getItem(GUEST_SESSION_KEY) !== 'true') return null;
-      if (guestMigration.current) return guestMigration.current;
-
-      const migration = (async () => {
-        const { data, error } = await supabase.rpc('create_space', {
-          space_name: 'Imported guest space',
-        });
-        if (error || !data?.id) throw error ?? new Error('Unable to create an imported space.');
-        await db.rehomeContext({
-          fromUserId: GUEST_USER_ID,
-          fromSpaceId: GUEST_SPACE_ID,
-          toUserId: currentUser.id,
-          toSpaceId: data.id,
-        });
-        window.localStorage.removeItem(GUEST_SESSION_KEY);
-        return data;
-      })();
-
-      guestMigration.current = migration;
-      try {
-        return await migration;
-      } finally {
-        if (guestMigration.current === migration) guestMigration.current = null;
-      }
-    },
-    [supabase]
-  );
-
   const loadAuthenticatedUser = useCallback(
     async currentUser => {
-      const importedSpace = await migrateGuestData(currentUser);
+      const hasGuestMigration = window.localStorage.getItem(GUEST_SESSION_KEY) === 'true';
+      setSpaces([]);
+      setActiveSpaceIdState(null);
+      setLocalContextReady(false);
+      setGuestMigrationError(null);
+      setGuestMigrationPending(false);
       setUser(currentUser);
-      setOfflineSession(false);
+      setOfflineSession(hasGuestMigration);
       window.localStorage.setItem('lastAuthenticatedUser', JSON.stringify(currentUser));
       await Promise.all([loadProfile(currentUser), loadSpaces(currentUser)]);
-      if (importedSpace?.id) {
-        setActiveSpaceIdState(importedSpace.id);
-        window.localStorage.setItem(`activeSpace:${currentUser.id}`, importedSpace.id);
+      if (hasGuestMigration) {
+        setGuestMigrationSummary(await db.getContextSummary(GUEST_USER_ID, GUEST_SPACE_ID));
+        setGuestMigrationPending(true);
+      } else {
+        setOfflineSession(false);
       }
     },
-    [loadProfile, loadSpaces, migrateGuestData]
+    [loadProfile, loadSpaces]
   );
 
   useEffect(() => {
@@ -216,7 +201,7 @@ export function AppProvider({ children }) {
   );
 
   const signOut = useCallback(async () => {
-    window.localStorage.removeItem(GUEST_SESSION_KEY);
+    if (user?.is_guest) window.localStorage.removeItem(GUEST_SESSION_KEY);
     if (user?.is_guest || !supabase) {
       setUser(null);
       setProfile(null);
@@ -227,6 +212,85 @@ export function AppProvider({ children }) {
     }
     await supabase.auth.signOut({ scope: 'local' });
   }, [supabase, user]);
+
+  const importGuestData = useCallback(
+    async ({ spaceId, spaceName }) => {
+      if (!supabase || !user || user.is_guest || !guestMigrationPending) return;
+      if (guestMigrationInFlight.current) return guestMigrationInFlight.current;
+
+      const migration = (async () => {
+        setGuestMigrationBusy(true);
+        setGuestMigrationError(null);
+        try {
+          let destination = spaces.find(space => space.id === spaceId);
+          if (spaceId === 'new') {
+            const { data, error } = await supabase.rpc('create_space', {
+              space_name: spaceName,
+            });
+            if (error || !data?.id) throw error ?? new Error('Unable to create the new space.');
+            destination = { ...data, role: 'admin' };
+            newlyCreatedSpaceIds.current.add(data.id);
+            setSpaces(current => [destination, ...current.filter(space => space.id !== data.id)]);
+          }
+
+          if (!destination || destination.role !== 'admin') {
+            throw new Error('Choose an admin space for the complete guest-data import.');
+          }
+
+          await db.rehomeContext({
+            fromUserId: GUEST_USER_ID,
+            fromSpaceId: GUEST_SPACE_ID,
+            toUserId: user.id,
+            toSpaceId: destination.id,
+          });
+          window.localStorage.removeItem(GUEST_SESSION_KEY);
+          setGuestMigrationPending(false);
+          setGuestMigrationSummary(null);
+          setActiveSpaceIdState(destination.id);
+          window.localStorage.setItem(`activeSpace:${user.id}`, destination.id);
+          setOfflineSession(false);
+          return destination;
+        } catch (error) {
+          setGuestMigrationError(error?.message ?? 'Unable to migrate guest data.');
+          throw error;
+        } finally {
+          setGuestMigrationBusy(false);
+        }
+      })();
+
+      guestMigrationInFlight.current = migration;
+      try {
+        return await migration;
+      } finally {
+        if (guestMigrationInFlight.current === migration) guestMigrationInFlight.current = null;
+      }
+    },
+    [guestMigrationPending, spaces, supabase, user]
+  );
+
+  const deferGuestMigration = useCallback(() => {
+    setGuestMigrationPending(false);
+    setGuestMigrationError(null);
+    setOfflineSession(false);
+  }, []);
+
+  const discardGuestData = useCallback(async () => {
+    if (!guestMigrationPending || guestMigrationBusy) return;
+    setGuestMigrationBusy(true);
+    setGuestMigrationError(null);
+    try {
+      await db.discardContext(GUEST_USER_ID, GUEST_SPACE_ID);
+      window.localStorage.removeItem(GUEST_SESSION_KEY);
+      setGuestMigrationPending(false);
+      setGuestMigrationSummary(null);
+      setOfflineSession(false);
+    } catch (error) {
+      setGuestMigrationError(error?.message ?? 'Unable to discard guest data.');
+      throw error;
+    } finally {
+      setGuestMigrationBusy(false);
+    }
+  }, [guestMigrationBusy, guestMigrationPending]);
 
   const createSpace = useCallback(
     async name => {
@@ -336,9 +400,16 @@ export function AppProvider({ children }) {
     authLoading,
     offlineSession,
     isGuest: user?.is_guest === true,
+    guestMigrationPending,
+    guestMigrationSummary,
+    guestMigrationBusy,
+    guestMigrationError,
     startGuest: activateGuest,
     signInWithGoogle,
     signOut,
+    importGuestData,
+    deferGuestMigration,
+    discardGuestData,
     refreshProfile: () => user && !user.is_guest && loadProfile(user),
   };
   const spaceValue = {

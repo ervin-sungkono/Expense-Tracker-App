@@ -7,6 +7,7 @@ import Loading from '@components/layout/Loading';
 import { useAuth, useSpace } from '@components/providers/AppProvider';
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
+import GuestMigrationDialog from '@components/guest/GuestMigrationDialog';
 
 export default function Layout({
   children,
@@ -43,6 +44,7 @@ export default function Layout({
       >
         {children}
       </main>
+      <GuestMigrationDialog />
     </div>
   );
 }

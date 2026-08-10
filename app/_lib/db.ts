@@ -89,15 +89,56 @@ class ExpenseDB extends Dexie {
           }
         }
 
-        const cursor = await this.syncCursors.get([fromUserId, fromSpaceId]);
-        if (cursor) {
+        const sourceCursor = await this.syncCursors.get([fromUserId, fromSpaceId]);
+        const destinationCursor = await this.syncCursors.get([toUserId, toSpaceId]);
+        if (sourceCursor || destinationCursor) {
           await this.syncCursors.delete([fromUserId, fromSpaceId]);
-          await this.syncCursors.put({ ...cursor, userId: toUserId, spaceId: toSpaceId });
+          await this.syncCursors.put({
+            userId: toUserId,
+            spaceId: toSpaceId,
+            serverRevision: Math.max(
+              sourceCursor?.serverRevision ?? 0,
+              destinationCursor?.serverRevision ?? 0
+            ),
+          });
         }
 
         await this.context.put({ id: 'active', userId: toUserId, spaceId: toSpaceId, role: 'admin' });
       }
     );
+  }
+
+  async getContextSummary(userId, spaceId) {
+    const tables = [this.transactions, this.categories, this.budgets, this.shops];
+    const counts = await Promise.all(
+      tables.map(table => table.where('[userId+spaceId]').equals([userId, spaceId]).count())
+    );
+    return {
+      transactions: counts[0],
+      categories: counts[1],
+      budgets: counts[2],
+      shops: counts[3],
+      total: counts.reduce((sum, count) => sum + count, 0),
+    };
+  }
+
+  async discardContext(userId, spaceId) {
+    const tables = [
+      this.transactions,
+      this.categories,
+      this.budgets,
+      this.shops,
+      this.outbox,
+      this.conflicts,
+    ];
+    await this.transaction('rw', ...tables, this.syncCursors, this.context, async () => {
+      for (const table of tables) {
+        await table.where('[userId+spaceId]').equals([userId, spaceId]).delete();
+      }
+      await this.syncCursors.delete([userId, spaceId]);
+      const active = await this.context.get('active');
+      if (active?.userId === userId && active?.spaceId === spaceId) await this.context.delete('active');
+    });
   }
 
   getContext() {
