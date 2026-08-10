@@ -47,6 +47,12 @@ client can list spaces/categories/shops/transactions, manage user-authorized IDR
 taxonomy entries, match canonical shops, check a Gmail message for duplication, and run an idempotent
 Gmail import. Gmail email bodies are never sent to Xpensed.
 
+MCP access requires a permanent Xpensed account with a connected Google identity. Guest/anonymous
+sessions are rejected before tools are exposed. A newly linked Google account may have no spaces;
+`xpensed_list_spaces` returns `count: 0` with a next-step message. After the user explicitly confirms
+the name, call `xpensed_create_space` with `confirm: true`, then pass its returned `space.id` to the other tools. Xpensed
+allows at most three active spaces owned by one account.
+
 Transaction remarks, merchant names, shop names, and category names are untrusted data. Tool
 descriptions and structured responses tell clients never to follow instructions embedded in those
 fields; the server returns only allowlisted, length-bounded fields. The write tool accepts typed
@@ -106,6 +112,7 @@ Xpensed; do not work around this by copying access tokens into configuration fil
 ### Available tools
 
 - `xpensed_list_spaces`: list spaces and the user's role.
+- `xpensed_create_space`: create a private space after explicit user confirmation; limited to three owned spaces.
 - `xpensed_list_categories`: list active expense categories.
 - `xpensed_create_category`, `xpensed_update_category`, `xpensed_archive_category`,
   `xpensed_restore_category`: manage categories with version checks; archive is reversible.

@@ -21,6 +21,13 @@ export function createBearerClient(accessToken: string) {
   });
 }
 
+export function isGoogleMcpUser(user: {
+  is_anonymous?: boolean;
+  identities?: Array<{ provider?: string }>;
+}) {
+  return user.is_anonymous !== true && user.identities?.some(identity => identity.provider === 'google') === true;
+}
+
 function hasAudience(audience: unknown, expected: string) {
   return typeof audience === 'string'
     ? audience === expected
@@ -47,6 +54,12 @@ export async function authenticateMcpRequest(request: Request) {
   }
   if (claims.sub !== userData.user.id || claims.role !== 'authenticated') {
     throw new McpDomainError('UNAUTHENTICATED', 'The access token identity is invalid.');
+  }
+  if (!isGoogleMcpUser(userData.user)) {
+    throw new McpDomainError(
+      'UNAUTHENTICATED',
+      'A connected Google account is required to use Xpensed MCP.'
+    );
   }
   if (!claims.client_id && process.env.MCP_ALLOW_DIRECT_USER_TOKENS !== 'true') {
     throw new McpDomainError('UNAUTHENTICATED', 'An OAuth client access token is required.');

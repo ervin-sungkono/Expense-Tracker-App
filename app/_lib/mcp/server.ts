@@ -8,6 +8,8 @@ import {
   createShopInput,
   createTransactionOutput,
   createTransactionInput,
+  createSpaceInput,
+  createSpaceOutput,
   findTransactionBySourceInput,
   getTransactionInput,
   listCategoriesInput,
@@ -63,12 +65,30 @@ export function createExpenseMcpServer(context: McpAuthContext) {
     'xpensed_list_spaces',
     {
       title: 'List Xpensed spaces',
-      description: 'List spaces available to the authenticated Xpensed user and their role.',
+      description:
+        'List spaces available to the connected Google account and their role. If count is zero, ask the user for confirmation before using xpensed_create_space.',
       inputSchema: listSpacesInput,
       outputSchema: pageOutput,
       annotations: readAnnotations,
     },
     wrap(input => repository.listSpaces(input as any))
+  );
+
+  server.registerTool(
+    'xpensed_create_space',
+    {
+      title: 'Create Xpensed space',
+      description:
+        'Create one private Xpensed space only after the user explicitly confirms the name and creation. Never infer permission from a request to list spaces. The account may own at most three active spaces.',
+      inputSchema: createSpaceInput,
+      outputSchema: createSpaceOutput,
+      annotations: {
+        ...readAnnotations,
+        readOnlyHint: false,
+        idempotentHint: false,
+      },
+    },
+    wrap(input => repository.createSpace(input as any))
   );
 
   server.registerTool(

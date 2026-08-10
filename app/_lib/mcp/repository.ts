@@ -4,7 +4,7 @@ import { decodeCursor, encodeCursor } from './schemas';
 
 type PageInput = { limit: number; cursor?: string };
 
-function page<T>(rows: T[], limit: number, offset: number) {
+function page<T>(rows: T[], limit: number, offset: number, emptyMessage?: string) {
   const hasMore = rows.length > limit;
   const items = hasMore ? rows.slice(0, limit) : rows;
   return {
@@ -14,6 +14,7 @@ function page<T>(rows: T[], limit: number, offset: number) {
     items,
     has_more: hasMore,
     next_cursor: hasMore ? encodeCursor(offset + limit) : null,
+    ...(emptyMessage && rows.length === 0 && offset === 0 ? { message: emptyMessage } : {}),
   };
 }
 
@@ -92,7 +93,28 @@ export class ExpenseMcpRepository {
       ...membership.spaces,
       role: membership.role,
     }));
-    return page(rows, limit, offset);
+    return page(
+      rows,
+      limit,
+      offset,
+      'No Xpensed spaces are available yet. Ask the user for confirmation, then use xpensed_create_space to create one before using space-specific tools.'
+    );
+  }
+
+  async createSpace(input: { name: string }) {
+    const { data, error } = await this.supabase.rpc('create_space', {
+      space_name: input.name,
+    });
+    if (error) throw mapSupabaseError(error);
+    if (!data?.id) throw new McpDomainError('INTERNAL_ERROR', 'The space could not be created.');
+    return {
+      created: true as const,
+      space: {
+        id: data.id,
+        name: safeText(data.name, 60) || input.name,
+        role: 'admin' as const,
+      },
+    };
   }
 
   async listCategories(input: PageInput & { space_id: string; query?: string; type: 'Expense' }) {

@@ -10,6 +10,19 @@ export const listSpacesInput = {
   cursor: cursorSchema,
 };
 
+export const createSpaceInput = {
+  name: z
+    .string()
+    .trim()
+    .min(1)
+    .max(60)
+    .regex(/^[^\u0000-\u001f\u007f]*$/)
+    .describe('Name for the new private Xpensed space. Ask the user to confirm before creating it.'),
+  confirm: z
+    .literal(true)
+    .describe('Must be true only after the user explicitly approves creating this space.'),
+};
+
 export const listRecordsInput = {
   space_id: uuidSchema.describe('Xpensed space UUID'),
   query: z
@@ -178,6 +191,16 @@ export const pageOutput = {
   items: z.array(z.record(z.string(), z.unknown())),
   has_more: z.boolean(),
   next_cursor: z.string().nullable(),
+  message: z.string().optional(),
+};
+
+export const createSpaceOutput = {
+  created: z.literal(true),
+  space: z.object({
+    id: uuidSchema,
+    name: z.string(),
+    role: z.literal('admin'),
+  }),
 };
 
 export const sourceLookupOutput = {

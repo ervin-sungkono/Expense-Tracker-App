@@ -22,6 +22,9 @@ export function mapSupabaseError(error: { code?: string; message?: string }) {
   const message = error.message ?? 'The request could not be completed.';
   if (error.code === '28000')
     return new McpDomainError('UNAUTHENTICATED', 'Authentication failed.');
+  if (error.code === '23514' && message.includes('at most three spaces')) {
+    return new McpDomainError('VALIDATION_FAILED', 'You already own the maximum of 3 spaces.');
+  }
   if (error.code === '42501') return new McpDomainError('FORBIDDEN', 'You do not have permission.');
   if (error.code === '53300') {
     return new McpDomainError('RATE_LIMITED', 'Too many mutation attempts. Retry later.');

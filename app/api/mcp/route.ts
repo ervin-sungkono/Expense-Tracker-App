@@ -64,6 +64,15 @@ function callsTransactionWriteTool(message: unknown) {
   });
 }
 
+function callsSpaceWriteTool(message: unknown) {
+  const messages = Array.isArray(message) ? message : [message];
+  return messages.some(item => {
+    if (!item || typeof item !== 'object') return false;
+    const request = item as { method?: unknown; params?: { name?: unknown } };
+    return request.method === 'tools/call' && request.params?.name === 'xpensed_create_space';
+  });
+}
+
 async function handle(request: Request, message: unknown) {
   if (!request.headers.get('authorization')?.startsWith('Bearer ')) {
     try {
@@ -110,6 +119,16 @@ async function handle(request: Request, message: unknown) {
       windowSeconds: 86_400,
     });
     if (isRateLimitResponse(dailyWriteLimit)) return dailyWriteLimit;
+  }
+
+  if (callsSpaceWriteTool(message)) {
+    const spaceLimit = await enforceRateLimit(request, {
+      scope: 'mcp-space-write',
+      subject: `${context.userId}:${context.clientId ?? 'direct'}`,
+      limit: 5,
+      windowSeconds: 60,
+    });
+    if (isRateLimitResponse(spaceLimit)) return spaceLimit;
   }
 
   const origins = allowedOrigins();
