@@ -299,17 +299,12 @@ export class ExpenseMcpRepository {
     return data;
   }
 
-  async createCategory(input: {
-    space_id: string;
-    name: string;
-    parent_id?: string;
-    icon?: string;
-  }) {
+  async createCategory(input: { space_id: string; name: string; parent_id?: string }) {
     const { data, error } = await this.supabase.rpc('create_mcp_category', {
       target_space_id: input.space_id,
       category_name: input.name,
       parent_id: input.parent_id ?? null,
-      category_icon: input.icon ?? null,
+      category_icon: 'sky--weather_star.svg',
     });
     if (error) throw mapSupabaseError(error);
     return data;

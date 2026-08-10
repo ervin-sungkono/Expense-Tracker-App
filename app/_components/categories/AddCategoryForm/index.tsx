@@ -63,6 +63,7 @@ export default function AddCategoryForm({ category = {}, onSubmit }) {
 
     payload.icon = selectedIcon;
     payload.parentId = selectedParent?.id ?? null; // set to null if left unfilled
+    payload.mutable = category.mutable ?? true;
 
     try {
       let error = {};

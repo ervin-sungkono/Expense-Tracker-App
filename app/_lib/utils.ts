@@ -428,3 +428,19 @@ export function detectMimeType(base64 = '') {
 export function getSignedTransactionAmount(amount, type) {
   return type === 'Expense' ? -amount : amount;
 }
+
+export function canEditCategory(category, canManageSpace) {
+  return canManageSpace && category.mutable !== false;
+}
+
+export function shouldOpenMenuUpward(
+  menuHeight,
+  anchorTop,
+  anchorBottom,
+  viewportHeight,
+  padding = 8
+) {
+  const spaceBelow = viewportHeight - anchorBottom - padding;
+  const spaceAbove = anchorTop - padding;
+  return menuHeight > spaceBelow && spaceAbove > spaceBelow;
+}

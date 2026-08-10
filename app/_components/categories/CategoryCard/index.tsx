@@ -6,13 +6,14 @@ import { IoMdMore as MoreIcon } from 'react-icons/io';
 import Image from 'next/image';
 import Dialog from '../../common/Dialog';
 import { useSpace } from '../../providers/AppProvider';
+import { canEditCategory } from '@lib/utils';
 
 const InfoCategoryContent = dynamic(() => import('../InfoCategoryContent'));
 const AddCategoryForm = dynamic(() => import('../AddCategoryForm'));
 const DeleteCategoryForm = dynamic(() => import('../DeleteCategoryForm'));
 
 function CategoryCard({ category, onClick, style, depth = 0 }) {
-  const { id, name, icon, mutable } = category;
+  const { id, name, icon } = category;
   const [showMenu, setShowMenu] = useState(false);
   const [showInfo, setShowInfo] = useState(false);
   const [showEdit, setShowEdit] = useState(false);
@@ -20,7 +21,7 @@ function CategoryCard({ category, onClick, style, depth = 0 }) {
   const { canManageSpace } = useSpace();
 
   const getMutableItems = () => {
-    return mutable && canManageSpace
+    return canEditCategory(category, canManageSpace)
       ? [
           {
             label: 'Edit',
@@ -68,12 +69,14 @@ function CategoryCard({ category, onClick, style, depth = 0 }) {
               <p className="text-sm md:text-base font-semibold grow">{name}</p>
             </div>
             {!onClick && (
-              <div
+              <button
+                type="button"
+                aria-label={`More options for ${name}`}
                 onClick={() => setShowMenu(true)}
                 className="cursor-pointer p-2 rounded-full active:bg-neutral-300/30 dark:active:bg-light/10 transition-colors duration-150 ease-in-out"
               >
                 <MoreIcon size={24} />
-              </div>
+              </button>
             )}
           </div>
         </div>

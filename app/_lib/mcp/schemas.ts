@@ -17,7 +17,9 @@ export const createSpaceInput = {
     .min(1)
     .max(60)
     .regex(/^[^\u0000-\u001f\u007f]*$/)
-    .describe('Name for the new private Xpensed space. Ask the user to confirm before creating it.'),
+    .describe(
+      'Name for the new private Xpensed space. Ask the user to confirm before creating it.'
+    ),
   confirm: z
     .literal(true)
     .describe('Must be true only after the user explicitly approves creating this space.'),
@@ -149,7 +151,6 @@ export const createCategoryInput = {
   space_id: uuidSchema,
   name: taxonomyName,
   parent_id: uuidSchema.optional(),
-  icon: taxonomyText.optional(),
 };
 export const updateCategoryInput = {
   space_id: uuidSchema,
@@ -157,7 +158,6 @@ export const updateCategoryInput = {
   expected_version: z.number().int().positive(),
   name: taxonomyName.optional(),
   parent_id: uuidSchema.nullable().optional(),
-  icon: taxonomyText.nullable().optional(),
 };
 export const categoryMutationInput = {
   space_id: uuidSchema,

@@ -1,4 +1,5 @@
 import {
+  canEditCategory,
   dateToInputValue,
   dateToLocalInput,
   detectMimeType,
@@ -22,6 +23,7 @@ import {
   isInAmountRange,
   isInDateRange,
   nFormatter,
+  shouldOpenMenuUpward,
 } from '@lib/utils';
 
 describe('utility helpers', () => {
@@ -95,6 +97,14 @@ describe('utility helpers', () => {
   it('treats expenses as negative transaction totals', () => {
     expect(getSignedTransactionAmount(11000, 'Expense')).toBe(-11000);
     expect(getSignedTransactionAmount(11000, 'Income')).toBe(11000);
+  });
+
+  it('keeps explicit system categories read-only and flips menus when space below is insufficient', () => {
+    expect(canEditCategory({}, true)).toBe(true);
+    expect(canEditCategory({ mutable: false }, true)).toBe(false);
+    expect(canEditCategory({}, false)).toBe(false);
+    expect(shouldOpenMenuUpward(120, 600, 656, 700)).toBe(true);
+    expect(shouldOpenMenuUpward(120, 100, 156, 700)).toBe(false);
   });
 
   it('detects supported image formats', () => {

@@ -1,5 +1,6 @@
 'use client';
-import { useState, useEffect } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { shouldOpenMenuUpward } from '@lib/utils';
 
 export default function ContextMenu({
   items = [],
@@ -10,7 +11,10 @@ export default function ContextMenu({
   position = {},
 }) {
   const [hidden, setHidden] = useState(true);
-  const opensUpward = position.top !== undefined;
+  const [autoOpensUpward, setAutoOpensUpward] = useState(false);
+  const menuRef = useRef(null);
+  const hasExplicitVerticalPosition = position.top !== undefined || position.bottom !== undefined;
+  const explicitlyOpensUpward = position.top !== undefined;
   const overlapsTrigger = position.overlap === true;
 
   useEffect(() => {
@@ -23,13 +27,42 @@ export default function ContextMenu({
     return () => clearTimeout(hide);
   }, [show, hidden]);
 
+  useLayoutEffect(() => {
+    const menu = menuRef.current;
+    const anchor = menu?.parentElement;
+    if (hidden || hasExplicitVerticalPosition || !menu || !anchor) return;
+
+    const anchorRect = anchor.getBoundingClientRect();
+    setAutoOpensUpward(
+      shouldOpenMenuUpward(menu.offsetHeight, anchorRect.top, anchorRect.bottom, window.innerHeight)
+    );
+  }, [hasExplicitVerticalPosition, hidden, items.length]);
+
+  const opensUpward = hasExplicitVerticalPosition ? explicitlyOpensUpward : autoOpensUpward;
+  const placementClass = hasExplicitVerticalPosition
+    ? overlapsTrigger
+      ? 'origin-top-right'
+      : opensUpward
+        ? '-translate-y-full origin-bottom-right'
+        : 'translate-y-full origin-top-right'
+    : opensUpward
+      ? 'origin-bottom-right'
+      : 'origin-top-right';
+
   if (!hidden)
     return (
       <>
         <div
-          className={`absolute z-50 min-w-[120px] ${overlapsTrigger ? 'origin-top-right' : opensUpward ? '-translate-y-full origin-bottom-right' : 'translate-y-full origin-top-right'} ${show ? 'animate-[scale-in_.25s_forwards_ease-in-out]' : 'animate-[scale-out_.25s_forwards_ease-in-out]'}`}
+          ref={menuRef}
+          className={`absolute z-50 min-w-[120px] ${placementClass} ${show ? 'animate-[scale-in_.25s_forwards_ease-in-out]' : 'animate-[scale-out_.25s_forwards_ease-in-out]'}`}
           style={{
-            ...(opensUpward ? { top: position.top } : { bottom: position.bottom ?? 0 }),
+            ...(hasExplicitVerticalPosition
+              ? explicitlyOpensUpward
+                ? { top: position.top }
+                : { bottom: position.bottom }
+              : opensUpward
+                ? { bottom: '100%' }
+                : { top: '100%' }),
             right: position.right ?? 0,
           }}
         >
