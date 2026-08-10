@@ -37,14 +37,29 @@ function allowedOrigins() {
   return getMcpAllowedOrigins();
 }
 
-function callsImportTool(message: unknown) {
+function callsTransactionWriteTool(message: unknown) {
   const messages = Array.isArray(message) ? message : [message];
   return messages.some(item => {
     if (!item || typeof item !== 'object') return false;
     const request = item as { method?: unknown; params?: { name?: unknown } };
     return (
       request.method === 'tools/call' &&
-      request.params?.name === 'xpensed_create_transaction_from_email'
+      typeof request.params?.name === 'string' &&
+      [
+        'xpensed_create_transaction_from_email',
+        'xpensed_create_transaction',
+        'xpensed_update_transaction',
+        'xpensed_archive_transaction',
+        'xpensed_restore_transaction',
+        'xpensed_create_category',
+        'xpensed_update_category',
+        'xpensed_archive_category',
+        'xpensed_restore_category',
+        'xpensed_create_shop',
+        'xpensed_update_shop',
+        'xpensed_archive_shop',
+        'xpensed_restore_shop',
+      ].includes(request.params.name)
     );
   });
 }
@@ -79,9 +94,9 @@ async function handle(request: Request, message: unknown) {
   });
   if (isRateLimitResponse(userLimit)) return userLimit;
 
-  if (callsImportTool(message)) {
+  if (callsTransactionWriteTool(message)) {
     const writeLimit = await enforceRateLimit(request, {
-      scope: 'mcp-import-write',
+      scope: 'mcp-transaction-write',
       subject: `${context.userId}:${context.clientId ?? 'direct'}`,
       limit: 30,
       windowSeconds: 60,
@@ -89,7 +104,7 @@ async function handle(request: Request, message: unknown) {
     if (isRateLimitResponse(writeLimit)) return writeLimit;
 
     const dailyWriteLimit = await enforceRateLimit(request, {
-      scope: 'mcp-import-write-daily',
+      scope: 'mcp-transaction-write-daily',
       subject: `${context.userId}:${context.clientId ?? 'direct'}`,
       limit: 500,
       windowSeconds: 86_400,

@@ -19,7 +19,10 @@ function page<T>(rows: T[], limit: number, offset: number) {
 
 function safeText(value: unknown, maxLength: number) {
   return typeof value === 'string'
-    ? value.replace(/[\u0000-\u001f\u007f]/g, ' ').trim().slice(0, maxLength)
+    ? value
+        .replace(/[\u0000-\u001f\u007f]/g, ' ')
+        .trim()
+        .slice(0, maxLength)
     : null;
 }
 
@@ -58,6 +61,14 @@ function transaction(row: Record<string, any>) {
     merchant: safeText(value.merchant, 120),
     currency: value.currency === 'IDR' ? 'IDR' : null,
     remarks: safeText(value.remarks, 120),
+  };
+}
+
+function transactionWithStatus(row: Record<string, any>) {
+  return {
+    ...transaction(row),
+    server_revision: row.server_revision,
+    status: row.deleted_at ? 'archived' : 'active',
   };
 }
 
@@ -115,13 +126,15 @@ export class ExpenseMcpRepository {
     return page((data ?? []).map(shop), input.limit, offset);
   }
 
-  async listTransactions(input: PageInput & {
-    space_id: string;
-    date_from: string;
-    date_to: string;
-    category_id?: string;
-    shop_id?: string;
-  }) {
+  async listTransactions(
+    input: PageInput & {
+      space_id: string;
+      date_from: string;
+      date_to: string;
+      category_id?: string;
+      shop_id?: string;
+    }
+  ) {
     if (input.date_from > input.date_to) {
       throw new McpDomainError('VALIDATION_FAILED', 'date_from must not be after date_to.');
     }
@@ -143,11 +156,7 @@ export class ExpenseMcpRepository {
     return page((data ?? []).map(transaction), input.limit, offset);
   }
 
-  async findTransactionBySource(input: {
-    space_id: string;
-    provider: 'gmail';
-    source_id: string;
-  }) {
+  async findTransactionBySource(input: { space_id: string; provider: 'gmail'; source_id: string }) {
     const { data, error } = await this.supabase
       .from('transaction_sources')
       .select('transaction_id')
@@ -165,7 +174,7 @@ export class ExpenseMcpRepository {
       .single();
     if (transactionError) throw mapSupabaseError(transactionError);
     return {
-      status: transaction.deleted_at ? ('deleted' as const) : ('active' as const),
+      status: transaction.deleted_at ? ('archived' as const) : ('active' as const),
       transaction_id: data.transaction_id,
     };
   }
@@ -199,5 +208,157 @@ export class ExpenseMcpRepository {
       version?: number;
       server_revision?: number;
     };
+  }
+
+  async getTransaction(input: { space_id: string; transaction_id: string }) {
+    const { data, error } = await this.supabase
+      .from('space_records')
+      .select('id,payload,version,server_revision,deleted_at')
+      .eq('id', input.transaction_id)
+      .eq('space_id', input.space_id)
+      .eq('entity_type', 'transaction')
+      .maybeSingle();
+    if (error) throw mapSupabaseError(error);
+    if (!data) throw new McpDomainError('NOT_FOUND', 'Transaction was not found.');
+    return transactionWithStatus(data);
+  }
+
+  async createTransaction(input: {
+    space_id: string;
+    amount: number;
+    currency: 'IDR';
+    transaction_date: string;
+    category_id: string;
+    merchant: string;
+    shop_id?: string;
+    remarks?: string;
+    idempotency_key?: string;
+  }) {
+    const { data, error } = await this.supabase.rpc('create_mcp_transaction', {
+      target_space_id: input.space_id,
+      transaction_amount: input.amount,
+      transaction_date: input.transaction_date,
+      category_id: input.category_id,
+      merchant_name: input.merchant,
+      shop_id: input.shop_id ?? null,
+      transaction_remarks: input.remarks ?? null,
+      transaction_currency: input.currency,
+      idempotency_key: input.idempotency_key ?? null,
+    });
+    if (error) throw mapSupabaseError(error);
+    return data;
+  }
+
+  async updateTransaction(input: Record<string, unknown>) {
+    const { space_id, transaction_id, expected_version, ...patch } = input as any;
+    const { data, error } = await this.supabase.rpc('update_mcp_transaction', {
+      target_space_id: space_id,
+      target_transaction_id: transaction_id,
+      target_version: expected_version,
+      transaction_patch: patch,
+    });
+    if (error) throw mapSupabaseError(error);
+    return data;
+  }
+
+  async setTransactionArchived(input: {
+    space_id: string;
+    transaction_id: string;
+    expected_version: number;
+    archived: boolean;
+  }) {
+    const { data, error } = await this.supabase.rpc('set_mcp_transaction_archived', {
+      target_space_id: input.space_id,
+      target_transaction_id: input.transaction_id,
+      target_version: input.expected_version,
+      should_archive: input.archived,
+    });
+    if (error) throw mapSupabaseError(error);
+    return data;
+  }
+
+  async createCategory(input: {
+    space_id: string;
+    name: string;
+    parent_id?: string;
+    icon?: string;
+  }) {
+    const { data, error } = await this.supabase.rpc('create_mcp_category', {
+      target_space_id: input.space_id,
+      category_name: input.name,
+      parent_id: input.parent_id ?? null,
+      category_icon: input.icon ?? null,
+    });
+    if (error) throw mapSupabaseError(error);
+    return data;
+  }
+  async updateCategory(input: Record<string, unknown>) {
+    const { space_id, category_id, expected_version, ...patch } = input as any;
+    const { data, error } = await this.supabase.rpc('update_mcp_category', {
+      target_space_id: space_id,
+      target_category_id: category_id,
+      target_version: expected_version,
+      category_patch: patch,
+    });
+    if (error) throw mapSupabaseError(error);
+    return data;
+  }
+  async setCategoryArchived(input: {
+    space_id: string;
+    category_id: string;
+    expected_version: number;
+    archived: boolean;
+  }) {
+    const { data, error } = await this.supabase.rpc('set_mcp_category_archived', {
+      target_space_id: input.space_id,
+      target_category_id: input.category_id,
+      target_version: input.expected_version,
+      should_archive: input.archived,
+    });
+    if (error) throw mapSupabaseError(error);
+    return data;
+  }
+  async createShop(input: { space_id: string; name: string; location?: string }) {
+    const { data, error } = await this.supabase.rpc('create_mcp_shop', {
+      target_space_id: input.space_id,
+      shop_name: input.name,
+      shop_location: input.location ?? null,
+    });
+    if (error) throw mapSupabaseError(error);
+    return data;
+  }
+  async updateShop(input: Record<string, unknown>) {
+    const { space_id, shop_id, expected_version, ...patch } = input as any;
+    const { data, error } = await this.supabase.rpc('update_mcp_shop', {
+      target_space_id: space_id,
+      target_shop_id: shop_id,
+      target_version: expected_version,
+      shop_patch: patch,
+    });
+    if (error) throw mapSupabaseError(error);
+    return data;
+  }
+  async setShopArchived(input: {
+    space_id: string;
+    shop_id: string;
+    expected_version: number;
+    archived: boolean;
+  }) {
+    const { data, error } = await this.supabase.rpc('set_mcp_shop_archived', {
+      target_space_id: input.space_id,
+      target_shop_id: input.shop_id,
+      target_version: input.expected_version,
+      should_archive: input.archived,
+    });
+    if (error) throw mapSupabaseError(error);
+    return data;
+  }
+  async matchShop(input: { space_id: string; merchant: string }) {
+    const { data, error } = await this.supabase.rpc('match_mcp_shop', {
+      target_space_id: input.space_id,
+      merchant_name: input.merchant,
+    });
+    if (error) throw mapSupabaseError(error);
+    return data;
   }
 }

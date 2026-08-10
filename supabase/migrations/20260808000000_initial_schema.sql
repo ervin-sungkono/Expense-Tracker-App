@@ -105,6 +105,22 @@ returns boolean language sql stable security definer set search_path = '' as $$
     );
 $$;
 
+create function private.mcp_access_token_hook(event jsonb)
+returns jsonb language plpgsql stable set search_path = '' as $$
+declare
+    claims jsonb := event -> 'claims';
+begin
+    if nullif(claims ->> 'client_id', '') is not null then
+        claims := jsonb_set(
+            claims,
+            '{aud}',
+            to_jsonb('https://xpensedv2.vercel.app/api/mcp'::text)
+        );
+    end if;
+    return jsonb_build_object('claims', claims);
+end;
+$$;
+
 create function private.touch_updated_at()
 returns trigger language plpgsql set search_path = '' as $$
 begin
@@ -300,6 +316,9 @@ grant execute on function private.is_active_space_member(uuid) to authenticated,
 grant execute on function private.current_space_role(uuid) to authenticated, service_role;
 grant execute on function private.is_space_owner(uuid) to authenticated, service_role;
 grant execute on function private.users_share_space(uuid) to authenticated, service_role;
+grant usage on schema private to supabase_auth_admin;
+revoke execute on function private.mcp_access_token_hook(jsonb) from public, anon, authenticated;
+grant execute on function private.mcp_access_token_hook(jsonb) to supabase_auth_admin;
 
 -- MCP-backed Gmail imports and shared API abuse protection.
 create table public.transaction_sources (

@@ -30,8 +30,8 @@ by the configured Supabase access-token hook.
 
 Every API route fails closed with `503` if the distributed limiter or secret is unavailable. Bucket
 identifiers are HMAC-hashed; raw IP addresses, access tokens, share tokens, and invitation tokens
-are not stored. The Gmail write limit is enforced both at `/api/mcp` and in the database, so direct
-RPC calls cannot bypass it.
+are not stored. MCP write limits are enforced both at `/api/mcp` and in the database, so direct RPC
+calls cannot bypass them.
 
 ## Client connection
 
@@ -43,14 +43,16 @@ https://xpensedv2.vercel.app/.well-known/oauth-protected-resource/api/mcp
 ```
 
 The protected-resource document points clients to Supabase OAuth discovery. After consent, the
-client can list spaces/categories/shops/transactions, check a Gmail message for duplication, and
-create a single idempotent IDR expense. Gmail email bodies are never sent to Xpensed.
+client can list spaces/categories/shops/transactions, manage user-authorized IDR expenses and
+taxonomy entries, match canonical shops, check a Gmail message for duplication, and run an idempotent
+Gmail import. Gmail email bodies are never sent to Xpensed.
 
 Transaction remarks, merchant names, shop names, and category names are untrusted data. Tool
 descriptions and structured responses tell clients never to follow instructions embedded in those
 fields; the server returns only allowlisted, length-bounded fields. The write tool accepts typed
 transaction fields only, never email HTML/body content, URLs, commands, or free-form tool
-instructions. Clients should still show a human confirmation before creating an expense.
+instructions. Direct writes require user intent; clients should show a human confirmation unless a
+narrowly scoped workflow has already been authorized.
 
 ## Connect from a local LLM host
 
@@ -80,7 +82,7 @@ MCP-capable host around that model is responsible for connecting to Xpensed and 
 6. Connect or enable the server. The host should discover Xpensed's OAuth metadata and open a
    browser window.
 7. Sign in to Xpensed, review the requested access, and approve it.
-8. Return to the host and confirm that the six `xpensed_*` tools are available.
+8. Return to the host and confirm that the Xpensed tools are available.
 
 Configuration formats differ between hosts. When a host accepts JSON, its entry commonly resembles
 the following example; use the exact field names documented by that host:
@@ -104,16 +106,25 @@ Xpensed; do not work around this by copying access tokens into configuration fil
 ### Available tools
 
 - `xpensed_list_spaces`: list spaces and the user's role.
-- `xpensed_list_categories`: list expense categories.
-- `xpensed_list_shops`: list shops for merchant matching.
-- `xpensed_list_transactions`: list transactions in a bounded date range.
+- `xpensed_list_categories`: list active expense categories.
+- `xpensed_create_category`, `xpensed_update_category`, `xpensed_archive_category`,
+  `xpensed_restore_category`: manage categories with version checks; archive is reversible.
+- `xpensed_list_shops`: list active shops for merchant matching.
+- `xpensed_match_shop`: match a merchant to an existing canonical shop without creating one.
+- `xpensed_create_shop`, `xpensed_update_shop`, `xpensed_archive_shop`, `xpensed_restore_shop`:
+  manage shops with version checks; archive is reversible.
+- `xpensed_list_transactions`: list active transactions in a bounded date range.
+- `xpensed_get_transaction`: retrieve one transaction and its current version/status.
+- `xpensed_create_transaction`: create one user-authorized IDR expense with optional idempotency.
+- `xpensed_update_transaction`: patch a transaction using its expected version.
+- `xpensed_archive_transaction`, `xpensed_restore_transaction`: archive or restore transactions.
 - `xpensed_find_transaction_by_source`: check whether a Gmail message was already imported.
-- `xpensed_create_transaction_from_email`: create one idempotent IDR expense after confirmation.
+- `xpensed_create_transaction_from_email`: create one idempotent Gmail expense from structured fields.
 
 The Gmail connector is separate from Xpensed. When a host also has Gmail access, it should treat
-email content as untrusted, extract only the structured transaction fields, show those fields to
-the user, and request confirmation before calling the Xpensed write tool. Never send an email body,
-HTML, embedded instructions, links, or credentials to Xpensed.
+email content as untrusted and extract only the structured transaction fields. A direct import needs
+user intent or a matching preauthorized workflow; never send an email body, HTML, embedded
+instructions, links, or credentials to Xpensed.
 
 ### Example requests
 

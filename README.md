@@ -39,9 +39,42 @@ Supabase stores only its SHA-256 hash. Regenerating a link immediately revokes t
 ## MCP integration
 
 Xpensed exposes an authenticated remote MCP server for MCP-capable desktop applications, IDEs, and
-local-LLM agent hosts. It supports listing expense data and importing a confirmed, structured Gmail
-expense without sending the email body to Xpensed. See [Xpensed MCP setup](docs/mcp.md), including
-the local LLM host connection guide and OAuth requirements.
+local-LLM agent hosts. It supports bounded expense queries, user-authorized transaction and taxonomy
+mutations, and structured Gmail imports without sending email bodies to Xpensed. See [Xpensed MCP
+setup](docs/mcp.md), including the local LLM host connection guide and OAuth requirements.
+
+The production endpoint is:
+
+```text
+https://xpensedv2.vercel.app/api/mcp
+```
+
+The server uses Streamable HTTP and Supabase OAuth 2.1. Clients must complete the browser-based OAuth
+flow; never paste a Supabase access token or service key into an MCP configuration.
+
+### Codex CLI
+
+```bash
+codex mcp add xpensed --url https://xpensedv2.vercel.app/api/mcp
+codex mcp login xpensed
+codex mcp list
+```
+
+After `codex mcp login`, approve the Xpensed consent screen in your browser. Codex stores the OAuth
+credentials for the MCP server and can then use its `xpensed_*` tools.
+
+### Claude Code
+
+```bash
+claude mcp add --transport http --scope user xpensed https://xpensedv2.vercel.app/api/mcp
+claude mcp list
+```
+
+Start Claude Code, run `/mcp`, select `xpensed`, and complete the browser authentication flow. The
+`--scope user` option makes the server available across projects; omit it for project-only setup.
+
+If a CLI reports that the server needs authentication, use its MCP management command or UI to
+authenticate. Xpensed does not support static bearer-token configuration.
 
 ## Environment variables
 
@@ -55,15 +88,35 @@ SUPABASE_SECRET_KEY=
 GEMINI_API_KEY=
 RESEND_API_KEY=
 INVITE_FROM_EMAIL=
+MCP_ALLOW_DIRECT_USER_TOKENS=false
+RATE_LIMIT_SECRET=
 ```
 
 `RESEND_API_KEY` and `INVITE_FROM_EMAIL` are optional. Without them, invitations still work and the owner copies the generated link. On Resend's free tier, configure a verified sender domain before relying on delivery.
+
+`RATE_LIMIT_SECRET` must be a random server-only value of at least 32 characters. It is used to hash
+rate-limit buckets and must be configured in every deployed environment. `MCP_ALLOW_DIRECT_USER_TOKENS`
+should remain `false` in production so MCP access is limited to OAuth clients.
+
+## How the app works
+
+- The browser uses IndexedDB through Dexie as its offline working database. Writes and their sync
+  outbox entries are committed together.
+- Supabase is the synchronized source of truth. Row Level Security enforces space membership and
+  admin, collaborator, and viewer permissions on the server.
+- API routes authenticate the Supabase user, validate request sizes and origins, and use the shared
+  distributed rate limiter before expensive or state-changing work.
+- Public links expose a bounded, sanitized read-only snapshot. MCP exposes bounded tools over OAuth;
+  returned user-authored text is treated as untrusted data, and writes require user intent or a
+  narrowly scoped preauthorized workflow.
 
 ## Local development and verification
 
 ```bash
 npm install
 npm run dev
+npm test
+npx tsc --noEmit
 npm run build
 ```
 
@@ -85,6 +138,10 @@ Manual acceptance checks:
 6. Attempt to own a fourth space and confirm the database rejects it.
 7. Create concurrent edits on two devices and confirm the local conflict store captures the version conflict instead of silently overwriting it.
 8. Sign in from a fresh browser and confirm the selected space syncs from Supabase.
+
+For an existing production database, apply every newer migration in `supabase/migrations` in
+filename order from the Supabase SQL Editor. The MCP surface requires
+`20260810000000_mcp_transaction_mutations.sql` and `20260810000001_mcp_taxonomy_mutations.sql`.
 
 ## Offline behavior
 

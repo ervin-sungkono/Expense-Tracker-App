@@ -20,10 +20,11 @@ export class McpDomainError extends Error {
 
 export function mapSupabaseError(error: { code?: string; message?: string }) {
   const message = error.message ?? 'The request could not be completed.';
-  if (error.code === '28000') return new McpDomainError('UNAUTHENTICATED', 'Authentication failed.');
+  if (error.code === '28000')
+    return new McpDomainError('UNAUTHENTICATED', 'Authentication failed.');
   if (error.code === '42501') return new McpDomainError('FORBIDDEN', 'You do not have permission.');
   if (error.code === '53300') {
-    return new McpDomainError('RATE_LIMITED', 'Too many import attempts. Retry later.');
+    return new McpDomainError('RATE_LIMITED', 'Too many mutation attempts. Retry later.');
   }
   if (error.code === '40001' || error.code === '23505') {
     return new McpDomainError('CONFLICT', 'The record changed or already exists. Retry safely.');
