@@ -6,6 +6,7 @@ import { useState } from 'react';
 import CategoryListPage from '../page/CategoryListPage';
 import AboutAppPage from '../page/AboutAppPage';
 import BudgetListPage from '../page/BudgetListPage';
+import HelpPage from '../page/HelpPage';
 import SpaceSwitcher from '@components/spaces/SpaceSwitcher';
 import SyncStatus from '@components/sync/SyncStatus';
 import { useAuth } from '@components/providers/AppProvider';
@@ -17,6 +18,7 @@ export default function ActionBar() {
   const [showBudget, setShowBudget] = useState(false);
   // const [showReport, setShowReport] = useState(false); TODO: make report page
   const [showAbout, setShowAbout] = useState(false);
+  const [showHelp, setShowHelp] = useState(false);
 
   const items = [
     {
@@ -34,6 +36,10 @@ export default function ActionBar() {
     {
       label: 'About',
       onClick: () => setShowAbout(true),
+    },
+    {
+      label: 'Help',
+      onClick: () => setShowHelp(true),
     },
   ];
 
@@ -63,6 +69,7 @@ export default function ActionBar() {
       <CategoryListPage show={showCategory} hideFn={() => setShowCategory(false)} />
       <AboutAppPage show={showAbout} hideFn={() => setShowAbout(false)} />
       <BudgetListPage show={showBudget} hideFn={() => setShowBudget(false)} />
+      <HelpPage show={showHelp} hideFn={() => setShowHelp(false)} />
     </div>
   );
 }
