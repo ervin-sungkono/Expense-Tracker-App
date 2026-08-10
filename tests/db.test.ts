@@ -44,6 +44,30 @@ describe('ExpenseDB', () => {
     });
   });
 
+  it('rehomes local guest data without changing record or mutation ids', async () => {
+    const guest = { userId: 'guest-user', spaceId: 'guest-space', role: 'admin' };
+    const account = { userId: 'user-2', spaceId: 'space-2', role: 'admin' };
+    await db.configureContext(guest);
+    const transactionId = await db.addTransaction({ amount: 250, date: new Date(2026, 0, 2) });
+    const [mutation] = await db.getPendingMutations(guest.userId, guest.spaceId);
+
+    await db.rehomeContext({
+      fromUserId: guest.userId,
+      fromSpaceId: guest.spaceId,
+      toUserId: account.userId,
+      toSpaceId: account.spaceId,
+    });
+
+    expect(await db.transactions.get(transactionId)).toMatchObject({
+      userId: account.userId,
+      spaceId: account.spaceId,
+    });
+    expect(await db.getPendingMutations(account.userId, account.spaceId)).toMatchObject([
+      { mutationId: mutation.mutationId, userId: account.userId, spaceId: account.spaceId },
+    ]);
+    expect(await db.getPendingMutations(guest.userId, guest.spaceId)).toEqual([]);
+  });
+
   it('enforces viewer and collaborator permissions', async () => {
     await db.configureContext({ ...owner, role: 'viewer' });
     await expect(db.addTransaction({ amount: 1 })).rejects.toThrow(

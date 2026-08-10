@@ -8,8 +8,10 @@ import AboutAppPage from '../page/AboutAppPage';
 import BudgetListPage from '../page/BudgetListPage';
 import SpaceSwitcher from '@components/spaces/SpaceSwitcher';
 import SyncStatus from '@components/sync/SyncStatus';
+import { useAuth } from '@components/providers/AppProvider';
 
 export default function ActionBar() {
+  const { isGuest } = useAuth();
   const [showMenu, setShowMenu] = useState(false);
   const [showCategory, setShowCategory] = useState(false);
   const [showBudget, setShowBudget] = useState(false);
@@ -55,7 +57,7 @@ export default function ActionBar() {
           position={{ bottom: '-10px' }}
           hideOnItemClick
         >
-          <SyncStatus onStarted={() => setShowMenu(false)} />
+          {!isGuest && <SyncStatus onStarted={() => setShowMenu(false)} />}
         </ContextMenu>
       </div>
       <CategoryListPage show={showCategory} hideFn={() => setShowCategory(false)} />

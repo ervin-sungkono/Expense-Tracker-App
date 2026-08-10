@@ -17,13 +17,13 @@ type AuthorizationDetails = {
 function ConsentContent() {
   const searchParams = useSearchParams();
   const authorizationId = searchParams.get('authorization_id');
-  const { configured, user, authLoading, supabase, signInWithGoogle } = useAuth();
+  const { configured, user, isGuest, authLoading, supabase, signInWithGoogle } = useAuth();
   const [details, setDetails] = useState<AuthorizationDetails | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
-    if (!user || !authorizationId) return;
+    if (!user || isGuest || !authorizationId) return;
     let active = true;
     supabase.auth.oauth.getAuthorizationDetails(authorizationId).then(({ data, error }) => {
       if (!active) return;
@@ -33,13 +33,13 @@ function ConsentContent() {
     return () => {
       active = false;
     };
-  }, [authorizationId, supabase, user]);
+  }, [authorizationId, isGuest, supabase, user]);
 
   if (authLoading) return <Loading />;
   if (!configured) return <p>Supabase OAuth is not configured.</p>;
   if (!authorizationId) return <p>This authorization request is missing its ID.</p>;
 
-  if (!user) {
+  if (!user || isGuest) {
     const next = `/oauth/consent?authorization_id=${encodeURIComponent(authorizationId)}`;
     return (
       <div className="w-full max-w-sm flex flex-col items-center gap-6 text-center">

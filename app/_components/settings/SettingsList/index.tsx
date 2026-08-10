@@ -10,7 +10,7 @@ import Dialog from '@components/common/Dialog';
 import CategoryListPage from '@components/common/page/CategoryListPage';
 import AboutAppPage from '@components/common/page/AboutAppPage';
 import { useRouter } from 'next/navigation';
-import { useSpace } from '@components/providers/AppProvider';
+import { useAuth, useSpace } from '@components/providers/AppProvider';
 // import ChangeCurrencyDialog from "../ChangeCurrencyDialog";
 
 const ImportDataForm = dynamic(() => import('../ImportDataForm'));
@@ -19,6 +19,7 @@ const ChangeUsernameForm = dynamic(() => import('../ChangeUsernameForm'));
 
 export default function SettingsList() {
   const router = useRouter();
+  const { isGuest } = useAuth();
   const { canManageSpace } = useSpace();
   const [showCategory, setShowCategory] = useState(false);
   const [showUsername, setShowUsername] = useState(false);
@@ -93,14 +94,18 @@ export default function SettingsList() {
     {
       id: 'spaces',
       title: 'Spaces & sharing',
-      description: 'Switch spaces, invite people, and review roles',
+      description: isGuest
+        ? 'Available after signing in with Google'
+        : 'Switch spaces, invite people, and review roles',
       onClick: () => router.push('/spaces'),
+      disabled: isGuest,
     },
     {
       id: 'change-username',
       title: 'Change username',
-      description: 'Set a new username',
+      description: isGuest ? 'Available after signing in with Google' : 'Set a new username',
       onClick: () => setShowUsername(true),
+      disabled: isGuest,
     },
     // {
     //     id: 'change-currency',

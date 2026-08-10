@@ -424,3 +424,7 @@ export function detectMimeType(base64 = '') {
 
   return mimeType;
 }
+
+export function getSignedTransactionAmount(amount, type) {
+  return type === 'Expense' ? -amount : amount;
+}

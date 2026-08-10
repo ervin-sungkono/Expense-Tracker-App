@@ -2,7 +2,6 @@
 
 import Navbar from '@components/common/navbar/Navbar';
 import ActionBar from '@components/common/ActionBar';
-// import BudgetRepeatUpdate from "../../budgets/BudgetRepeatUpdate";
 import { NAV_ITEMS } from '@lib/const';
 import Loading from '@components/layout/Loading';
 import { useAuth, useSpace } from '@components/providers/AppProvider';
@@ -37,7 +36,6 @@ export default function Layout({
 
   return (
     <div className="flex flex-col overflow-auto fixed top-0 left-0 bottom-0 right-0">
-      {/* <BudgetRepeatUpdate/> */}
       {showActionBar && <ActionBar />}
       {showNavbar && <Navbar items={NAV_ITEMS} pathname={pathname} />}
       <main

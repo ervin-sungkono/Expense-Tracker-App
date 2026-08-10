@@ -4,7 +4,7 @@ import SelectField from '../../common/SelectField';
 import ToggleSwitch from '../../common/ToggleSwitch';
 import { db } from '@lib/db';
 import { useLiveQuery } from 'dexie-react-hooks';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import Button from '../../common/Button';
 import { DateValidator, NumberValidator, StringValidator } from '@lib/validator';
 import Image from 'next/image';
@@ -18,7 +18,7 @@ export default function AddBudgetForm({ budget = {}, onSubmit }) {
   const [selectedCategory, setSelectedCategory] = useState(budget.category);
   const [selectCategory, setSelectCategory] = useState(false);
   const [repeat, setRepeat] = useState(budget.repeat ?? false);
-  const [duration, setDuration] = useState('weekly');
+  const [duration, setDuration] = useState(budget.repeatInterval ?? 'weekly');
   const [dateRange, setDateRange] = useState([budget.start_date, budget.end_date]);
 
   const excludedCategory = ['Debt', 'Debt Collection'];
@@ -45,10 +45,6 @@ export default function AddBudgetForm({ budget = {}, onSubmit }) {
       label: 'Custom range',
     },
   ];
-
-  useEffect(() => {
-    setDateRange(getDateRange(duration));
-  }, [duration]);
 
   const validateDate = (startDate, endDate) => {
     const startDateValidation = new DateValidator('Start Date', startDate)
@@ -84,6 +80,11 @@ export default function AddBudgetForm({ budget = {}, onSubmit }) {
     setSelectCategory(false);
   };
 
+  const handleDurationChange = nextDuration => {
+    setDuration(nextDuration);
+    if (nextDuration !== 'custom') setDateRange(getDateRange(nextDuration));
+  };
+
   const handleSubmit = e => {
     e.preventDefault();
 
@@ -97,6 +98,7 @@ export default function AddBudgetForm({ budget = {}, onSubmit }) {
     }
     payload.categoryId = selectedCategory?.id ?? null; // set to null if left unfilled
     payload.repeat = duration === 'custom' ? false : repeat; // if custom range then repeat is false by default
+    payload.repeatInterval = payload.repeat ? duration : null;
 
     try {
       let error = {};
@@ -175,7 +177,7 @@ export default function AddBudgetForm({ budget = {}, onSubmit }) {
             label={'Duration'}
             _selected={duration}
             _options={durationOptions}
-            onChange={id => setDuration(id)}
+            onChange={handleDurationChange}
           />
           <div className="w-full flex flex-col gap-2">
             <div className="grid grid-cols-2 gap-2">

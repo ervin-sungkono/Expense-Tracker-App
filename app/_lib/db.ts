@@ -52,6 +52,54 @@ class ExpenseDB extends Dexie {
     await this.context.put({ id: 'active', userId, spaceId, role });
   }
 
+  async rehomeContext({ fromUserId, fromSpaceId, toUserId, toSpaceId }) {
+    if (!fromUserId || !fromSpaceId || !toUserId || !toSpaceId) {
+      throw new Error('All source and destination context identifiers are required.');
+    }
+    if (fromUserId === toUserId && fromSpaceId === toSpaceId) return;
+
+    await this.transaction(
+      'rw',
+      this.context,
+      this.transactions,
+      this.categories,
+      this.budgets,
+      this.shops,
+      this.outbox,
+      this.conflicts,
+      this.syncCursors,
+      async () => {
+        const tables = [
+          this.transactions,
+          this.categories,
+          this.budgets,
+          this.shops,
+          this.outbox,
+          this.conflicts,
+        ];
+        for (const table of tables) {
+          const rows = await table
+            .where('[userId+spaceId]')
+            .equals([fromUserId, fromSpaceId])
+            .toArray();
+          if (rows.length) {
+            await table.bulkPut(
+              rows.map(row => ({ ...row, userId: toUserId, spaceId: toSpaceId }))
+            );
+          }
+        }
+
+        const cursor = await this.syncCursors.get([fromUserId, fromSpaceId]);
+        if (cursor) {
+          await this.syncCursors.delete([fromUserId, fromSpaceId]);
+          await this.syncCursors.put({ ...cursor, userId: toUserId, spaceId: toSpaceId });
+        }
+
+        await this.context.put({ id: 'active', userId: toUserId, spaceId: toSpaceId, role: 'admin' });
+      }
+    );
+  }
+
   getContext() {
     return this.context.get('active');
   }

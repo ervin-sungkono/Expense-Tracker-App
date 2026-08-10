@@ -11,6 +11,7 @@ import { IoFilter as FilterIcon } from 'react-icons/io5';
 import Dialog from '@components/common/Dialog';
 import FilterTransaction from '@components/transactions/FilterTransaction';
 import { useSearchParams } from 'next/navigation';
+import { getSignedTransactionAmount } from '@lib/utils';
 
 const UpdateFilter = ({ onSearchParamResult }) => {
   const searchParams = useSearchParams();
@@ -92,16 +93,14 @@ export default function Transactions() {
         if (!transactionMap[dateKey]) {
           transactionMap[dateKey] = {
             date: new Date(dateKey),
-            totalAmount: transaction.amount,
+            totalAmount: getSignedTransactionAmount(transaction.amount, transaction.type),
             data: [transaction],
           };
         } else {
-          let modifier = 1;
-          if (transaction.type === 'Expense') {
-            modifier = -1;
-          }
-
-          transactionMap[dateKey].totalAmount += transaction.amount * modifier;
+          transactionMap[dateKey].totalAmount += getSignedTransactionAmount(
+            transaction.amount,
+            transaction.type
+          );
           transactionMap[dateKey].data.push(transaction);
         }
       });

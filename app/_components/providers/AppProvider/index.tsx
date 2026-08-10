@@ -15,6 +15,18 @@ import { db } from '@lib/db';
 import { syncSpace } from '@lib/sync';
 import { getCategories } from '@lib/seeder';
 
+const GUEST_USER_ID = 'guest-local-user';
+const GUEST_SPACE_ID = 'guest-local-space';
+const GUEST_SESSION_KEY = 'xpensed:guest-active';
+const GUEST_USER = { id: GUEST_USER_ID, email: 'Guest', is_guest: true, is_anonymous: true };
+const GUEST_SPACE = {
+  id: GUEST_SPACE_ID,
+  name: 'Guest space',
+  owner_id: GUEST_USER_ID,
+  role: 'admin',
+  localOnly: true,
+};
+
 const AuthContext = createContext(null);
 const SpaceContext = createContext(null);
 
@@ -34,6 +46,7 @@ export function AppProvider({ children }) {
   const localInitialization = useRef({ key: null, promise: null });
   const newlyCreatedSpaceIds = useRef(new Set());
   const spacesRequest = useRef(0);
+  const guestMigration = useRef(null);
 
   const loadProfile = useCallback(
     async currentUser => {
@@ -75,8 +88,67 @@ export function AppProvider({ children }) {
     [supabase]
   );
 
+  const activateGuest = useCallback(() => {
+    newlyCreatedSpaceIds.current.add(GUEST_SPACE_ID);
+    window.localStorage.setItem(GUEST_SESSION_KEY, 'true');
+    setUser(GUEST_USER);
+    setProfile(null);
+    setOfflineSession(true);
+    setSpaces([{ ...GUEST_SPACE }]);
+    setActiveSpaceIdState(GUEST_SPACE_ID);
+    setSpacesLoading(false);
+  }, []);
+
+  const migrateGuestData = useCallback(
+    async currentUser => {
+      if (!supabase || window.localStorage.getItem(GUEST_SESSION_KEY) !== 'true') return null;
+      if (guestMigration.current) return guestMigration.current;
+
+      const migration = (async () => {
+        const { data, error } = await supabase.rpc('create_space', {
+          space_name: 'Imported guest space',
+        });
+        if (error || !data?.id) throw error ?? new Error('Unable to create an imported space.');
+        await db.rehomeContext({
+          fromUserId: GUEST_USER_ID,
+          fromSpaceId: GUEST_SPACE_ID,
+          toUserId: currentUser.id,
+          toSpaceId: data.id,
+        });
+        window.localStorage.removeItem(GUEST_SESSION_KEY);
+        return data;
+      })();
+
+      guestMigration.current = migration;
+      try {
+        return await migration;
+      } finally {
+        if (guestMigration.current === migration) guestMigration.current = null;
+      }
+    },
+    [supabase]
+  );
+
+  const loadAuthenticatedUser = useCallback(
+    async currentUser => {
+      const importedSpace = await migrateGuestData(currentUser);
+      setUser(currentUser);
+      setOfflineSession(false);
+      window.localStorage.setItem('lastAuthenticatedUser', JSON.stringify(currentUser));
+      await Promise.all([loadProfile(currentUser), loadSpaces(currentUser)]);
+      if (importedSpace?.id) {
+        setActiveSpaceIdState(importedSpace.id);
+        window.localStorage.setItem(`activeSpace:${currentUser.id}`, importedSpace.id);
+      }
+    },
+    [loadProfile, loadSpaces, migrateGuestData]
+  );
+
   useEffect(() => {
-    if (!supabase) return;
+    if (!supabase) {
+      if (window.localStorage.getItem(GUEST_SESSION_KEY) === 'true') activateGuest();
+      return;
+    }
     let mounted = true;
     const initialize = async () => {
       try {
@@ -86,39 +158,50 @@ export function AppProvider({ children }) {
         if (sessionUser) {
           try {
             const { data } = await supabase.auth.getUser();
-            setUser(data.user);
-            setOfflineSession(false);
-            window.localStorage.setItem('lastAuthenticatedUser', JSON.stringify(data.user));
-            await Promise.all([loadProfile(data.user), loadSpaces(data.user)]);
+            await loadAuthenticatedUser(data.user);
           } catch {
             setUser(sessionUser);
+            setProfile(null);
+            setSpaces([]);
+            setActiveSpaceIdState(null);
             setOfflineSession(true);
           }
+        } else if (window.localStorage.getItem(GUEST_SESSION_KEY) === 'true') {
+          activateGuest();
         }
       } finally {
         if (mounted) setAuthLoading(false);
       }
     };
     initialize();
-    const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
+    const { data: listener } = supabase.auth.onAuthStateChange((event, session) => {
       const nextUser = session?.user ?? null;
-      setUser(nextUser);
       if (nextUser) {
-        queueMicrotask(() => {
-          loadProfile(nextUser);
-          loadSpaces(nextUser);
-        });
+        if (event !== 'INITIAL_SESSION') {
+          queueMicrotask(() => {
+            loadAuthenticatedUser(nextUser).catch(() => {
+              setUser(nextUser);
+              setProfile(null);
+              setSpaces([]);
+              setActiveSpaceIdState(null);
+              setOfflineSession(true);
+            });
+          });
+        }
+      } else if (window.localStorage.getItem(GUEST_SESSION_KEY) === 'true') {
+        activateGuest();
       } else {
         setProfile(null);
         setSpaces([]);
         setActiveSpaceIdState(null);
+        setOfflineSession(false);
       }
     });
     return () => {
       mounted = false;
       listener.subscription.unsubscribe();
     };
-  }, [supabase, loadProfile, loadSpaces]);
+  }, [activateGuest, loadAuthenticatedUser, supabase]);
 
   const signInWithGoogle = useCallback(
     async (next = '/home') => {
@@ -133,11 +216,26 @@ export function AppProvider({ children }) {
   );
 
   const signOut = useCallback(async () => {
+    window.localStorage.removeItem(GUEST_SESSION_KEY);
+    if (user?.is_guest || !supabase) {
+      setUser(null);
+      setProfile(null);
+      setSpaces([]);
+      setActiveSpaceIdState(null);
+      setOfflineSession(false);
+      return;
+    }
     await supabase.auth.signOut({ scope: 'local' });
-  }, [supabase]);
+  }, [supabase, user]);
 
   const createSpace = useCallback(
     async name => {
+      if (user?.is_guest) {
+        const createdSpace = { ...GUEST_SPACE, name };
+        setSpaces([createdSpace]);
+        setActiveSpaceIdState(GUEST_SPACE_ID);
+        return createdSpace;
+      }
       const { data, error } = await supabase.rpc('create_space', {
         space_name: name,
       });
@@ -218,7 +316,7 @@ export function AppProvider({ children }) {
   }, [activeSpace, user]);
 
   useEffect(() => {
-    if (!activeSpace || !localContextReady || !navigator.onLine) return;
+    if (!activeSpace || !localContextReady || !navigator.onLine || offlineSession) return;
     syncNow().catch(() => {});
     const handleOnline = () => syncNow().catch(() => {});
     const handleFocus = () => navigator.onLine && syncNow().catch(() => {});
@@ -228,7 +326,7 @@ export function AppProvider({ children }) {
       window.removeEventListener('online', handleOnline);
       window.removeEventListener('focus', handleFocus);
     };
-  }, [activeSpace, localContextReady, syncNow]);
+  }, [activeSpace, localContextReady, offlineSession, syncNow]);
 
   const authValue = {
     configured,
@@ -237,9 +335,11 @@ export function AppProvider({ children }) {
     profile,
     authLoading,
     offlineSession,
+    isGuest: user?.is_guest === true,
+    startGuest: activateGuest,
     signInWithGoogle,
     signOut,
-    refreshProfile: () => user && loadProfile(user),
+    refreshProfile: () => user && !user.is_guest && loadProfile(user),
   };
   const spaceValue = {
     spaces,
@@ -248,7 +348,7 @@ export function AppProvider({ children }) {
     spacesLoading,
     setActiveSpaceId,
     createSpace,
-    refreshSpaces: () => user && loadSpaces(user),
+    refreshSpaces: () => user && !user.is_guest && loadSpaces(user),
     syncStatus,
     pendingCount,
     syncNow,

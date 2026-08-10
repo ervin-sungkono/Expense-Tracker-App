@@ -15,6 +15,7 @@ import {
   getDebtLoanType,
   getMonthlyLabels,
   getOwnerLabel,
+  getSignedTransactionAmount,
   getWeekNumber,
   getWeekRanges,
   getWeeklyLabels,
@@ -89,6 +90,11 @@ describe('utility helpers', () => {
       true
     );
     expect(isInDateRange(new Date(2026, 0, 9), [null, new Date(2026, 0, 8)])).toBe(false);
+  });
+
+  it('treats expenses as negative transaction totals', () => {
+    expect(getSignedTransactionAmount(11000, 'Expense')).toBe(-11000);
+    expect(getSignedTransactionAmount(11000, 'Income')).toBe(11000);
   });
 
   it('detects supported image formats', () => {

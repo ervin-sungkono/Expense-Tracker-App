@@ -17,7 +17,7 @@ async function invitationTokenHash(token) {
 }
 
 export default function SpaceManagement() {
-  const { supabase, user } = useAuth();
+  const { supabase, user, isGuest } = useAuth();
   const { activeSpace, canManageSpace, spaces, createSpace, refreshSpaces } = useSpace();
   const [members, setMembers] = useState([]);
   const [membersError, setMembersError] = useState('');
@@ -31,7 +31,7 @@ export default function SpaceManagement() {
   const [busy, setBusy] = useState(false);
 
   useEffect(() => {
-    if (!activeSpace) {
+    if (isGuest || !activeSpace || !supabase) {
       setMembers([]);
       return;
     }
@@ -87,10 +87,10 @@ export default function SpaceManagement() {
     return () => {
       cancelled = true;
     };
-  }, [activeSpace, supabase]);
+  }, [activeSpace, isGuest, supabase]);
 
   useEffect(() => {
-    if (!activeSpace || !canManageSpace) {
+    if (isGuest || !activeSpace || !canManageSpace) {
       setPublicShare(null);
       setPublicLink('');
       return;
@@ -114,7 +114,7 @@ export default function SpaceManagement() {
     return () => {
       cancelled = true;
     };
-  }, [activeSpace, canManageSpace]);
+  }, [activeSpace, canManageSpace, isGuest]);
 
   async function handleCreateSpace(event) {
     event.preventDefault();
@@ -281,6 +281,18 @@ export default function SpaceManagement() {
       'You left this space.'
     );
     if (leftSpace) await refreshSpaces();
+  }
+
+  if (isGuest) {
+    return (
+      <div className="flex flex-col gap-3 pb-4 text-sm text-dark/80 dark:text-white/80">
+        <h2 className="text-lg font-bold text-dark dark:text-white">Local guest mode</h2>
+        <p>
+          Guest mode stores one private space on this device only. Sign in with Google to create a
+          synced space and import this data.
+        </p>
+      </div>
+    );
   }
 
   return (
