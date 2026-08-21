@@ -3,13 +3,31 @@ import { generateBudgets, generateTransactions, getCategories, getShops } from "
 import { isInAmountRange, isInDateRange } from "./utils";
 
 const DB_NAME = "ExpenseDB";
-const DB_VERSION = 2;
+const DB_VERSION = 3;
+
+export type AssistantMessage = {
+    id?: string;
+    role: "user" | "assistant";
+    content: string;
+    createdAt: string;
+};
+
+export type AssistantSession = {
+    id: "default";
+    transcript: AssistantMessage[];
+    state: Record<string, unknown>;
+    summary: string | null;
+    updatedAt: string;
+};
+
+const ASSISTANT_SESSION_ID = "default";
 
 /**
  * @extends Dexie
  */
 class ExpenseDB extends Dexie {
     static instance;
+    assistant!: Dexie.Table<AssistantSession, string>;
 
     constructor() {
         super(DB_NAME);
@@ -19,7 +37,7 @@ class ExpenseDB extends Dexie {
             expenses: '++id, date, amount, categoryId, shopId, remarks',
             categories: '++id, name, budget',
             shops: '++id, name, image, location'
-        }).upgrade(async() => {
+        }).upgrade(async () => {
             await this.resetDB();
         });
 
@@ -29,7 +47,7 @@ class ExpenseDB extends Dexie {
             categories: '++id, icon, name, type, parentId, mutable',
             budgets: '++id, amount, categoryId, start_date, end_date, repeat',
             shops: '++id, name, image, location'
-        }).upgrade(async() => {
+        }).upgrade(async () => {
             await this.resetDB();
         });
 
@@ -38,9 +56,8 @@ class ExpenseDB extends Dexie {
             expenses: null,
             categories: '++id, icon, name, type, parentId, mutable',
             budgets: '++id, amount, categoryId, start_date, end_date, repeat',
-            shops: '++id, name, image, location'
-        }).upgrade(async() => {
-            await this.resetDB();
+            shops: '++id, name, image, location',
+            assistant: 'id'
         });
 
         this.on('populate', () => this.populate());
@@ -51,10 +68,10 @@ class ExpenseDB extends Dexie {
      * @returns {ExpenseDB} static database instance.
      */
     static getInstance() {
-        if(!this.instance) {
+        if (!this.instance) {
             this.instance = new ExpenseDB();
         }
-        
+
         return this.instance;
     }
 
@@ -71,6 +88,24 @@ class ExpenseDB extends Dexie {
 
     getAllTransactions() {
         return this.transactions.toArray();
+    }
+
+    getAssistantSession() {
+        return this.assistant.get(ASSISTANT_SESSION_ID);
+    }
+
+    saveAssistantSession({ transcript, state = {}, summary = null, updatedAt = new Date().toISOString() }) {
+        return this.assistant.put({
+            id: ASSISTANT_SESSION_ID,
+            transcript,
+            state,
+            summary,
+            updatedAt
+        });
+    }
+
+    clearAssistantSession() {
+        return this.assistant.delete(ASSISTANT_SESSION_ID);
     }
 
     getMonthTransactions() {
@@ -97,7 +132,7 @@ class ExpenseDB extends Dexie {
                     .between([id, startDate], [id, endDate])
                     .toArray()
             ))
-        )
+        );
 
         return results.flat();
     }
@@ -110,11 +145,11 @@ class ExpenseDB extends Dexie {
         return this.transactions
             .orderBy('date')
             .filter(transaction => {
-                if(!transaction.remarks.toLowerCase().includes(searchText)) return false;
-                if(categoryId && transaction.categoryId != categoryId) return false;
-                if(shopId && transaction.shopId != shopId) return false;
-                if(!isInAmountRange(transaction.amount, amountRange)) return false;
-                if(!isInDateRange(transaction.date, dateRange)) return false;
+                if (!transaction.remarks.toLowerCase().includes(searchText)) return false;
+                if (categoryId && transaction.categoryId != categoryId) return false;
+                if (shopId && transaction.shopId != shopId) return false;
+                if (!isInAmountRange(transaction.amount, amountRange)) return false;
+                if (!isInDateRange(transaction.date, dateRange)) return false;
 
                 return true;
             })
@@ -142,14 +177,14 @@ class ExpenseDB extends Dexie {
     }
 
     getCategoryById(categoryId) {
-        if(!categoryId) return null;
+        if (!categoryId) return null;
         return this.categories.where({ id: categoryId }).first();
     }
 
     async getMergeCategories(categoryId) {
         const category = await this.getCategoryById(categoryId);
 
-        if(category.parentId) {
+        if (category.parentId) {
             return this.categories.filter(c => c.type === category?.type && c.id !== categoryId).toArray();
         } else {
             return this.categories.filter(c => c.type === category?.type && c.id !== categoryId && c.parentId !== categoryId).toArray();
@@ -176,7 +211,7 @@ class ExpenseDB extends Dexie {
         return this.shops
             .orderBy('name')
             .filter(shop => {
-                if(!shop.name.toLowerCase().includes(searchText)) return false;
+                if (!shop.name.toLowerCase().includes(searchText)) return false;
 
                 return true;
             })
@@ -190,33 +225,33 @@ class ExpenseDB extends Dexie {
      * @returns 
      */
     getAllBudgets(type) {
-        if(type === 'active') {
+        if (type === 'active') {
             return this.budgets
                 .orderBy('start_date')
                 .reverse()
                 .filter(budget => {
-                    if(!isInDateRange(new Date(), [budget.start_date, budget.end_date])) return false;
+                    if (!isInDateRange(new Date(), [budget.start_date, budget.end_date])) return false;
                     return true;
                 })
                 .toArray();
         }
-        if(type === 'finished') {
+        if (type === 'finished') {
             return this.budgets
                 .orderBy('start_date')
                 .reverse()
                 .filter(budget => {
-                    if(isInDateRange(new Date(), [budget.start_date, budget.end_date])) return false;
-                    if(new Date().getTime() < budget.start_date.getTime()) return false; // not yet started
+                    if (isInDateRange(new Date(), [budget.start_date, budget.end_date])) return false;
+                    if (new Date().getTime() < budget.start_date.getTime()) return false; // not yet started
                     return true;
                 })
                 .toArray();
         }
-        if(type === 'upcoming') {
+        if (type === 'upcoming') {
             return this.budgets
                 .orderBy('start_date')
                 .filter(budget => {
-                    if(isInDateRange(new Date(), [budget.start_date, budget.end_date])) return false;
-                    if(new Date().getTime() > budget.end_date.getTime()) return false; // already finished
+                    if (isInDateRange(new Date(), [budget.start_date, budget.end_date])) return false;
+                    if (new Date().getTime() > budget.end_date.getTime()) return false; // already finished
                     return true;
                 })
                 .toArray();
@@ -230,35 +265,35 @@ class ExpenseDB extends Dexie {
      * @returns 
      */
     getPaginatedBudgets(limit, type) {
-        if(type === 'active') {
+        if (type === 'active') {
             return this.budgets
                 .orderBy('start_date')
                 .reverse()
                 .filter(budget => {
-                    if(!isInDateRange(new Date(), [budget.start_date, budget.end_date])) return false;
+                    if (!isInDateRange(new Date(), [budget.start_date, budget.end_date])) return false;
                     return true;
                 })
                 .limit(limit)
                 .toArray();
         }
-        if(type === 'finished') {
+        if (type === 'finished') {
             return this.budgets
                 .orderBy('start_date')
                 .reverse()
                 .filter(budget => {
-                    if(isInDateRange(new Date(), [budget.start_date, budget.end_date])) return false;
-                    if(new Date().getTime() < new Date(budget.start_date).getTime()) return false; // not started yet
+                    if (isInDateRange(new Date(), [budget.start_date, budget.end_date])) return false;
+                    if (new Date().getTime() < new Date(budget.start_date).getTime()) return false; // not started yet
                     return true;
                 })
                 .limit(limit)
                 .toArray();
         }
-        if(type === 'upcoming') {
+        if (type === 'upcoming') {
             return this.budgets
                 .orderBy('start_date')
                 .filter(budget => {
-                    if(isInDateRange(new Date(), [budget.start_date, budget.end_date])) return false;
-                    if(new Date().getTime() > budget.end_date.getTime()) return false; // already finished
+                    if (isInDateRange(new Date(), [budget.start_date, budget.end_date])) return false;
+                    if (new Date().getTime() > budget.end_date.getTime()) return false; // already finished
                     return true;
                 })
                 .limit(limit)
@@ -284,20 +319,20 @@ class ExpenseDB extends Dexie {
     }
 
     updateTransaction(transactionId, { date, amount, categoryId, shopId, owner, type, remarks }) {
-        return this.transactions.update(transactionId, {date, amount, categoryId, shopId, owner, type, remarks});
+        return this.transactions.update(transactionId, { date, amount, categoryId, shopId, owner, type, remarks });
     }
 
     updateCategory(categoryId, { icon, name, type, parentId }) {
         return this.transaction('rw', this.categories, () => {
             // In case modifying parentId of category that has a sub category,
             // modify all sub category to have the same parent as the category
-            if(parentId) this.categories.where({ parentId: categoryId }).modify({ parentId });
+            if (parentId) this.categories.where({ parentId: categoryId }).modify({ parentId });
             this.categories.update(categoryId, { icon, name, type, parentId });
         })
     }
 
     updateShop(shopId, { name, image, location }) {
-        return this.shops.update(shopId, {name, image, location});
+        return this.shops.update(shopId, { name, image, location });
     }
 
     updateBudget(budgetId, { amount, categoryId, start_date, end_date, repeat }) {
@@ -310,7 +345,7 @@ class ExpenseDB extends Dexie {
     }
 
     deleteTransaction(transactionId) {
-        this.transactions.delete(transactionId);
+        return this.transactions.delete(transactionId);
     }
 
     // Keep the sub categories and transactions by merging it with a new prent category
@@ -318,7 +353,7 @@ class ExpenseDB extends Dexie {
         const newCategory = await this.getCategoryById(newParentId);
 
         return this.transaction('rw', this.transactions, this.budgets, this.categories, () => {
-            if(newParentId) {
+            if (newParentId) {
                 this.transactions.where({ categoryId }).modify({ categoryId: newParentId });
                 this.budgets.where({ categoryId }).modify({ categoryId: newParentId });
                 this.categories.where({ parentId: categoryId }).modify({ parentId: newCategory.parentId ?? newParentId });
@@ -330,17 +365,17 @@ class ExpenseDB extends Dexie {
     // delete the sub categories and transactions along with parent category
     deleteCategory(categoryId) {
         return this.transaction('rw', this.transactions, this.budgets, this.categories, () => {
-          this.transactions.where({ categoryId }).delete();
-          this.budgets.where({ categoryId }).delete();
-          this.categories.where({ parentId: categoryId }).delete();
-          this.categories.delete(categoryId);
+            this.transactions.where({ categoryId }).delete();
+            this.budgets.where({ categoryId }).delete();
+            this.categories.where({ parentId: categoryId }).delete();
+            this.categories.delete(categoryId);
         });
     }
 
     deleteShop(shopId) {
         return this.transaction('rw', this.transactions, this.shops, () => {
-          this.transactions.where({ shopId }).modify({ shopId: null });
-          this.shops.delete(shopId);
+            this.transactions.where({ shopId }).modify({ shopId: null });
+            this.shops.delete(shopId);
         });
     }
 
@@ -349,7 +384,7 @@ class ExpenseDB extends Dexie {
     }
 
     async importDB({ file, clearTablesBeforeImport = false, overwriteValues = false, progressCallback }) {
-        if(typeof window !== 'undefined') {
+        if (typeof window !== 'undefined') {
             await import('dexie-export-import');
         }
 
@@ -357,7 +392,7 @@ class ExpenseDB extends Dexie {
     }
 
     async exportDB({ progressCallback }) {
-        if(typeof window !== 'undefined') {
+        if (typeof window !== 'undefined') {
             await import('dexie-export-import');
         }
 

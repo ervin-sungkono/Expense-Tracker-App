@@ -3,6 +3,7 @@ import "./globals.css";
 import { ThemeProvider } from "next-themes";
 import { GoogleAnalytics } from "@next/third-parties/google";
 import ToastComponent from "@components/toast/Toast";
+import AssistantChat from "@components/assistant/AssistantChat";
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -16,9 +17,10 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={inter.className}>
-        <ThemeProvider enableColorScheme enableSystem>
-          {children}
-        </ThemeProvider>
+<ThemeProvider enableColorScheme enableSystem>
+{children}
+<AssistantChat/>
+</ThemeProvider>
         <ToastComponent/>
         { process.env.NODE_ENV === 'production' && <GoogleAnalytics gaId="G-FG6W314EEP"/>}
       </body>

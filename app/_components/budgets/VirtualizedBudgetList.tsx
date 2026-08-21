@@ -8,36 +8,36 @@ import InfiniteLoader from 'react-window-infinite-loader';
 import BudgetCard from './BudgetCard';
 
 const Row = ({ index, style, data: { items } }) => {
-  const item = items[index];
+    const item = items[index];
 
-  if(!item) return <div style={style} className='flex justify-center items-center animate-pulse'><p>Loading more data..</p></div>
-  
-  return (
-      <BudgetCard budget={item} style={style}/>
-  );
+    if (!item) return <div style={style} className='flex justify-center items-center animate-pulse'><p>Loading more data..</p></div>
+
+    return (
+        <BudgetCard budget={item} style={style} />
+    );
 };
 
 const MemoizedRow = memo(Row);
 
-const VirtualizedCategoryList = ({ scrollRef, items, hasNextPage, loadMore }) => {
+const VirtualizedBudgetList = ({ scrollRef, items, hasNextPage, loadMore }) => {
     const isItemLoaded = index => !hasNextPage || index < items.length;
 
-    if(!items) {
+    if (!items) {
         return (
-        <div className='w-full h-full flex flex-col justify-center items-center gap-4 rounded-lg px-4 py-2.5'>
-            <LoadingSpinner/>
-            <p className='text-dark/80 dark:text-white/80 text-sm md:text-base text-center'>Loading budget data..</p>
-        </div>
+            <div className='w-full h-full flex flex-col justify-center items-center gap-4 rounded-lg px-4 py-2.5'>
+                <LoadingSpinner />
+                <p className='text-dark/80 dark:text-white/80 text-sm md:text-base text-center'>Loading budget data..</p>
+            </div>
         )
     }
-    if(items.length === 0) {
-        return(
-        <div className='w-full h-full flex flex-col justify-center items-center text-center gap-2 rounded-lg px-4 py-2.5'>
-            <div className='relative w-full aspect-[16/10]'>
-            <Image fill src={'/not-found.png'} alt='' className='object-contain opacity-60 saturate-0'/>
+    if (items.length === 0) {
+        return (
+            <div className='w-full h-full flex flex-col justify-center items-center text-center gap-2 rounded-lg px-4 py-2.5'>
+                <div className='relative w-full aspect-[16/10]'>
+                    <Image fill src={'/not-found.png'} alt='' className='object-contain opacity-60 saturate-0' />
+                </div>
+                <p className='text-dark/80 dark:text-white/80 text-sm md:text-base'>No budget found..</p>
             </div>
-            <p className='text-dark/80 dark:text-white/80 text-sm md:text-base'>No budget found..</p>
-        </div>
         )
     }
     return (
@@ -48,11 +48,11 @@ const VirtualizedCategoryList = ({ scrollRef, items, hasNextPage, loadMore }) =>
                     loadMoreItems={loadMore}
                     isItemLoaded={isItemLoaded}
                 >
-                    {({ onItemsRendered, ref }) => (  
+                    {({ onItemsRendered, ref }) => (
                         <FixedSizeList
                             ref={(ele) => {
                                 ref(ele);
-                                if(scrollRef) scrollRef.current = ele;
+                                if (scrollRef) scrollRef.current = ele;
                             }}
                             onItemsRendered={onItemsRendered}
                             height={height}
@@ -60,7 +60,7 @@ const VirtualizedCategoryList = ({ scrollRef, items, hasNextPage, loadMore }) =>
                             itemCount={items.length}
                             itemSize={152}
                             itemData={{ items }}
-                            style={{willChange: 'initial'}}
+                            style={{ willChange: 'initial' }}
                         >
                             {MemoizedRow}
                         </FixedSizeList>
@@ -71,4 +71,4 @@ const VirtualizedCategoryList = ({ scrollRef, items, hasNextPage, loadMore }) =>
     );
 };
 
-export default VirtualizedCategoryList;
+export default VirtualizedBudgetList;
