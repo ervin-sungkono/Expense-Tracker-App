@@ -94,7 +94,7 @@ class ExpenseDB extends Dexie {
             categories.map(id => (
                 this.transactions
                     .where('[categoryId+date]')
-                    .between([categoryId, startDate], [categoryId, endDate])
+                    .between([id, startDate], [id, endDate])
                     .toArray()
             ))
         )

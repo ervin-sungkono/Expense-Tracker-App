@@ -20,8 +20,8 @@ function BudgetCard({ budget, style }) {
     const totalDays = getDayDifference(start_date, end_date);
     const remainingDays = Math.max(0, Math.min(getDayDifference(todayDate, end_date), totalDays));
 
-    const category = useLiveQuery(() => db.getCategoryById(categoryId));
-    const transactions = useLiveQuery(() => db.getTransactionsRange(start_date, end_date, categoryId));
+    const category = useLiveQuery(() => db.getCategoryById(categoryId), [categoryId]);
+    const transactions = useLiveQuery(() => db.getTransactionsRange(start_date, end_date, categoryId), [categoryId]);
 
     useEffect(() => {
         if(transactions && transactions.length > 0) {

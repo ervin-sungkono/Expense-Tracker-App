@@ -15,11 +15,11 @@ import { toast } from "react-toastify";
 export default function AddBudgetForm({ budget = {}, onSubmit }) {
     const categories = useLiveQuery(() => db.getAllCategories());
     const [errorMessage, setErrorMessage] = useState({});
-    const [selectedCategory, setSelectedCategory] = useState(budget.category); 
+    const [selectedCategory, setSelectedCategory] = useState(budget.category);
     const [selectCategory, setSelectCategory] = useState(false);
-    const [repeat, setRepeat] = useState(false);
+    const [repeat, setRepeat] = useState(budget.repeat ?? false);
     const [duration, setDuration] = useState('weekly');
-    const [dateRange, setDateRange] = useState([undefined, undefined]);
+    const [dateRange, setDateRange] = useState([budget.start_date, budget.end_date]);
 
     const excludedCategory = ["Debt", "Debt Collection"];
 
