@@ -18,6 +18,37 @@ const MAX_TOOL_ROUNDS = 6;
 const RECENT_MESSAGE_COUNT = 12;
 const MAX_SUMMARY_LENGTH = 6000;
 
+function normalizeAssistantMarkdown(content: string) {
+    const lines = content.split("\n");
+    const normalized: string[] = [];
+    let inFence = false;
+
+    for (let index = 0; index < lines.length; index += 1) {
+        const line = lines[index];
+        if (/^\s*```/.test(line)) {
+            inFence = !inFence;
+            normalized.push(line);
+            continue;
+        }
+
+        if (!inFence && /^\s*\d+\.\s*$/.test(line)) {
+            let nextIndex = index + 1;
+            while (nextIndex < lines.length && !lines[nextIndex].trim()) nextIndex += 1;
+            const nextLine = lines[nextIndex];
+            if (nextLine && !/^\s*(?:\d+\.|[-*+])\s+/.test(nextLine)) {
+                const indent = line.match(/^\s*/)?.[0] ?? "";
+                normalized.push(`${indent}${line.trim()} ${nextLine.trimStart()}`);
+                index = nextIndex;
+                continue;
+            }
+        }
+
+        normalized.push(line);
+    }
+
+    return normalized.join("\n");
+}
+
 const markdownComponents = {
     h1: ({ children }) => <h1 className="mb-2 text-lg font-bold">{children}</h1>,
     h2: ({ children }) => <h2 className="mb-2 text-base font-bold">{children}</h2>,
@@ -278,11 +309,11 @@ export default function AssistantChat() {
                 : { history: toHistory(turnMessages, compacted.summary, compactedThrough) };
             const result = await readEvents(body, text => {
                 assistantText += text;
-                setDraft(assistantText);
+                setDraft(normalizeAssistantMarkdown(assistantText));
             });
 
             if (!result.calls.length) {
-                const content = assistantText.trim() || "Done.";
+                const content = normalizeAssistantMarkdown(assistantText.trim()) || "Done.";
                 const next = [...turnMessages, { id: messageId(), role: "assistant" as const, content, createdAt: new Date().toISOString() }];
                 setMessages(next);
                 setDraft("");
@@ -401,10 +432,10 @@ export default function AssistantChat() {
                     </div>}
                     {messages.map(message => <div key={message.id} className={`mb-3 flex ${message.role === "user" ? "justify-end" : "justify-start"}`}>
                         <div className={`max-w-[85%] select-text rounded-2xl px-3 py-2 text-sm ${message.role === "user" ? "whitespace-pre-wrap bg-basic-gradient text-white" : "bg-foreground/10"}`}>
-                            {message.role === "assistant" ? <ReactMarkdown components={markdownComponents}>{message.content}</ReactMarkdown> : message.content}
+                            {message.role === "assistant" ? <ReactMarkdown components={markdownComponents}>{normalizeAssistantMarkdown(message.content)}</ReactMarkdown> : message.content}
                         </div>
                     </div>)}
-                    {draft && <div className="mb-3 flex justify-start"><div className="max-w-[85%] select-text rounded-2xl bg-foreground/10 px-3 py-2 text-sm"><ReactMarkdown components={markdownComponents}>{draft}</ReactMarkdown></div></div>}
+                    {draft && <div className="mb-3 flex justify-start"><div className="max-w-[85%] select-text rounded-2xl bg-foreground/10 px-3 py-2 text-sm"><ReactMarkdown components={markdownComponents}>{normalizeAssistantMarkdown(draft)}</ReactMarkdown></div></div>}
                     {pending && <div className="mb-3 rounded-xl border border-amber-500/50 bg-amber-500/10 p-3 text-sm">
                         <p className="font-semibold">Allow this change?</p>
                         <p className="mt-2 whitespace-pre-line select-text text-xs">{formatMutationPreview(pending.call, pending.preview)}</p>
