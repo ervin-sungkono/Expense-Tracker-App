@@ -4,11 +4,11 @@
 @import "./_styles/navbar.css";
 @import "./_styles/toast.css";
 
-* {
-  -moz-user-select:none;
-  -webkit-user-select:none;
-  -ms-user-select:none;
-  user-select:none
+*:not(.select-text) {
+  -moz-user-select: none;
+  -webkit-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
 }
 
 :root {
@@ -16,10 +16,10 @@
   --foreground: #2b2b2b;
 
   /* place above navbar z-index */
-  --toastify-z-index: 10000; 
+  --toastify-z-index: 10000;
 }
 
-[data-theme='dark'] {
+[data-theme="dark"] {
   --background: #1b1b1b;
   --foreground: #ededed;
 }
@@ -53,9 +53,9 @@ body {
   /* Handle on hover */
   ::-webkit-scrollbar-thumb:hover {
     @apply bg-neutral-400;
-  } 
+  }
 
-  [data-theme='dark'] {
+  [data-theme="dark"] {
     /* Track */
     ::-webkit-scrollbar-track {
       @apply bg-neutral-700;
@@ -70,18 +70,18 @@ body {
 
 input::-webkit-outer-spin-button,
 input::-webkit-inner-spin-button {
-    /* display: none; <- Crashes Chrome on hover */
-    -webkit-appearance: none;
-    margin: 0; /* <-- Apparently some margin are still there even though it's hidden */
+  /* display: none; <- Crashes Chrome on hover */
+  -webkit-appearance: none;
+  margin: 0; /* <-- Apparently some margin are still there even though it's hidden */
 }
 
-input[type=number],
+input[type="number"],
 input[type="date"],
 input[type="datetime-local"] {
-    -moz-appearance:textfield; /* Firefox */
-    position: relative;
-    z-index: 2;
-    background: transparent;
+  -moz-appearance: textfield; /* Firefox */
+  position: relative;
+  z-index: 2;
+  background: transparent;
 }
 
 input[type="date"],
