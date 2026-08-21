@@ -2,8 +2,10 @@
 
 import { FormEvent, useEffect, useRef, useState } from "react";
 import { IoChatbubbleEllipses, IoClose, IoSend, IoTrash } from "react-icons/io5";
+import ReactMarkdown from "react-markdown";
 import { db, AssistantMessage, AssistantSession } from "@lib/db";
 import { executeLocalTool, previewLocalTool } from "@lib/assistant/tools";
+import { formatCurrency } from "@lib/utils";
 import {
     AssistantContent,
     AssistantContinuation,
@@ -16,6 +18,19 @@ const MAX_TOOL_ROUNDS = 6;
 const RECENT_MESSAGE_COUNT = 12;
 const MAX_SUMMARY_LENGTH = 6000;
 
+const markdownComponents = {
+    h1: ({ children }) => <h1 className="mb-2 text-lg font-bold">{children}</h1>,
+    h2: ({ children }) => <h2 className="mb-2 text-base font-bold">{children}</h2>,
+    h3: ({ children }) => <h3 className="mb-1 text-sm font-bold">{children}</h3>,
+    p: ({ children }) => <p className="mb-2 last:mb-0">{children}</p>,
+    ul: ({ children }) => <ul className="mb-2 list-disc space-y-1 pl-5 last:mb-0">{children}</ul>,
+    ol: ({ children }) => <ol className="mb-2 list-decimal space-y-1 pl-5 last:mb-0">{children}</ol>,
+    blockquote: ({ children }) => <blockquote className="mb-2 border-l-2 border-ocean-blue pl-3 italic opacity-80">{children}</blockquote>,
+    a: ({ children, href }) => <a href={href} target="_blank" rel="noreferrer" className="text-ocean-blue underline">{children}</a>,
+    pre: ({ children }) => <pre className="mb-2 overflow-x-auto rounded-lg bg-black/10 p-2 text-xs last:mb-0">{children}</pre>,
+    code: ({ children, className }) => <code className={`${className ?? ""} rounded bg-black/10 px-1 py-0.5 text-xs`}>{children}</code>,
+};
+
 type StoredState = {
     autoAllow?: boolean;
     compactedThrough?: number;
@@ -27,6 +42,112 @@ type PendingMutation = {
     preview: unknown;
     resolve: (approved: boolean) => void;
 };
+
+function record(value: unknown): Record<string, any> {
+    return value && typeof value === "object" ? value as Record<string, any> : {};
+}
+
+function readableValue(value: unknown) {
+    if (value === null || value === undefined || value === "") return "Not set";
+    if (typeof value === "boolean") return value ? "Yes" : "No";
+    return String(value);
+}
+
+function readableDate(value: unknown) {
+    if (typeof value !== "string") return readableValue(value);
+    const date = new Date(value);
+    return Number.isNaN(date.getTime()) ? value : date.toLocaleDateString(undefined, { dateStyle: "medium" });
+}
+
+function readableAmount(value: unknown) {
+    return typeof value === "number" && Number.isFinite(value) ? formatCurrency(value) : readableValue(value);
+}
+
+function changeLines(before: Record<string, any>, after: Record<string, any>, fields: string[]) {
+    const labels: Record<string, string> = {
+        date: "Date",
+        amount: "Amount",
+        type: "Type",
+        categoryId: "Category",
+        shopId: "Shop",
+        owner: "Owner",
+        remarks: "Notes",
+        name: "Name",
+        location: "Location",
+        parentId: "Parent category",
+    };
+    return fields
+        .filter(field => JSON.stringify(before[field]) !== JSON.stringify(after[field]))
+        .map(field => {
+            const format = field === "amount" ? readableAmount : field === "date" ? readableDate : readableValue;
+            return `${labels[field] ?? field}: ${format(before[field])} → ${format(after[field])}`;
+        });
+}
+
+function formatMutationPreview(call: ToolCall, preview: unknown) {
+    const result = record(preview);
+    const name = call.name.replace(/^xpensed_/, "");
+    const data = record(result.data);
+
+    if (name === "create_transaction") {
+        return [
+            `Create ${String(data.type ?? "").toLowerCase()} transaction`,
+            `Amount: ${readableAmount(data.amount)}`,
+            `Date: ${readableDate(data.date)}`,
+            `Category ID: ${readableValue(data.categoryId)}`,
+            `Shop ID: ${readableValue(data.shopId)}`,
+            data.remarks ? `Notes: ${data.remarks}` : "",
+        ].filter(Boolean).join("\n");
+    }
+
+    if (name === "update_transaction") {
+        const before = record(result.before);
+        const after = record(result.after);
+        return [`Update transaction #${readableValue(after.id ?? before.id)}`, ...changeLines(before, after, ["date", "amount", "type", "categoryId", "shopId", "owner", "remarks"])].join("\n");
+    }
+
+    if (name === "delete_transaction") {
+        const deleted = record(result.deleted);
+        return [`Delete transaction #${readableValue(deleted.id)}`, `Amount: ${readableAmount(deleted.amount)}`, `Date: ${readableDate(deleted.date)}`].join("\n");
+    }
+
+    if (name === "create_category") {
+        return [`Create ${String(data.type ?? "").toLowerCase()} category`, `Name: ${readableValue(data.name)}`, `Parent category ID: ${readableValue(data.parentId)}`].join("\n");
+    }
+
+    if (name === "update_category") {
+        const before = record(result.before);
+        const after = record(result.after);
+        return [`Update category #${readableValue(after.id ?? before.id)}`, ...changeLines(before, after, ["name", "type", "parentId"])].join("\n");
+    }
+
+    if (name === "delete_category") {
+        const category = record(result.category);
+        return [
+            `Delete category “${readableValue(category.name)}”`,
+            `Transactions removed: ${readableValue(result.transactionCount)}`,
+            `Budgets removed: ${readableValue(result.budgetCount)}`,
+            `Child categories removed: ${readableValue(result.childCategoryCount)}`,
+        ].join("\n");
+    }
+
+    if (name === "create_shop") {
+        return [`Create shop “${readableValue(data.name)}”`, `Location: ${readableValue(data.location)}`].join("\n");
+    }
+
+    if (name === "update_shop") {
+        const before = record(result.before);
+        const after = record(result.after);
+        return [`Update shop #${readableValue(after.id ?? before.id)}`, ...changeLines(before, after, ["name", "location"])].join("\n");
+    }
+
+    if (name === "delete_shop") {
+        const shop = record(result.shop);
+        return [`Delete shop “${readableValue(shop.name)}”`, `Transactions will be unlinked: ${readableValue(result.unlinkedTransactionCount)}`].join("\n");
+    }
+
+    return `Apply ${name.replaceAll("_", " ")} changes`;
+}
 
 function messageId() {
     return crypto.randomUUID();
@@ -279,16 +400,16 @@ export default function AssistantChat() {
                     </div>}
                     {messages.map(message => <div key={message.id} className={`mb-3 flex ${message.role === "user" ? "justify-end" : "justify-start"}`}>
                         <div className={`max-w-[85%] whitespace-pre-wrap select-text rounded-2xl px-3 py-2 text-sm ${message.role === "user" ? "bg-basic-gradient text-white" : "bg-foreground/10"}`}>
-                            {message.content}
+                            {message.role === "assistant" ? <ReactMarkdown components={markdownComponents}>{message.content}</ReactMarkdown> : message.content}
                         </div>
                     </div>)}
-                    {draft && <div className="mb-3 flex justify-start"><div className="max-w-[85%] whitespace-pre-wrap select-text rounded-2xl bg-foreground/10 px-3 py-2 text-sm">{draft}</div></div>}
+                    {draft && <div className="mb-3 flex justify-start"><div className="max-w-[85%] select-text rounded-2xl bg-foreground/10 px-3 py-2 text-sm"><ReactMarkdown components={markdownComponents}>{draft}</ReactMarkdown></div></div>}
                     {pending && <div className="mb-3 rounded-xl border border-amber-500/50 bg-amber-500/10 p-3 text-sm">
-                        <p className="font-semibold">Allow this local change?</p>
-                        <pre className="mt-2 max-h-40 overflow-auto whitespace-pre-wrap select-text text-xs">{JSON.stringify(pending.preview, null, 2)}</pre>
+                        <p className="font-semibold">Allow this change?</p>
+                        <p className="mt-2 whitespace-pre-line select-text text-xs">{formatMutationPreview(pending.call, pending.preview)}</p>
                         <div className="mt-3 flex justify-end gap-2">
                             <button type="button" onClick={() => finishApproval(false)} className="rounded-lg border border-foreground/20 px-3 py-1.5 cursor-pointer">Cancel</button>
-                            <button type="button" onClick={() => finishApproval(true)} className="rounded-lg bg-basic-gradient px-3 py-1.5 text-white cursor-pointer">Allow</button>
+                            <button type="button" onClick={() => finishApproval(true)} className="rounded-lg bg-basic-gradient px-3 py-1.5 text-white cursor-pointer">Allow changes</button>
                         </div>
                     </div>}
                     {status && <p className="mb-3 text-xs opacity-70">{status}</p>}
