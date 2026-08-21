@@ -22,9 +22,10 @@ const markdownComponents = {
     h1: ({ children }) => <h1 className="mb-2 text-lg font-bold">{children}</h1>,
     h2: ({ children }) => <h2 className="mb-2 text-base font-bold">{children}</h2>,
     h3: ({ children }) => <h3 className="mb-1 text-sm font-bold">{children}</h3>,
-    p: ({ children }) => <p className="mb-2 last:mb-0">{children}</p>,
-    ul: ({ children }) => <ul className="mb-2 list-disc space-y-1 pl-5 last:mb-0">{children}</ul>,
-    ol: ({ children }) => <ol className="mb-2 list-decimal space-y-1 pl-5 last:mb-0">{children}</ol>,
+    p: ({ children }) => <p className="mb-1 leading-5 last:mb-0">{children}</p>,
+    ul: ({ children }) => <ul className="my-0 list-disc pl-5 [&>li+li]:mt-1">{children}</ul>,
+    ol: ({ children }) => <ol className="my-0 list-decimal pl-5 [&>li+li]:mt-1">{children}</ol>,
+    li: ({ children }) => <li className="leading-5 [&>p]:mb-0 [&>p:empty]:hidden [&>ul]:my-0 [&>ol]:my-0">{children}</li>,
     blockquote: ({ children }) => <blockquote className="mb-2 border-l-2 border-ocean-blue pl-3 italic opacity-80">{children}</blockquote>,
     a: ({ children, href }) => <a href={href} target="_blank" rel="noreferrer" className="text-ocean-blue underline">{children}</a>,
     pre: ({ children }) => <pre className="mb-2 overflow-x-auto rounded-lg bg-black/10 p-2 text-xs last:mb-0">{children}</pre>,
@@ -373,13 +374,13 @@ export default function AssistantChat() {
         >
             <IoChatbubbleEllipses size={26}/>
         </button>
-        {open && <div className="fixed inset-0 z-fixed flex justify-end bg-black/40" onMouseDown={() => setOpen(false)}>
+        {open && <div className="fixed inset-0 z-fixed flex justify-end bg-black/40 animate-[fade-in_.2s_ease-out] motion-reduce:animate-none" onMouseDown={() => setOpen(false)}>
             <section
                 role="dialog"
                 aria-modal="true"
                 aria-label="Expense assistant"
                 onMouseDown={event => event.stopPropagation()}
-                className="flex h-full w-full max-w-md flex-col bg-background text-foreground shadow-2xl"
+                className="flex h-full w-full max-w-md flex-col bg-background text-foreground shadow-2xl animate-[assistant-drawer-in_.25s_ease-out] motion-reduce:animate-none"
             >
                 <header className="flex items-center gap-3 border-b border-foreground/15 px-4 py-3">
                     <div className="min-w-0 flex-1">
@@ -399,7 +400,7 @@ export default function AssistantChat() {
                         Ask about transactions, categories, or shops. I can also create, update, and delete them with your permission.
                     </div>}
                     {messages.map(message => <div key={message.id} className={`mb-3 flex ${message.role === "user" ? "justify-end" : "justify-start"}`}>
-                        <div className={`max-w-[85%] whitespace-pre-wrap select-text rounded-2xl px-3 py-2 text-sm ${message.role === "user" ? "bg-basic-gradient text-white" : "bg-foreground/10"}`}>
+                        <div className={`max-w-[85%] select-text rounded-2xl px-3 py-2 text-sm ${message.role === "user" ? "whitespace-pre-wrap bg-basic-gradient text-white" : "bg-foreground/10"}`}>
                             {message.role === "assistant" ? <ReactMarkdown components={markdownComponents}>{message.content}</ReactMarkdown> : message.content}
                         </div>
                     </div>)}

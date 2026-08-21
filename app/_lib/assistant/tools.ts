@@ -112,6 +112,12 @@ function isoDate(value: unknown, field = "date") {
     return date;
 }
 
+function inclusiveEndDate(value: unknown) {
+    const date = isoDate(value, "endDate");
+    if (typeof value === "string" && value.length === 10) date.setUTCHours(23, 59, 59, 999);
+    return date;
+}
+
 function dateText(value: unknown) {
     const date = value instanceof Date ? value : new Date(value as string);
     if (Number.isNaN(date.getTime())) throw new LocalToolError("Stored transaction date is invalid.");
@@ -314,7 +320,7 @@ async function listTransactions(input: Record<string, unknown>) {
     const category = categoryId === undefined ? null : await categoryById(requiredId(categoryId, "categoryId"));
     const shop = shopId === undefined ? null : await shopById(requiredId(shopId, "shopId"));
     const startDate = start === undefined ? null : isoDate(start, "startDate");
-    const endDate = end === undefined ? null : isoDate(end, "endDate");
+    const endDate = end === undefined ? null : inclusiveEndDate(end);
     if (startDate && endDate && startDate > endDate) throw new LocalToolError("startDate must not be after endDate.");
 
     const rows = await db.getAllTransactions();
