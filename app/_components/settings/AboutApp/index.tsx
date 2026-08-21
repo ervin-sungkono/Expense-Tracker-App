@@ -4,15 +4,18 @@ import { IoLogoGithub as GithubIcon, IoLogoLinkedin as LinkedInIcon } from 'reac
 export default function AboutApp() {
   return (
     <div className="flex flex-col grow">
-      <p className="text-center font-semibold text-sm md:text-base text-dark/80 dark:text-white/80 mb-4">
-        App version: {version}
-      </p>
-      <p className="text-sm md:text-base text-dark/80 dark:text-white/80 grow">
-        This app is an transaction tracker for tracking your transaction. It is built for offline
-        support with no remote database, meaning that none of your data here is stored outside the
-        application.
-      </p>
-      <p className="text-sm text-center mb-2">
+      <div className="mx-auto flex w-full max-w-xl flex-col gap-5 pt-3 text-center text-sm leading-6 text-dark/80 dark:text-white/80 md:text-base">
+        <p className="font-semibold">App version: {version}</p>
+        <p>
+          Xpensed is an offline-first expense tracker for personal and shared spaces. Track
+          transactions, categories, shops, and budgets wherever you are.
+        </p>
+        <p>
+          Use guest mode for local-only tracking, or sign in with Google to sync across devices,
+          collaborate with others, share read-only snapshots, and connect supported AI assistants.
+        </p>
+      </div>
+      <p className="mt-auto text-sm text-center mb-2">
         Developed by
         <br />
         <b className="text-lg">Ervin Cahyadinata Sungkono</b>
