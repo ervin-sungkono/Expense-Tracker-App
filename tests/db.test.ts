@@ -16,6 +16,36 @@ describe('ExpenseDB', () => {
     );
   });
 
+  it('stores assistant history per user and space', async () => {
+    const id = `${owner.userId}:${owner.spaceId}`;
+    await db.saveAssistantSession({
+      id,
+      userId: owner.userId,
+      spaceId: owner.spaceId,
+      transcript: [{ id: 'message', role: 'user', content: 'Hello' }],
+      summary: null,
+      state: {},
+      updatedAt: new Date().toISOString(),
+    });
+
+    expect(await db.getAssistantSession(id)).toMatchObject({
+      userId: owner.userId,
+      spaceId: owner.spaceId,
+      transcript: [{ content: 'Hello' }],
+    });
+  });
+
+  it('rejects updates to a cached record outside the active space', async () => {
+    const other = { userId: 'user-2', spaceId: 'space-2', role: 'admin' };
+    await db.configureContext(other);
+    const id = await db.addTransaction({ amount: 10, date: new Date() });
+    await db.configureContext(owner);
+
+    await expect(db.updateTransaction(id, { amount: 20, date: new Date() })).rejects.toThrow(
+      'does not belong to the active space'
+    );
+  });
+
   it('stores scoped transactions and queues an outbox mutation', async () => {
     const id = await db.addTransaction({
       amount: 200,
