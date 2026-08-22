@@ -76,6 +76,19 @@ Start Claude Code, run `/mcp`, select `xpensed`, and complete the browser authen
 If a CLI reports that the server needs authentication, use its MCP management command or UI to
 authenticate. Xpensed does not support static bearer-token configuration.
 
+## In-app assistant
+
+Signed-in Google users can open the Xpensed Assistant from an active space. The assistant and MCP
+server share the same validated expense-tool catalog. The in-app adapter uses the active UUID-based
+Dexie context, queues approved changes in the normal outbox, and lets the existing sync flow send
+them to Supabase under Row Level Security. It does not use the MCP OAuth token or MCP-only mutation
+RPCs.
+
+Conversation history stays in IndexedDB and is separated by user and space. Financial tool results
+may be sent to Gemini when needed for a request; guest and offline sessions cannot use the assistant.
+Every mutation requires an explicit confirmation, and user-authored tool data is treated as
+untrusted content rather than instructions.
+
 ## Environment variables
 
 Copy `.env.example` to `.env.local` for development and configure the same values in Vercel:
@@ -109,6 +122,8 @@ should remain `false` in production so MCP access is limited to OAuth clients.
 - Public links expose a bounded, sanitized read-only snapshot. MCP exposes bounded tools over OAuth;
   returned user-authored text is treated as untrusted data, and writes require user intent or a
   narrowly scoped preauthorized workflow.
+- The in-app assistant reuses the MCP tool contracts but executes against the active offline context;
+  approved mutations enter the same Supabase sync and RLS path as ordinary UI changes.
 
 ## Local development and verification
 
