@@ -29,6 +29,11 @@ const withPWA = withPWAInit({
         handler: 'NetworkOnly',
         options: { cacheName: 'mcp-network-only' },
       },
+      {
+        urlPattern: /\/api\/assistant(?:\/|$)/i,
+        handler: 'NetworkOnly',
+        options: { cacheName: 'assistant-network-only' },
+      },
     ],
   },
   disable: process.env.NODE_ENV === 'development',
@@ -73,6 +78,13 @@ const nextConfig = {
       },
       {
         source: '/api/mcp',
+        headers: [
+          { key: 'Cache-Control', value: 'private, no-store, max-age=0' },
+          { key: 'Referrer-Policy', value: 'no-referrer' },
+        ],
+      },
+      {
+        source: '/api/assistant',
         headers: [
           { key: 'Cache-Control', value: 'private, no-store, max-age=0' },
           { key: 'Referrer-Policy', value: 'no-referrer' },

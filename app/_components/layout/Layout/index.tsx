@@ -8,6 +8,9 @@ import { useAuth, useSpace } from '@components/providers/AppProvider';
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 import GuestMigrationDialog from '@components/guest/GuestMigrationDialog';
+import dynamic from 'next/dynamic';
+
+const AssistantChat = dynamic(() => import('@components/assistant/AssistantChat'), { ssr: false });
 
 export default function Layout({
   children,
@@ -45,6 +48,7 @@ export default function Layout({
         {children}
       </main>
       <GuestMigrationDialog />
+      <AssistantChat />
     </div>
   );
 }

@@ -2,7 +2,7 @@ import Dexie from 'dexie';
 import { isInAmountRange, isInDateRange } from './utils';
 
 const DB_NAME = 'XpensedLocal';
-const DB_VERSION = 2;
+const DB_VERSION = 3;
 
 function uuid() {
   return globalThis.crypto.randomUUID();
@@ -41,6 +41,7 @@ class ExpenseDB extends Dexie {
         '&mutationId, groupId, userId, spaceId, entityType, entityId, state, createdAt, [userId+spaceId+state]',
       conflicts: '&id, userId, spaceId, entityType, entityId, createdAt, [userId+spaceId]',
       syncCursors: '[userId+spaceId], userId, spaceId',
+      assistant: '&id, userId, spaceId',
     });
   }
 
@@ -179,11 +180,18 @@ class ExpenseDB extends Dexie {
     ) {
       throw new Error('Your role cannot change this data.');
     }
+    const existing = record.id ? await table.get(record.id) : null;
+    if (
+      existing &&
+      (existing.userId !== context.userId || existing.spaceId !== context.spaceId)
+    ) {
+      throw new Error('The record does not belong to the active space.');
+    }
     const mutationId = uuid();
     const next =
       operation === 'delete'
         ? { ...record, syncState: 'pending', deletedAt: now(), localUpdatedAt: now() }
-        : this._decorate(context, record, record.id ? await table.get(record.id) : {});
+        : this._decorate(context, record, existing ?? {});
 
     await this.transaction('rw', table, this.outbox, async () => {
       await table.put(next);
@@ -358,7 +366,7 @@ class ExpenseDB extends Dexie {
   }
 
   async deleteTransaction(id) {
-    const row = await this.transactions.get(id);
+    const row = (await this.getAllTransactions()).find(transaction => transaction.id === id);
     if (row) return this._queue(this.transactions, 'transaction', row, 'delete');
   }
 
@@ -368,7 +376,7 @@ class ExpenseDB extends Dexie {
   }
 
   async deleteShop(id) {
-    const row = await this.shops.get(id);
+    const row = (await this.getAllShops()).find(shop => shop.id === id);
     if (!row) return;
     const groupId = uuid();
     const transactions = (await this.getAllTransactions()).filter(item => item.shopId === id);
@@ -438,6 +446,18 @@ class ExpenseDB extends Dexie {
   }
 
   updateRepeatableBudgets() {}
+
+  async getAssistantSession(id) {
+    return this.assistant.get(id);
+  }
+
+  async saveAssistantSession(session) {
+    return this.assistant.put(session);
+  }
+
+  async clearAssistantSession(id) {
+    return this.assistant.delete(id);
+  }
 
   async seedCategories(categories) {
     const context = await this.getContext();
@@ -589,6 +609,7 @@ class ExpenseDB extends Dexie {
       this.conflicts.clear(),
       this.syncCursors.clear(),
       this.context.clear(),
+      this.assistant.clear(),
     ]);
   }
 }

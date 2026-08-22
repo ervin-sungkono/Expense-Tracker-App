@@ -4,11 +4,16 @@
 @import './_styles/navbar.css';
 @import './_styles/toast.css';
 
-* {
+*:not(.select-text) {
   -moz-user-select: none;
   -webkit-user-select: none;
   -ms-user-select: none;
   user-select: none;
+}
+
+@keyframes assistant-drawer-in {
+  from { transform: translateX(100%); }
+  to { transform: translateX(0); }
 }
 
 :root {
