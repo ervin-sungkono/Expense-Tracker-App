@@ -39,16 +39,18 @@ export default function Layout({
   const showNavbar = !hideNavbar && Boolean(activeSpace);
 
   return (
-    <div className="flex flex-col overflow-auto fixed top-0 left-0 bottom-0 right-0">
-      {showActionBar && <ActionBar />}
-      {showNavbar && <Navbar items={NAV_ITEMS} pathname={pathname} />}
-      <main
-        className={`relative w-full h-full overflow-x-hidden overflow-y-auto max-w-3xl px-6 ${showActionBar ? 'pt-4' : 'pt-6'} ${showNavbar ? 'mb-22' : 'pb-8'} mx-auto`}
-      >
-        {children}
-      </main>
-      <GuestMigrationDialog />
+    <>
+      <div className="flex flex-col overflow-auto fixed top-0 left-0 bottom-0 right-0">
+        {showActionBar && <ActionBar />}
+        {showNavbar && <Navbar items={NAV_ITEMS} pathname={pathname} />}
+        <main
+          className={`relative w-full h-full overflow-x-hidden overflow-y-auto max-w-3xl px-6 ${showActionBar ? 'pt-4' : 'pt-6'} ${showNavbar ? 'mb-22' : 'pb-8'} mx-auto`}
+        >
+          {children}
+        </main>
+        <GuestMigrationDialog />
+      </div>
       <AssistantChat />
-    </div>
+    </>
   );
 }
