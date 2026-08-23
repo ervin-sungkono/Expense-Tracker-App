@@ -27,7 +27,7 @@ export default function Page({
         <div
           className={`relative w-full h-full flex flex-col overflow-y-auto max-w-3xl bg-background px-6 pb-8 z-50 ${show ? 'animate-[slide-in_.35s_forwards_ease-in-out]' : 'animate-[slide-out_.35s_forwards_ease-in-out]'}`}
         >
-          <div className="relative h-14 md:h-16 flex gap-4 justify-center items-center">
+          <div className="relative h-14 md:h-16 flex gap-4 justify-center items-center shrink-0">
             {!hideBackButton && (
               <div
                 onClick={hideFn}

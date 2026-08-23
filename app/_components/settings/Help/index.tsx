@@ -68,7 +68,7 @@ function Section({ title, children }) {
 
 export default function Help() {
   return (
-    <div className="mx-auto flex w-full max-w-2xl flex-col gap-6 pb-10 pt-4 text-sm leading-6 text-dark/80 dark:text-white/80 md:gap-8 md:pt-8">
+    <div className="mx-auto flex w-full max-w-2xl flex-col gap-6 pb-10 text-sm leading-6 text-dark/80 dark:text-white/80 md:gap-8">
       <div className="mx-auto max-w-xl text-center">
         <p className="text-lg font-semibold text-dark dark:text-white">Get more from Xpensed</p>
         <p className="mt-2">Find the action bar options and connect a supported AI assistant when you are ready.</p>
