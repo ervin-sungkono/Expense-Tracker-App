@@ -106,10 +106,29 @@ export function executeExpenseTool(repository: ExpenseMcpRepository, name: strin
   return tool.run(repository, parseExpenseToolInput(tool, input) as never);
 }
 
+function toGeminiSchema(value: unknown): unknown {
+  if (Array.isArray(value)) return value.map(toGeminiSchema);
+  if (!value || typeof value !== 'object') return value;
+
+  const schema = Object.fromEntries(
+    Object.entries(value).map(([key, item]) => [key, toGeminiSchema(item)])
+  );
+  if (typeof schema.type === 'string' && 'const' in schema) {
+    schema.enum = [schema.const];
+    delete schema.const;
+  }
+  if (typeof schema.exclusiveMinimum === 'number') {
+    // ponytail: Gemini only supports inclusive minimum; Zod remains the strict validator.
+    schema.minimum = schema.type === 'integer' ? schema.exclusiveMinimum + 1 : schema.exclusiveMinimum;
+    delete schema.exclusiveMinimum;
+  }
+  return schema;
+}
+
 export function assistantToolDeclarations() {
   return assistantExpenseTools.map(tool => {
     const { space_id, cursor, ...assistantInput } = tool.inputSchema;
     const { $schema, ...parameters } = z.toJSONSchema(z.object(assistantInput).strict());
-    return { name: tool.name, description: tool.description, parameters };
+    return { name: tool.name, description: tool.description, parameters: toGeminiSchema(parameters) };
   });
 }

@@ -5,7 +5,11 @@ import {
   executeLocalAssistantTool,
   previewLocalAssistantTool,
 } from '@lib/assistant/tools';
-import { assistantExpenseTools, expenseToolCatalog } from '@lib/mcp/tool-catalog';
+import {
+  assistantExpenseTools,
+  assistantToolDeclarations,
+  expenseToolCatalog,
+} from '@lib/mcp/tool-catalog';
 
 const context = { userId: crypto.randomUUID(), spaceId: crypto.randomUUID(), role: 'admin' };
 
@@ -22,6 +26,20 @@ describe('local assistant', () => {
     expect(assistantExpenseTools.map(tool => tool.name)).not.toContain(
       'xpensed_create_transaction_from_email'
     );
+  });
+
+  it('generates Gemini-compatible tool schemas', () => {
+    const declarations = assistantToolDeclarations() as any[];
+    const schemas = JSON.stringify(declarations);
+    expect(schemas).not.toContain('"const"');
+    expect(schemas).not.toContain('"exclusiveMinimum"');
+    expect(
+      declarations.find(tool => tool.name === 'xpensed_list_categories').parameters.properties.type
+    ).toMatchObject({ enum: ['Expense'] });
+    expect(
+      declarations.find(tool => tool.name === 'xpensed_update_transaction').parameters.properties
+        .expected_version
+    ).toMatchObject({ minimum: 1 });
   });
 
   it('validates bounded conversation requests', () => {

@@ -138,6 +138,20 @@ function publicError(error: unknown): Extract<AssistantEvent, { type: 'error' }>
   return { type: 'error', code: 'model', message: 'The assistant could not complete the request.' };
 }
 
+function logModelError(error: unknown, requestId: string | null) {
+  const candidate = error as { name?: unknown; status?: unknown; code?: unknown; message?: unknown };
+  console.error(JSON.stringify({
+    level: 'error',
+    message: 'Assistant model request failed',
+    route: '/api/assistant',
+    requestId,
+    errorName: String(candidate?.name ?? 'Error'),
+    status: candidate?.status,
+    code: candidate?.code,
+    error: String(candidate?.message ?? error).slice(0, 1000),
+  }));
+}
+
 export async function POST(request: Request) {
   const originError = requireSameOrigin(request);
   if (originError) return originError;
@@ -211,6 +225,7 @@ export async function POST(request: Request) {
           finishReason: result.finishReason,
         });
       } catch (error) {
+        logModelError(error, request.headers.get('x-vercel-id'));
         emit(publicError(error));
       } finally {
         controller.close();
